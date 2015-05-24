@@ -16,7 +16,7 @@ How to run
 ----------
 
 .. code-block:: console
-   $ python ika.py
+   $ python run.py
 
 
 License

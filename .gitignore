@@ -57,4 +57,4 @@ docs/_build/
 target/
 
 # Configuration
-config.py
+config.json

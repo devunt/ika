@@ -2,8 +2,7 @@
 
 import asyncio
 
-import config
-from server import Server
+from ika.server import Server
 
 
 def main():
