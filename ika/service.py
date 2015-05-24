@@ -17,6 +17,6 @@ class Service:
     @property
     def description(self):
         if 'description' in self.__class__.__dict__:
-            return self.ident
+            return self.description
         else:
             return '사용법: /msg {0} 도움말'.format(self.name)
