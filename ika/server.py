@@ -15,7 +15,7 @@ class Server:
     def __init__(self):
         self.name = settings.server.name
         self.description = settings.server.description
-        self.uid = settings.server.uid
+        self.sid = settings.server.sid
         self.link = settings.link
 
     @asyncio.coroutine
@@ -23,7 +23,7 @@ class Server:
         self.reader, self.writer = yield from asyncio.open_connection(self.link.host, self.link.port)
         logger.debug('Connected')
         self.writeline('SERVER {0} {1} 0 {2} :{3}'.format(
-            self.name, self.link.password, self.uid, self.description
+            self.name, self.link.password, self.sid, self.description
         ))
         while 1:
             line = yield from self.readline()
@@ -32,7 +32,7 @@ class Server:
             if RE_SERVER.match(line):
                 _, command, *params = ircutils.parseline(line)
                 if command == b'PING':
-                    self.writeserverline('PONG {0} {1}'.format(self.uid, self.link.uid))
+                    self.writeserverline('PONG {0} {1}'.format(self.sid, self.link.sid))
             elif RE_USER.match(line):
                 continue
             else:
@@ -45,7 +45,7 @@ class Server:
                         self.writeline('ERROR :Server information doesn\'t match.')
                         break
                     else:
-                        self.link.uid = params[3].decode()
+                        self.link.sid = params[3].decode()
                         self.writeserverline('BURST {0}'.format(timeutils.unixtime()))
                         self.writeserverline('VERSION :{0} {1}'.format(Versions.IKA, self.name))
                         self.writeserverline('ENDBURST')
@@ -67,5 +67,5 @@ class Server:
         logger.debug('<<< {0}'.format(line))
 
     def writeserverline(self, line, *args, **kwargs):
-        prefix = ':{0} '.format(self.uid)
+        prefix = ':{0} '.format(self.sid)
         self.writeline(prefix + line, *args, **kwargs)

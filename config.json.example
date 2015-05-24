@@ -2,7 +2,7 @@
 	"server": {
 		"name": "services.ozinger.org",
 		"description": "Service bot - ika",
-		"uid": "XXX"
+		"sid": "XXX"
 	},
 	"link": {
 		"name": "kanade.irc.ozinger.org",
