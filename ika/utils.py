@@ -2,15 +2,17 @@ from time import time
 from easydict import EasyDict as edict
 
 
-def parse_ircline(line):
-    params = line.split()
-    retparams = list()
-    for x in range(1, len(params)):
-        if params[x].startswith(':'):
-            retparams.append(' '.join(params[x:])[1:])
-            break
-        retparams.append(params[x])
-    return retparams
+class ircutils:
+    @staticmethod
+    def parseline(line):
+        params = line.split()
+        retparams = list()
+        for x in range(0, len(params)):
+            if params[x].startswith(b':'):
+                retparams.append(b' '.join(params[x:])[1:])
+                break
+            retparams.append(params[x])
+        return retparams
 
 
 def unixtime():

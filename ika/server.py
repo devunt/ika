@@ -4,28 +4,26 @@ import re
 from ika.conf import settings
 from ika.constants import Versions
 from ika.logger import logger
+from ika.utils import ircutils
 
 
 RE_SERVER = re.compile(rb'^:(\w{3}) ')
 RE_USER = re.compile(rb'^:(\w{9}) ')
+
 
 class Server:
     def __init__(self):
         self.name = settings.server.name
         self.description = settings.server.description
         self.uid = settings.server.uid
-        self.link_name = settings.link.name
-        self.link_host = settings.link.host
-        self.link_port = settings.link.port
-        self.link_password = settings.link.password
+        self.link = settings.link
 
     @asyncio.coroutine
     def connect(self):
-        self.reader, self.writer = yield from asyncio.open_connection(self.link_host, self.link_port)
+        self.reader, self.writer = yield from asyncio.open_connection(self.link.host, self.link.port)
         logger.debug('Connected')
-        #self.writeline('CAPAB START {0}'.format(Versions.INSPIRCD_PROTOCOL))
         self.writeline('SERVER {0} {1} 0 {2} :{3}'.format(
-            self.name, self.link_password, self.uid, self.description
+            self.name, self.link.password, self.uid, self.description
         ))
         while 1:
             line = yield from self.readline()
@@ -36,7 +34,10 @@ class Server:
             elif RE_USER.match(line):
                 continue
             else:
-                continue
+                command, *params = ircutils.parseline(line)
+                if command == b'SERVER':
+                    assert params[0] == self.link.name.encode()
+                    assert params[1] == self.link.password.encode()
             # TODO: Implement each functions
         logger.debug('Disconnected')
 
