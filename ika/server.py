@@ -1,5 +1,8 @@
 import asyncio
+import inspect
 import re
+from collections import defaultdict
+from importlib import import_module
 
 from ika.conf import settings
 from ika.constants import Versions
@@ -17,6 +20,7 @@ class Server:
         self.description = settings.server.description
         self.sid = settings.server.sid
         self.link = settings.link
+        self.services = defaultdict(list)
 
     @asyncio.coroutine
     def connect(self):
@@ -48,6 +52,17 @@ class Server:
                         self.link.sid = params[3].decode()
                         self.writeserverline('BURST {0}'.format(timeutils.unixtime()))
                         self.writeserverline('VERSION :{0} {1}'.format(Versions.IKA, self.name))
+                        for services in self.services.values():
+                            for service in services:
+                                self.writeserverline('UID {uid} {timestamp} {nick} {host} {host} {ident} 0 {timestamp} + :{gecos}'.format(
+                                    uid=service.uid,
+                                    nick=service.name,
+                                    ident=service.ident,
+                                    host=settings.server.name,
+                                    gecos=service.description,
+                                    timestamp=timeutils.unixtime(),
+                                ))
+                                self.writeuserline(service.uid, 'OPERTYPE Services')
                         self.writeserverline('ENDBURST')
             # TODO: Implement each functions
         logger.debug('Disconnected')
@@ -69,3 +84,24 @@ class Server:
     def writeserverline(self, line, *args, **kwargs):
         prefix = ':{0} '.format(self.sid)
         self.writeline(prefix + line, *args, **kwargs)
+
+    def writeuserline(self, uid, line, *args, **kwargs):
+        prefix = ':{0} '.format(uid)
+        self.writeline(prefix + line, *args, **kwargs)
+
+    def register_services(self):
+        idx = 621937810 # int('AAAAAA', 36)
+        services = import_module('ika.services')
+        for modulename in services.modulenames:
+            module = import_module('.{0}'.format(modulename), 'ika.services')
+            classes = inspect.getmembers(module, lambda member: inspect.isclass(member)
+                and member.__module__ == 'ika.services.{0}'.format(modulename))
+            for clsname, cls in classes:
+                names = list(cls.aliases)
+                names.insert(0, cls.name)
+                for name in names:
+                    instance = cls()
+                    instance.id = ircutils.base36encode(idx)
+                    instance.name = name
+                    self.services[clsname].append(instance)
+                    idx += 1
