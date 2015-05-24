@@ -26,9 +26,9 @@ class Server:
     def connect(self):
         self.reader, self.writer = yield from asyncio.open_connection(self.link.host, self.link.port)
         logger.debug('Connected')
-        self.writeline('SERVER {0} {1} 0 {2} :{3}'.format(
+        self.writeline('SERVER {0} {1} 0 {2} :{3}',
             self.name, self.link.password, self.sid, self.description
-        ))
+        )
         while 1:
             line = yield from self.readline()
             if not line:
@@ -36,7 +36,7 @@ class Server:
             if RE_SERVER.match(line):
                 _, command, *params = ircutils.parseline(line)
                 if command == b'PING':
-                    self.writeserverline('PONG {0} {1}'.format(self.sid, self.link.sid))
+                    self.writeserverline('PONG {0} {1}', self.sid, self.link.sid)
             elif RE_USER.match(line):
                 continue
             else:
@@ -50,18 +50,18 @@ class Server:
                         break
                     else:
                         self.link.sid = params[3].decode()
-                        self.writeserverline('BURST {0}'.format(timeutils.unixtime()))
-                        self.writeserverline('VERSION :{0} {1}'.format(Versions.IKA, self.name))
+                        self.writeserverline('BURST {0}', timeutils.unixtime())
+                        self.writeserverline('VERSION :{0} {1}', Versions.IKA, self.name)
                         for services in self.services.values():
                             for service in services:
-                                self.writeserverline('UID {uid} {timestamp} {nick} {host} {host} {ident} 0 {timestamp} + :{gecos}'.format(
+                                self.writeserverline('UID {uid} {timestamp} {nick} {host} {host} {ident} 0 {timestamp} + :{gecos}',
                                     uid=service.uid,
                                     nick=service.name,
                                     ident=service.ident,
                                     host=settings.server.name,
                                     gecos=service.description,
                                     timestamp=timeutils.unixtime(),
-                                ))
+                                )
                                 self.writeuserline(service.uid, 'OPERTYPE Services')
                         self.writeserverline('ENDBURST')
             # TODO: Implement each functions
