@@ -4,7 +4,7 @@ import re
 from ika.conf import settings
 from ika.constants import Versions
 from ika.logger import logger
-from ika.utils import ircutils
+from ika.utils import ircutils, timeutils
 
 
 RE_SERVER = re.compile(rb'^:(\w{3}) ')
@@ -30,14 +30,25 @@ class Server:
             if not line:
                 break
             if RE_SERVER.match(line):
-                continue
+                _, command, *params = ircutils.parseline(line)
+                if command == b'PING':
+                    self.writeserverline('PONG {0} {1}'.format(self.uid, self.link.uid))
             elif RE_USER.match(line):
                 continue
             else:
                 command, *params = ircutils.parseline(line)
                 if command == b'SERVER':
-                    assert params[0] == self.link.name.encode()
-                    assert params[1] == self.link.password.encode()
+                    try:
+                        assert params[0] == self.link.name.encode()
+                        assert params[1] == self.link.password.encode()
+                    except AssertionError:
+                        self.writeline('ERROR :Server information doesn\'t match.')
+                        break
+                    else:
+                        self.link.uid = params[3].decode()
+                        self.writeserverline('BURST {0}'.format(timeutils.unixtime()))
+                        self.writeserverline('VERSION :{0} {1}'.format(Versions.IKA, self.name))
+                        self.writeserverline('ENDBURST')
             # TODO: Implement each functions
         logger.debug('Disconnected')
 
