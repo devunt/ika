@@ -9,5 +9,7 @@
 		"host": "127.0.0.1",
 		"port": 7002,
 		"password": "MTIzNA=="
-	}
+	},
+
+	"admin_channel": "#ika"
 }

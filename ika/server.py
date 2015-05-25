@@ -3,6 +3,7 @@ import inspect
 import re
 from importlib import import_module
 
+from ika.classes import Channel
 from ika.conf import settings
 from ika.constants import Versions
 from ika.logger import logger
@@ -22,6 +23,7 @@ class Server:
         self.services = dict()
         self.services_instances = list()
         self.uids = dict()
+        self.channels = dict()
 
     @asyncio.coroutine
     def connect(self):
@@ -33,11 +35,24 @@ class Server:
         while 1:
             line = yield from self.readline()
             if not line:
-                break
+                continue
             if RE_SERVER.match(line):
                 _, command, *params = ircutils.parseline(line)
                 if command == b'PING':
                     self.writeserverline('PONG {0} {1}', self.sid, self.link.sid)
+                elif command == b'ENDBURST':
+                    if settings.admin_channel.encode() in self.channels:
+                        timestamp = self.channels[settings.admin_channel.encode()].timestamp
+                    else:
+                        timestamp = timeutils.unixtime()
+                    self.writeserverline('FJOIN {0} {1} + :{2}', settings.admin_channel, timestamp,
+                        ' '.join(map(lambda x: 'o,{0}'.format(x), self.services.keys())))
+                elif command == b'FJOIN':
+                    channel = params[0]
+                    if channel in self.channels:
+                        self.channels[channel].update(*params)
+                    else:
+                        self.channels[channel] = Channel(*params)
             elif RE_USER.match(line):
                 uid, command, *params = ircutils.parseline(line)
                 uid = uid[1:]
@@ -79,7 +94,7 @@ class Server:
                                     uid=uid,
                                     nick=name,
                                     ident=service.ident,
-                                    host=settings.server.name,
+                                    host=self.name,
                                     gecos=service.description,
                                     timestamp=timeutils.unixtime(),
                                 )
