@@ -1,4 +1,4 @@
-from ika.service import Service
+from ika.classes import Service
 
 
 class NickServ(Service):
