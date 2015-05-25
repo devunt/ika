@@ -19,7 +19,7 @@ How to run
 
    $ pip install -r requirements.txt
    $ cp config.json.example config.json
-   $ vim config.json (or any of your favourite editor except emacs)
+   $ vim config.json # Or any of your favourite editor except emacs
    $ python run.py
 
 
