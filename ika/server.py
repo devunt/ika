@@ -1,7 +1,6 @@
 import asyncio
 import inspect
 import re
-from collections import defaultdict
 from importlib import import_module
 
 from ika.conf import settings
@@ -20,7 +19,9 @@ class Server:
         self.description = settings.server.description
         self.sid = settings.server.sid
         self.link = settings.link
-        self.services = defaultdict(list)
+        self.services = dict()
+        self.services_instances = list()
+        self.uids = dict()
 
     @asyncio.coroutine
     def connect(self):
@@ -52,17 +53,23 @@ class Server:
                         self.link.sid = params[3].decode()
                         self.writeserverline('BURST {0}', timeutils.unixtime())
                         self.writeserverline('VERSION :{0} {1}', Versions.IKA, self.name)
-                        for services in self.services.values():
-                            for service in services:
+                        idx = 621937810 # int('AAAAAA', 36)
+                        for service in self.services_instances:
+                            names = list(service.aliases)
+                            names.insert(0, service.name)
+                            for name in names:
+                                uid = '{0}{1}'.format(self.sid, ircutils.base36encode(idx))
                                 self.writeserverline('UID {uid} {timestamp} {nick} {host} {host} {ident} 0 {timestamp} + :{gecos}',
-                                    uid=service.uid,
-                                    nick=service.name,
+                                    uid=uid,
+                                    nick=name,
                                     ident=service.ident,
                                     host=settings.server.name,
                                     gecos=service.description,
                                     timestamp=timeutils.unixtime(),
                                 )
-                                self.writeuserline(service.uid, 'OPERTYPE Services')
+                                self.writeuserline(uid, 'OPERTYPE Services')
+                                self.services[uid] = service
+                                idx += 1
                         self.writeserverline('ENDBURST')
             # TODO: Implement each functions
         logger.debug('Disconnected')
@@ -90,18 +97,11 @@ class Server:
         self.writeline(prefix + line, *args, **kwargs)
 
     def register_services(self):
-        idx = 621937810 # int('AAAAAA', 36)
         services = import_module('ika.services')
         for modulename in services.modulenames:
             module = import_module('.{0}'.format(modulename), 'ika.services')
             classes = inspect.getmembers(module, lambda member: inspect.isclass(member)
                 and member.__module__ == 'ika.services.{0}'.format(modulename))
-            for clsname, cls in classes:
-                names = list(cls.aliases)
-                names.insert(0, cls.name)
-                for name in names:
-                    instance = cls()
-                    instance.id = ircutils.base36encode(idx)
-                    instance.name = name
-                    self.services[clsname].append(instance)
-                    idx += 1
+            for _, cls in classes:
+                instance = cls()
+                self.services_instances.append(instance)
