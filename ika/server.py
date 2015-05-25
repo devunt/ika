@@ -130,9 +130,10 @@ class Server:
     def register_services(self):
         services = import_module('ika.services')
         for modulename in services.modulenames:
-            module = import_module('.{0}'.format(modulename), 'ika.services')
-            classes = inspect.getmembers(module, lambda member: inspect.isclass(member)
-                and member.__module__ == 'ika.services.{0}'.format(modulename))
-            for _, cls in classes:
-                instance = cls()
+            if modulename in settings.services:
+                module = import_module('.{0}'.format(modulename), 'ika.services')
+                classes = inspect.getmembers(module, lambda member: inspect.isclass(member)
+                    and member.__module__ == 'ika.services.{0}'.format(modulename))
+                for _, cls in classes:
+                    instance = cls()
                 self.services_instances.append(instance)
