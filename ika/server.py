@@ -66,11 +66,13 @@ class Server:
                             except:
                                 logger.exception('Exception!')
                             else:
+                                if isinstance(results, str):
+                                    results = (results,)
                                 for result in results:
-                                    self.writeuserline(target_uid, result)
+                                    self.writeuserline(target_uid, 'NOTICE {0} :{1}', uid, result)
                         future = asyncio.Future()
                         future.add_done_callback(callback)
-                        asyncio.async(service.execute(future, params[1]))
+                        asyncio.async(service.process(future, params[1]))
             else:
                 command, *params = ircutils.parseline(line)
                 if command == 'SERVER':
@@ -135,8 +137,8 @@ class Server:
             except ImportError:
                 logger.exception('Missing module!')
             else:
-                classes = inspect.getmembers(module, lambda member: inspect.isclass(member)
-                    and member.__module__ == 'ika.services.{0}'.format(modulename))
-                for _, cls in classes:
-                    instance = cls()
+                _, cls = inspect.getmembers(module, lambda member: inspect.isclass(member)
+                    and member.__module__ == 'ika.services.{0}'.format(modulename))[0]
+                instance = cls()
+                instance.register_commands()
                 self.services_instances.append(instance)

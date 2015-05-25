@@ -11,10 +11,15 @@
 		"password": "MTIzNA=="
 	},
 
-	"services": [
-		"legacy.chanserv",
-		"legacy.nickserv"
-	],
+	"services": {
+		"ozinger": [
+			"test"
+		],
+		"legacy.chanserv": [
+		],
+		"legacy.nickserv": [
+		]
+	},
 
 	"admin_channel": "#ika"
 }
