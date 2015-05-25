@@ -14,11 +14,6 @@ class Channel:
             mode, uid = user.split(b',')
             self.users[uid] = mode
 
-        print(self.name)
-        print(self.timestamp)
-        print(self.modes)
-        print(self.users)
-
     def update(self, *params):
         pass
 
