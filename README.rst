@@ -18,6 +18,8 @@ How to run
 .. code-block:: console
 
    $ pip install -r requirements.txt
+   $ cp config.json.example config.json
+   $ vim config.json (or any of your favourite editor except emacs)
    $ python run.py
 
 
