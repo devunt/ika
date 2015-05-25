@@ -108,6 +108,8 @@ class Server:
     @asyncio.coroutine
     def readline(self):
         line = yield from self.reader.readline()
+        if line == b'':
+            raise RuntimeError('Disconnected')
         line = line.decode().rstrip('\r\n')
         logger.debug('>>> {0}'.format(line))
         return line

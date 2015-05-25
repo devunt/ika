@@ -11,8 +11,8 @@ def main():
     ika = Server()
     ika.register_services()
 
-    asyncio.async(ika.connect())
-    loop.run_forever()
+    loop.run_until_complete(ika.connect())
+    loop.close()
 
 
 if __name__ == '__main__':
