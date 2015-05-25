@@ -1,4 +1,7 @@
+import asyncio
+
 from ika.conf import settings
+
 
 class Service:
     aliases = []
@@ -20,3 +23,7 @@ class Service:
             return self.description
         else:
             return '사용법: /msg {0} 도움말'.format(self.name)
+
+    @asyncio.coroutine
+    def execute(self, future, line):
+        future.set_exception(RuntimeError('You must override `execute` method of service class'))

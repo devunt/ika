@@ -45,6 +45,17 @@ class Server:
                     target_uid = params[0].decode()
                     if target_uid[0:3] == self.sid:
                         service = self.services[target_uid]
+                        def callback(future):
+                            try:
+                                results = future.result()
+                            except:
+                                logger.exception('Exception!')
+                            else:
+                                for result in results:
+                                    self.writeuserline(target_uid, result)
+                        future = asyncio.Future()
+                        future.add_done_callback(callback)
+                        asyncio.async(service.execute(future, params[1]))
             else:
                 command, *params = ircutils.parseline(line)
                 if command == b'SERVER':
