@@ -39,7 +39,12 @@ class Server:
                 if command == b'PING':
                     self.writeserverline('PONG {0} {1}', self.sid, self.link.sid)
             elif RE_USER.match(line):
-                continue
+                uid, command, *params = ircutils.parseline(line)
+                uid = uid[1:]
+                if command in (b'PRIVMSG', b'NOTICE'):
+                    target_uid = params[0].decode()
+                    if target_uid[0:3] == self.sid:
+                        service = self.services[target_uid]
             else:
                 command, *params = ircutils.parseline(line)
                 if command == b'SERVER':
