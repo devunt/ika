@@ -128,10 +128,12 @@ class Server:
         self.writeline(prefix + line, *args, **kwargs)
 
     def register_services(self):
-        services = import_module('ika.services')
-        for modulename in services.modulenames:
-            if modulename in settings.services:
-                module = import_module('.{0}'.format(modulename), 'ika.services')
+        for modulename in settings.services:
+            try:
+                module = import_module('ika.services.{0}'.format(modulename))
+            except ImportError:
+                logger.exception('Missing module!')
+            else:
                 classes = inspect.getmembers(module, lambda member: inspect.isclass(member)
                     and member.__module__ == 'ika.services.{0}'.format(modulename))
                 for _, cls in classes:
