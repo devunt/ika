@@ -8,8 +8,8 @@ class ircutils:
         params = line.split()
         retparams = params[0:1]
         for x in range(1, len(params)):
-            if params[x].startswith(b':'):
-                retparams.append(b' '.join(params[x:])[1:])
+            if params[x].startswith(':'):
+                retparams.append(' '.join(params[x:])[1:])
                 break
             retparams.append(params[x])
         return retparams

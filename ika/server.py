@@ -10,8 +10,8 @@ from ika.logger import logger
 from ika.utils import ircutils, timeutils
 
 
-RE_SERVER = re.compile(rb'^:(\w{3}) ')
-RE_USER = re.compile(rb'^:(\w{9}) ')
+RE_SERVER = re.compile(r'^:(\w{3}) ')
+RE_USER = re.compile(r'^:(\w{9}) ')
 
 
 class Server:
@@ -38,16 +38,16 @@ class Server:
                 continue
             if RE_SERVER.match(line):
                 _, command, *params = ircutils.parseline(line)
-                if command == b'PING':
+                if command == 'PING':
                     self.writeserverline('PONG {0} {1}', self.sid, self.link.sid)
-                elif command == b'ENDBURST':
-                    if settings.admin_channel.encode() in self.channels:
-                        timestamp = self.channels[settings.admin_channel.encode()].timestamp
+                elif command == 'ENDBURST':
+                    if settings.admin_channel in self.channels:
+                        timestamp = self.channels[settings.admin_channel].timestamp
                     else:
                         timestamp = timeutils.unixtime()
                     self.writeserverline('FJOIN {0} {1} + :{2}', settings.admin_channel, timestamp,
                         ' '.join(map(lambda x: 'o,{0}'.format(x), self.services.keys())))
-                elif command == b'FJOIN':
+                elif command == 'FJOIN':
                     channel = params[0]
                     if channel in self.channels:
                         self.channels[channel].update(*params)
@@ -56,8 +56,8 @@ class Server:
             elif RE_USER.match(line):
                 uid, command, *params = ircutils.parseline(line)
                 uid = uid[1:]
-                if command in (b'PRIVMSG', b'NOTICE'):
-                    target_uid = params[0].decode()
+                if command in ('PRIVMSG', 'NOTICE'):
+                    target_uid = params[0]
                     if target_uid[0:3] == self.sid:
                         service = self.services[target_uid]
                         def callback(future):
@@ -73,15 +73,15 @@ class Server:
                         asyncio.async(service.execute(future, params[1]))
             else:
                 command, *params = ircutils.parseline(line)
-                if command == b'SERVER':
+                if command == 'SERVER':
                     try:
-                        assert params[0] == self.link.name.encode()
-                        assert params[1] == self.link.password.encode()
+                        assert params[0] == self.link.name
+                        assert params[1] == self.link.password
                     except AssertionError:
                         self.writeline('ERROR :Server information doesn\'t match.')
                         break
                     else:
-                        self.link.sid = params[3].decode()
+                        self.link.sid = params[3]
                         self.writeserverline('BURST {0}', timeutils.unixtime())
                         self.writeserverline('VERSION :{0} {1}', Versions.IKA, self.name)
                         idx = 621937810 # int('AAAAAA', 36)
@@ -108,15 +108,14 @@ class Server:
     @asyncio.coroutine
     def readline(self):
         line = yield from self.reader.readline()
-        line = line.rstrip(b'\r\n')
+        line = line.decode().rstrip('\r\n')
         logger.debug('>>> {0}'.format(line))
         return line
 
     def writeline(self, line, *args, **kwargs):
         if isinstance(line, str):
             line = line.format(*args, **kwargs)
-            line = line.encode()
-        self.writer.write(line + b'\r\n')
+        self.writer.write(line.encode() + b'\r\n')
         logger.debug('<<< {0}'.format(line))
 
     def writeserverline(self, line, *args, **kwargs):

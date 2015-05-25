@@ -11,7 +11,7 @@ class Channel:
         self.timestamp = int(params[1])
         self.modes = params[2]
         for user in params[3].split():
-            mode, uid = user.split(b',')
+            mode, uid = user.split(',')
             self.users[uid] = mode
 
     def update(self, *params):
