@@ -53,7 +53,7 @@ class Service:
             return '사용법: /msg {0} 도움말'.format(self.name)
 
     @asyncio.coroutine
-    def process(self, future, line):
+    def process_command(self, future, line):
         command, *params = line.split()
         if command in self.commands:
             asyncio.async(self.commands[command].execute(future, *params))

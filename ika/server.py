@@ -72,7 +72,7 @@ class Server:
                                     self.writeuserline(target_uid, 'NOTICE {0} :{1}', uid, result)
                         future = asyncio.Future()
                         future.add_done_callback(callback)
-                        asyncio.async(service.process(future, params[1]))
+                        asyncio.async(service.process_command(future, params[1]))
             else:
                 command, *params = ircutils.parseline(line)
                 if command == 'SERVER':
