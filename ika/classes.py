@@ -34,8 +34,8 @@ class Command:
 
 
 class Listener:
-    def __init__(self, server):
-        self.server = server
+    def __init__(self, service):
+        self.service = service
 
 
 class Service:
