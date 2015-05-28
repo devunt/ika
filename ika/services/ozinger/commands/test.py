@@ -10,6 +10,6 @@ class Test(Command):
     ]
 
     @asyncio.coroutine
-    def execute(self, future, *params):
-        future.set_result(' '.join(params))
+    def execute(self, uid, *params):
+        self.service.msg(uid, ' '.join(params))
         # Just repeat the lines

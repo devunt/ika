@@ -5,9 +5,11 @@ from easydict import EasyDict as edict
 class ircutils:
     @staticmethod
     def parseline(line):
+        if line[0] == ':':
+            line = line[1:]
         params = line.split()
-        retparams = params[0:1]
-        for x in range(1, len(params)):
+        retparams = list()
+        for x in range(0, len(params)):
             if params[x].startswith(':'):
                 retparams.append(' '.join(params[x:])[1:])
                 break

@@ -62,7 +62,7 @@ class Server:
                 if command == 'PRIVMSG':
                     target = params[0]
                     if target.startswith(self.sid):
-                        self.services[target].process_command(*params[1:])
+                        self.services[target].process_command(sender, *params[1:])
             else:
                 command, *params = ircutils.parseline(line)
                 sender = None
@@ -79,6 +79,7 @@ class Server:
                         self.writeserverline('VERSION :{0} {1}', Versions.IKA, self.name)
                         idx = 621937810 # int('AAAAAA', 36)
                         for service in self.services_instances:
+                            service.id = ircutils.base36encode(idx)
                             names = list(service.aliases)
                             names.insert(0, service.name)
                             for name in names:
@@ -132,6 +133,6 @@ class Server:
             else:
                 _, cls = inspect.getmembers(module, lambda member: inspect.isclass(member)
                     and member.__module__ == 'ika.services.{0}'.format(modulename))[0]
-                instance = cls()
-                instance.register_commands()
+                instance = cls(self)
+                instance.register_modules()
                 self.services_instances.append(instance)

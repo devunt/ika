@@ -2,4 +2,7 @@ from ika.classes import Service
 
 
 class ChanServ(Service):
-    name = 'ChanServ'
+    name = 'ㅇㅈㅇ'
+    aliases = [
+        'ChanServ',
+    ]
