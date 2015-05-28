@@ -4,7 +4,6 @@ from importlib import import_module
 
 from ika.conf import settings
 from ika.logger import logger
-from ika.event import EventHandler
 
 
 class Channel:
@@ -34,7 +33,7 @@ class Command:
         raise RuntimeError('You must override `execute` method of Command class')
 
 
-class Listner:
+class Listener:
     def __init__(self, server):
         self.server = server
 
@@ -91,7 +90,7 @@ class Service:
                     for name in names:
                         self.commands[name] = instance
                 elif isinstance(instance, Listener):
-                    for event in EventHandler.events:
+                    for event in self.server.ev.events:
                         if hasattr(instance, event):
-                            hook = getattr(self.ev, event)
+                            hook = getattr(self.server.ev, event)
                             hook += getattr(instance, event)

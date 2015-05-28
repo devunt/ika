@@ -44,6 +44,8 @@ class Server:
                 if command == 'PING':
                     self.writeserverline('PONG {0} {1}', self.sid, self.link.sid)
                 elif command == 'ENDBURST':
+                    for service in self.services_instances:
+                        service.register_modules()
                     if settings.admin_channel in self.channels:
                         timestamp = self.channels[settings.admin_channel].timestamp
                     else:
@@ -97,7 +99,7 @@ class Server:
                                 idx += 1
                         self.writeserverline('ENDBURST')
             if hasattr(self.ev, command):
-                getattr(self.ev, command).fire(*params, sender=sender)
+                getattr(self.ev, command).fire(sender, *params)
             # TODO: Implement each functions
         logger.debug('Disconnected')
 
@@ -134,5 +136,4 @@ class Server:
                 _, cls = inspect.getmembers(module, lambda member: inspect.isclass(member)
                     and member.__module__ == 'ika.services.{0}'.format(modulename))[0]
                 instance = cls(self)
-                instance.register_modules()
                 self.services_instances.append(instance)
