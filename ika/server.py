@@ -6,6 +6,7 @@ from importlib import import_module
 from ika.classes import Channel
 from ika.conf import settings
 from ika.constants import Versions
+from ika.event import EventHandler
 from ika.logger import logger
 from ika.utils import ircutils, timeutils
 
@@ -20,6 +21,7 @@ class Server:
         self.description = settings.server.description
         self.sid = settings.server.sid
         self.link = settings.link
+        self.ev = EventHandler()
         self.services = dict()
         self.services_instances = list()
         self.uids = dict()
@@ -37,7 +39,8 @@ class Server:
             if not line:
                 continue
             if RE_SERVER.match(line):
-                _, command, *params = ircutils.parseline(line)
+                server, command, *params = ircutils.parseline(line)
+                sender = server
                 if command == 'PING':
                     self.writeserverline('PONG {0} {1}', self.sid, self.link.sid)
                 elif command == 'ENDBURST':
@@ -55,26 +58,14 @@ class Server:
                         self.channels[channel] = Channel(*params)
             elif RE_USER.match(line):
                 uid, command, *params = ircutils.parseline(line)
-                uid = uid[1:]
-                if command in ('PRIVMSG', 'NOTICE'):
-                    target_uid = params[0]
-                    if target_uid[0:3] == self.sid:
-                        service = self.services[target_uid]
-                        def callback(future):
-                            try:
-                                results = future.result()
-                            except:
-                                logger.exception('Exception!')
-                            else:
-                                if isinstance(results, str):
-                                    results = (results,)
-                                for result in results:
-                                    self.writeuserline(target_uid, 'NOTICE {0} :{1}', uid, result)
-                        future = asyncio.Future()
-                        future.add_done_callback(callback)
-                        asyncio.async(service.process_command(future, params[1]))
+                sender = uid
+                if command == 'PRIVMSG':
+                    target = params[0]
+                    if target.startswith(self.sid):
+                        self.services[target].process_command(*params[1:])
             else:
                 command, *params = ircutils.parseline(line)
+                sender = None
                 if command == 'SERVER':
                     try:
                         assert params[0] == self.link.name
@@ -104,6 +95,8 @@ class Server:
                                 self.services[uid] = service
                                 idx += 1
                         self.writeserverline('ENDBURST')
+            if hasattr(self.ev, command):
+                getattr(self.ev, command).fire(*params, sender=sender)
             # TODO: Implement each functions
         logger.debug('Disconnected')
 
