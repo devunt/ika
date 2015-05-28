@@ -22,11 +22,11 @@ class Help(Command):
             if command in self.service.commands:
                 target = self.service.commands[command]
             else:
-                self.service.msg(uid, '해당 명령이 존재하지 않아 도움말을 찾을 수 없습니다. "/msg {} 도움말"을 입력해보세요.', self.service.name)
+                self.service.msg(uid, '해당 명령이 존재하지 않아 도움말을 찾을 수 없습니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.service.name)
                 return
-        self.service.msg(uid, '==== {} 도움말 ===='.format(target.name))
+        self.service.msg(uid, '==== \x02{}\x02 도움말 ====', target.name)
         if isinstance(target, Command):
-            self.service.msg(uid, '사용법: {} {}'.format(target.name, target.syntax))
+            self.service.msg(uid, '사용법: \x02/msg {} {} {}\x02', self.service.name, target.name, target.syntax)
         self.service.msg(uid, ' ')
         for description in target.description:
             self.service.msg(uid, description)
