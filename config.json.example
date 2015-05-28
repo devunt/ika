@@ -11,6 +11,8 @@
 		"password": "MTIzNA=="
 	},
 
+	"database": "sqlite:///ika.sqlite3",
+
 	"services": {
 		"ozinger": [
 			"welcome"
