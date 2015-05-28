@@ -91,7 +91,7 @@ class Server:
                                     nick=name,
                                     ident=service.ident,
                                     host=self.name,
-                                    gecos=service.description,
+                                    gecos=service.gecos,
                                     timestamp=timeutils.unixtime(),
                                 )
                                 self.writeuserline(uid, 'OPERTYPE Services')

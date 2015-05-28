@@ -23,6 +23,7 @@ class Channel:
 
 class Command:
     aliases = []
+    description = '설명이 없습니다.'
 
     def __init__(self, service):
         self.service = service
@@ -40,6 +41,7 @@ class Listener:
 
 class Service:
     aliases = []
+    description = '설명이 없습니다.'
     commands = dict()
 
     def __init__(self, server):
@@ -57,11 +59,8 @@ class Service:
             return self.__class__.__name__.lower()
 
     @property
-    def description(self):
-        if 'description' in self.__class__.__dict__:
-            return self.description
-        else:
-            return '사용법: /msg {0} 도움말'.format(self.name)
+    def gecos(self):
+        return '사용법: /msg {0} 도움말'.format(self.name)
 
     def msg(self, uid, line, *args, **kwargs):
         self.server.writeuserline(self.uid, 'NOTICE {0} :{1}'.format(uid, line), *args, **kwargs)
@@ -71,9 +70,15 @@ class Service:
         if command in self.commands:
             asyncio.async(self.commands[command].execute(uid, *params))
         else:
-            self.msg(uid, '존재하지 않는 명령어입니다. {0}', self.description)
+            self.msg(uid, '존재하지 않는 명령어입니다. "/msg {0} 도움말"을 입력해보세요.', self.name)
 
     def register_modules(self):
+        from ika.services.help import Help
+        help = Help(self)
+        names = list(help.aliases)
+        names.insert(0, help.name)
+        for name in names:
+            self.commands[name] = help
         service = self.__module__.lstrip('ika.services')
         for modulename in settings.services[service]:
             try:
