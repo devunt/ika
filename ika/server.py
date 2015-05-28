@@ -31,7 +31,7 @@ class Server:
     def connect(self):
         self.reader, self.writer = yield from asyncio.open_connection(self.link.host, self.link.port)
         logger.debug('Connected')
-        self.writeline('SERVER {0} {1} 0 {2} :{3}',
+        self.writeline('SERVER {} {} 0 {} :{}',
             self.name, self.link.password, self.sid, self.description
         )
         while 1:
@@ -42,7 +42,7 @@ class Server:
                 server, command, *params = ircutils.parseline(line)
                 sender = server
                 if command == 'PING':
-                    self.writeserverline('PONG {0} {1}', self.sid, self.link.sid)
+                    self.writeserverline('PONG {} {}', self.sid, self.link.sid)
                 elif command == 'ENDBURST':
                     for service in self.services_instances:
                         service.register_modules()
@@ -50,8 +50,8 @@ class Server:
                         timestamp = self.channels[settings.admin_channel].timestamp
                     else:
                         timestamp = timeutils.unixtime()
-                    self.writeserverline('FJOIN {0} {1} + :{2}', settings.admin_channel, timestamp,
-                        ' '.join(map(lambda x: 'o,{0}'.format(x), self.services.keys())))
+                    self.writeserverline('FJOIN {} {} + :{}', settings.admin_channel, timestamp,
+                        ' '.join(map(lambda x: 'o,{}'.format(x), self.services.keys())))
                 elif command == 'FJOIN':
                     channel = params[0]
                     if channel in self.channels:
@@ -77,15 +77,15 @@ class Server:
                         break
                     else:
                         self.link.sid = params[3]
-                        self.writeserverline('BURST {0}', timeutils.unixtime())
-                        self.writeserverline('VERSION :{0} {1}', Versions.IKA, self.name)
+                        self.writeserverline('BURST {}', timeutils.unixtime())
+                        self.writeserverline('VERSION :{} {}', Versions.IKA, self.name)
                         idx = 621937810 # int('AAAAAA', 36)
                         for service in self.services_instances:
                             service.id = ircutils.base36encode(idx)
                             names = list(service.aliases)
                             names.insert(0, service.name)
                             for name in names:
-                                uid = '{0}{1}'.format(self.sid, ircutils.base36encode(idx))
+                                uid = '{}{}'.format(self.sid, ircutils.base36encode(idx))
                                 self.writeserverline('UID {uid} {timestamp} {nick} {host} {host} {ident} 0 {timestamp} + :{gecos}',
                                     uid=uid,
                                     nick=name,
@@ -109,31 +109,31 @@ class Server:
         if line == b'':
             raise RuntimeError('Disconnected')
         line = line.decode().rstrip('\r\n')
-        logger.debug('>>> {0}'.format(line))
+        logger.debug('>>> {}'.format(line))
         return line
 
     def writeline(self, line, *args, **kwargs):
         if isinstance(line, str):
             line = line.format(*args, **kwargs)
         self.writer.write(line.encode() + b'\r\n')
-        logger.debug('<<< {0}'.format(line))
+        logger.debug('<<< {}'.format(line))
 
     def writeserverline(self, line, *args, **kwargs):
-        prefix = ':{0} '.format(self.sid)
+        prefix = ':{} '.format(self.sid)
         self.writeline(prefix + line, *args, **kwargs)
 
     def writeuserline(self, uid, line, *args, **kwargs):
-        prefix = ':{0} '.format(uid)
+        prefix = ':{} '.format(uid)
         self.writeline(prefix + line, *args, **kwargs)
 
     def register_services(self):
         for modulename in settings.services:
             try:
-                module = import_module('ika.services.{0}'.format(modulename))
+                module = import_module('ika.services.{}'.format(modulename))
             except ImportError:
                 logger.exception('Missing module!')
             else:
                 _, cls = inspect.getmembers(module, lambda member: inspect.isclass(member)
-                    and member.__module__ == 'ika.services.{0}'.format(modulename))[0]
+                    and member.__module__ == 'ika.services.{}'.format(modulename))[0]
                 instance = cls(self)
                 self.services_instances.append(instance)
