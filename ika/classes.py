@@ -7,9 +7,8 @@ from ika.logger import logger
 
 
 class Channel:
-    users = dict()
-
     def __init__(self, *params):
+        self.users = dict()
         self.name = params[0]
         self.timestamp = int(params[1])
         self.modes = params[2]
@@ -22,13 +21,12 @@ class Channel:
 
 
 class Command:
-    aliases = []
-    description = [
-        '설명이 없습니다.',
-    ]
-    syntax = ''
-
     def __init__(self, service):
+        self.aliases = []
+        self.description = [
+            '설명이 없습니다.',
+        ]
+        self.syntax = ''
         self.service = service
 
     @asyncio.coroutine
@@ -43,13 +41,12 @@ class Listener:
 
 
 class Service:
-    aliases = []
-    description = [
-        '설명이 없습니다.',
-    ]
-    commands = dict()
-
     def __init__(self, server):
+        self.aliases = []
+        self.description = [
+            '설명이 없습니다.',
+        ]
+        self.commands = dict()
         self.server = server
 
     @property
