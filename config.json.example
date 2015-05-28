@@ -1,6 +1,6 @@
 {
 	"server": {
-		"name": "services.ozinger.org",
+		"name": "ika.ozinger.org",
 		"description": "Service bot - ika",
 		"sid": "1KA"
 	},
@@ -13,7 +13,7 @@
 
 	"services": {
 		"ozinger": [
-			"test"
+			"welcome"
 		],
 		"legacy.chanserv": [
 		],
