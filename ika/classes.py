@@ -7,17 +7,34 @@ from ika.logger import logger
 
 
 class Channel:
-    def __init__(self, *params):
+    def __init__(self, users, *params):
         self.users = dict()
+        self.usermodes = dict()
         self.name = params[0]
         self.timestamp = int(params[1])
-        self.modes = params[2]
-        for user in params[3].split():
-            mode, uid = user.split(',')
-            self.users[uid] = mode
+        self.fjoin(users, *params)
 
-    def update(self, *params):
-        pass
+    def fjoin(self, users, *params):
+        self.modes = ' '.join(params[2:-1])[1:]
+        for usermode in params[-1].split():
+            mode, uid = usermode.split(',')
+            self.usermodes[uid] = mode
+            self.users[uid] = users[uid]
+            self.users[uid].channels[self.name] = self
+
+    def remove_user(self, user):
+        del self.users[user.uid]
+        del self.usermodes[user.uid]
+        del user.channels[self.name]
+
+
+class User:
+    def __init__(self, *params):
+        self.channels = dict()
+        self.uid, self.timestamp, self.nick, self.host, self.dhost, \
+            self.ident, self.ip, self.signon, self.modes, self.gecos = params
+        self.timestamp = int(self.timestamp)
+        self.signon = int(self.signon)
 
 
 class Command:

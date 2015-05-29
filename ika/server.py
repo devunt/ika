@@ -3,7 +3,7 @@ import inspect
 import re
 from importlib import import_module
 
-from ika.classes import Channel
+from ika.classes import Channel, User
 from ika.conf import settings
 from ika.constants import Versions
 from ika.event import EventHandler
@@ -24,7 +24,7 @@ class Server:
         self.ev = EventHandler()
         self.services = dict()
         self.services_instances = list()
-        self.uids = dict()
+        self.users = dict()
         self.channels = dict()
 
     @asyncio.coroutine
@@ -48,23 +48,36 @@ class Server:
                         service.register_modules()
                     if settings.admin_channel in self.channels:
                         timestamp = self.channels[settings.admin_channel].timestamp
+                        modes = self.channels[settings.admin_channel].modes
                     else:
                         timestamp = timeutils.unixtime()
-                    self.writeserverline('FJOIN {} {} + :{}', settings.admin_channel, timestamp,
+                        modes = ''
+                    self.writeserverline('FJOIN {} {} +{} :{}', settings.admin_channel, timestamp, modes,
                         ' '.join(map(lambda x: 'o,{}'.format(x), self.services.keys())))
+                elif command == 'UID':
+                    self.users[params[0]] = User(*params)
                 elif command == 'FJOIN':
                     channel = params[0]
                     if channel in self.channels:
-                        self.channels[channel].update(*params)
+                        self.channels[channel].fjoin(self.users, *params)
                     else:
-                        self.channels[channel] = Channel(*params)
+                        self.channels[channel] = Channel(self.users, *params)
             elif RE_USER.match(line):
                 uid, command, *params = ircutils.parseline(line)
                 sender = uid
+                user = self.users[uid]
                 if command == 'PRIVMSG':
                     target = params[0]
                     if target.startswith(self.sid):
                         self.services[target].process_command(sender, *params[1:])
+                elif command == 'PART':
+                    channel = params[0]
+                    if channel in self.channels:
+                        self.channels[channel].remove_user(user)
+                elif command == 'QUIT':
+                    for channel in self.users[uid].channels:
+                        channel.remove_user(user)
+                        del self.users[uid]
             else:
                 command, *params = ircutils.parseline(line)
                 sender = None
