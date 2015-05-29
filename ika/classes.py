@@ -38,12 +38,13 @@ class User:
 
 
 class Command:
+    aliases = []
+    description = [
+        '설명이 없습니다.',
+    ]
+    syntax = ''
+
     def __init__(self, service):
-        self.aliases = []
-        self.description = [
-            '설명이 없습니다.',
-        ]
-        self.syntax = ''
         self.service = service
 
     @asyncio.coroutine
@@ -58,11 +59,12 @@ class Listener:
 
 
 class Service:
+    aliases = []
+    description = [
+        '설명이 없습니다.',
+    ]
+
     def __init__(self, server):
-        self.aliases = []
-        self.description = [
-            '설명이 없습니다.',
-        ]
         self.commands = dict()
         self.server = server
 
