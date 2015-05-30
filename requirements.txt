@@ -1,2 +1,8 @@
 SQLAlchemy==1.0.4
+SQLAlchemy-Utils==0.30.7
+bcrypt==1.1.1
+cffi==1.1.0
 easydict==1.6
+passlib==1.6.2
+pycparser==2.13
+six==1.9.0
