@@ -1,6 +1,6 @@
 import asyncio
 
-from ika.classes import Command
+from ika.classes import Command, Service
 
 
 class Help(Command):
@@ -30,10 +30,10 @@ class Help(Command):
         self.service.msg(uid, ' ')
         for description in target.description:
             self.service.msg(uid, description)
-        self.service.msg(uid, ' ')
-
-        commands = list()
-        for _, command in self.service.commands.items():
-            if command not in commands:
-                commands.append(command)
-                self.service.msg(uid, '\x02{:\u3000<10}\x02{}', command.name, command.description[0])
+        if isinstance(target, Service):
+            self.service.msg(uid, ' ')
+            commands = list()
+            for _, command in self.service.commands.items():
+                if command not in commands:
+                    commands.append(command)
+                    self.service.msg(uid, '\x02{:\u3000<10}\x02{}', command.name, command.description[0])
