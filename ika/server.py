@@ -70,6 +70,8 @@ class Server:
                     target = params[0]
                     if target.startswith(self.sid):
                         self.services[target].process_command(sender, *params[1:])
+                elif command == 'NICK':
+                    user.nick = params[0]
                 elif command == 'PART':
                     channel = params[0]
                     if channel in self.channels:
