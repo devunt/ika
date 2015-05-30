@@ -5,13 +5,13 @@ from ika.classes import Command, Service
 
 class Help(Command):
     name = '도움말'
-    aliases = [
-        '도움'
-    ]
+    aliases = (
+        '도움',
+    )
     syntax = '[명령어 이름]'
-    description = [
+    description = (
         '특정 서비스봇이나 명령에 대한 도움말을 보여줍니다.',
-    ]
+    )
 
     @asyncio.coroutine
     def execute(self, uid, *params):

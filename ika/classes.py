@@ -38,10 +38,10 @@ class User:
 
 
 class Command:
-    aliases = []
-    description = [
+    aliases = ()
+    description = (
         '설명이 없습니다.',
-    ]
+    )
     syntax = ''
 
     def __init__(self, service):
@@ -59,10 +59,10 @@ class Listener:
 
 
 class Service:
-    aliases = []
-    description = [
+    aliases = ()
+    description = (
         '설명이 없습니다.',
-    ]
+    )
 
     def __init__(self, server):
         self.commands = dict()

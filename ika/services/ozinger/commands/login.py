@@ -7,17 +7,17 @@ from ika.database import Nick, User, Session
 
 class Register(Command):
     name = '로그인'
-    aliases = [
+    aliases = (
         '인증',
-    ]
+    )
     syntax = '[닉네임] <비밀번호>'
-    description = [
+    description = (
         '오징어 IRC 네트워크에 로그인합니다.',
         ' ',
         '이 명령을 사용할 시 오징어 IRC 네트워크에 이미 등록되어 있는 닉네임으로 로그인하며,',
         '그 뒤로 네트워크에서 제공하는 여러 편의 기능등을 이용하실 수 있습니다.',
         '네트워크에 새로운 닉네임을 등록하는 방법에 대해서는 \x02등록\x02 명령을 참고해주세요.',
-    ]
+    )
 
     @asyncio.coroutine
     def execute(self, uid, *params):
