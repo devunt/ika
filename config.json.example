@@ -15,7 +15,10 @@
 
 	"services": {
 		"ozinger": [
-			"welcome"
+			"check_registered",
+			"welcome",
+			"commands.login",
+			"commands.register"
 		],
 		"legacy.chanserv": [
 		],
