@@ -4,9 +4,12 @@ from ika.classes import Command
 
 
 class Test(Command):
-    name = "test"
+    name = "테스트"
     aliases = [
-        "테스트",
+        "test",
+    ]
+    description = [
+        "테스트 명령입니다.",
     ]
 
     @asyncio.coroutine
