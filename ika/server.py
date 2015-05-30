@@ -42,7 +42,7 @@ class Server:
                 server, command, *params = ircutils.parseline(line)
                 sender = server
                 if command == 'PING':
-                    self.writeserverline('PONG {} {}', self.sid, self.link.sid)
+                    self.writeserverline('PONG {} {}', params[1], params[0])
                 elif command == 'ENDBURST':
                     for service in self.services_instances:
                         service.register_modules()
