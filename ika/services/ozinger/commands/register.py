@@ -11,6 +11,7 @@ class Register(Command):
         '가입',
     )
     syntax = '<이메일 주소> <비밀번호>'
+    regex = r'(?P<email>\S+) (?P<password>\S+)'
     description = (
         '오징어 IRC 네트워크에 계정을 등록합니다.',
         ' ',
@@ -22,14 +23,14 @@ class Register(Command):
     )
 
     @asyncio.coroutine
-    def execute(self, uid, *params):
+    def execute(self, uid, email, password):
         nick = Nick()
         nick.name = self.service.server.users[uid].nick
         nick.last_use = datetime.now()
         account = Account()
-        account.email = params[0]
+        account.email = email
         account.name = nick
-        account.password = params[1]
+        account.password = password
         account.last_login = datetime.now()
         session = Session()
         session.add_all((nick, account))

@@ -11,6 +11,7 @@ class Register(Command):
         '인증',
     )
     syntax = '[계정명] <비밀번호>'
+    regex = r'((?P<name>\S+) )?(?P<password>\S+)'
     description = (
         '오징어 IRC 네트워크에 로그인합니다.',
         ' ',
@@ -20,17 +21,13 @@ class Register(Command):
     )
 
     @asyncio.coroutine
-    def execute(self, uid, *params):
+    def execute(self, uid, name, password):
         user = self.service.server.users[uid]
         if 'accountname' in user.metadata:
             self.service.msg(uid, '이미 \x02{}\x02 계정으로 로그인되어 있습니다.', user.metadata['accountname'])
             return
-        if len(params) == 1:
+        if name is None:
             name = user.nick
-            password = params[0]
-        else:
-            name = params[0]
-            password = params[1]
         session = Session()
         nick = session.query(Nick).filter_by(name=name).first()
         if nick:

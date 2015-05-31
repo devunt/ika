@@ -1,5 +1,6 @@
 import asyncio
 import inspect
+import re
 from importlib import import_module
 
 from ika.conf import settings
@@ -44,14 +45,24 @@ class Command:
         '설명이 없습니다.',
     )
     syntax = ''
+    regex = r''
 
     def __init__(self, service):
         self.service = service
 
     @asyncio.coroutine
-    def execute(self, uid, *params):
+    def execute(self, uid, **kwparams):
         self.service.msg(uid, '아직 구현되지 않은 명령어입니다.')
         raise RuntimeError('You must override `execute` method of Command class')
+
+    @asyncio.coroutine
+    def run(self, uid, param):
+        r = re.compile(r'^{}$'.format(self.regex))
+        m = r.match(param)
+        if m:
+            asyncio.async(self.execute(uid, **m.groupdict()))
+        else:
+            self.service.msg(uid, '사용법이 올바르지 않습니다. \x02/msg {} 도움말 {}\x02 를 입력해보세요.', self.service.name, self.name)
 
 
 class Listener:
@@ -88,9 +99,12 @@ class Service:
         self.server.writeuserline(self.uid, 'NOTICE {} :{}'.format(uid, line), *args, **kwargs)
 
     def process_command(self, uid, line):
-        command, *params = line.split()
+        split = line.split(maxsplit=1)
+        if len(split) == 1:
+            split.append('')
+        command, param = split
         if command in self.commands:
-            asyncio.async(self.commands[command].execute(uid, *params))
+            asyncio.async(self.commands[command].run(uid, param))
         else:
             self.msg(uid, '존재하지 않는 명령어입니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.name)
 
