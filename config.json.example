@@ -18,6 +18,7 @@
 			"check_registered",
 			"welcome",
 			"commands.login",
+			"commands.logout",
 			"commands.register"
 		],
 		"legacy.chanserv": [
