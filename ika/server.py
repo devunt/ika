@@ -56,6 +56,8 @@ class Server:
                         ' '.join(map(lambda x: 'o,{}'.format(x), self.services.keys())))
                 elif command == 'UID':
                     self.users[params[0]] = User(*params)
+                elif command == 'METADATA':
+                    self.users[params[0]].metadata[params[1]] = params[-1]
                 elif command == 'FJOIN':
                     channel = params[0]
                     if channel in self.channels:

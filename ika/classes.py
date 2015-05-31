@@ -30,6 +30,7 @@ class Channel:
 
 class User:
     def __init__(self, *params):
+        self.metadata = dict()
         self.channels = dict()
         self.uid, self.timestamp, self.nick, self.host, self.dhost, \
             self.ident, self.ip, self.signon, self.modes, self.gecos = params

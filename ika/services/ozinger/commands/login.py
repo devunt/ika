@@ -21,8 +21,12 @@ class Register(Command):
 
     @asyncio.coroutine
     def execute(self, uid, *params):
+        user = self.service.server.users[uid]
+        if 'accountname' in user.metadata:
+            self.service.msg(uid, '이미 \x02{}\x02 닉네임으로 로그인되어 있습니다.', user.metadata['accountname'])
+            return
         if len(params) == 1:
-            name = self.service.server.users[uid].nick
+            name = user.nick
             password = params[0]
         else:
             name = params[0]
@@ -37,5 +41,6 @@ class Register(Command):
                 session.commit()
                 self.service.msg(uid, '환영합니다! \x02{}\x02 닉네임으로 로그인되었습니다.', nick.user.name.name)
                 self.service.server.writeserverline('METADATA {} accountname :{}', uid, nick.user.name.name)
+                self.service.server.users[uid].metadata['accountname'] = nick.user.name.name
                 return
         self.service.msg(uid, '등록되지 않은 닉네임이거나 잘못된 비밀번호입니다. 닉네임이나 비밀번호를 모두 제대로 입력했는지 다시 한번 확인해주세요.')
