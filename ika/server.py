@@ -3,7 +3,7 @@ import inspect
 import re
 from importlib import import_module
 
-from ika.classes import Channel, User
+from ika.classes import Channel, Account
 from ika.conf import settings
 from ika.constants import Versions
 from ika.event import EventHandler
@@ -55,7 +55,7 @@ class Server:
                     self.writeserverline('FJOIN {} {} +{} :{}', settings.admin_channel, timestamp, modes,
                         ' '.join(map(lambda x: 'o,{}'.format(x), self.services.keys())))
                 elif command == 'UID':
-                    self.users[params[0]] = User(*params)
+                    self.users[params[0]] = Account(*params)
                 elif command == 'METADATA':
                     self.users[params[0]].metadata[params[1]] = params[-1]
                 elif command == 'FJOIN':

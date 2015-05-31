@@ -17,15 +17,15 @@ class Nick(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(32), unique=True)
     last_use = Column(DateTime)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    account_id = Column(Integer, ForeignKey('account.id'))
 
 
-class User(Base):
-    __tablename__ = 'user'
+class Account(Base):
+    __tablename__ = 'account'
     id = Column(Integer, primary_key=True)
     email = Column(String(255), unique=True)
-    name = relationship('Nick', uselist=False, backref='user')
-    aliases = relationship('Nick', backref='user_alias')
+    nick = relationship('Nick', uselist=False, backref='account')
+    aliases = relationship('Nick', backref='account_alias')
     password = Column(PasswordType(max_length=128,
         schemes=['bcrypt_sha256', 'md5_crypt'], deprecated=['md5_crypt']))
     last_login = Column(DateTime)
