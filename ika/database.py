@@ -16,16 +16,17 @@ class Nick(Base):
     __tablename__ = 'nick'
     id = Column(Integer, primary_key=True)
     name = Column(String(32), unique=True)
+    account_alias_id = Column(Integer, ForeignKey('account.id'))
+    account_alias = relationship('Account', foreign_keys='Nick.account_alias_id', backref='aliases')
     last_use = Column(DateTime)
-    account_id = Column(Integer, ForeignKey('account.id'))
 
 
 class Account(Base):
     __tablename__ = 'account'
     id = Column(Integer, primary_key=True)
     email = Column(String(255), unique=True)
-    nick = relationship('Nick', uselist=False, backref='account')
-    aliases = relationship('Nick', backref='account_alias')
+    name_id= Column(Integer, ForeignKey('nick.id'))
+    name = relationship('Nick', foreign_keys='Account.name_id', backref=backref('account', uselist=False))
     password = Column(PasswordType(max_length=128,
         schemes=['bcrypt_sha256', 'md5_crypt'], deprecated=['md5_crypt']))
     last_login = Column(DateTime)

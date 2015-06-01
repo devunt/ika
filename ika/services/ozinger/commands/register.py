@@ -24,15 +24,22 @@ class Register(Command):
 
     @asyncio.coroutine
     def execute(self, uid, email, password):
+        session = Session()
+
         nick = Nick()
         nick.name = self.service.server.users[uid].nick
         nick.last_use = datetime.now()
+
+        session.add(nick)
+        session.commit()
+
         account = Account()
         account.email = email
         account.name = nick
         account.password = password
         account.last_login = datetime.now()
-        session = Session()
-        session.add_all((nick, account))
+
+        session.add(account)
         session.commit()
-        self.service.msg(uid, '해당 닉네임 \x02{}\x02 의 계정 등록이 완료되었습니다. 앞으로 \x02/msg {} 로그인 {}\x02 명령을 통해 로그인할 수 있습니다. 지금 로그인 해보세요.', nick.name, self.service.name, params[1])
+
+        self.service.msg(uid, '해당 닉네임 \x02{}\x02 의 계정 등록이 완료되었습니다. 앞으로 \x02/msg {} 로그인 {}\x02 명령을 통해 로그인할 수 있습니다. 지금 로그인 해보세요.', nick.name, self.service.name, password)
