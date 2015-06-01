@@ -17,6 +17,7 @@
 		"ozinger": [
 			"check_registered",
 			"welcome",
+			"commands.change_password",
 			"commands.login",
 			"commands.logout",
 			"commands.register"
