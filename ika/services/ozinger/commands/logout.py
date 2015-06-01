@@ -17,7 +17,7 @@ class Register(Command):
     )
 
     @asyncio.coroutine
-    def execute(self, uid, *params):
+    def execute(self, uid):
         user = self.service.server.users[uid]
         if 'accountname' in user.metadata:
             self.service.server.writeserverline('METADATA {} accountname :', uid)
