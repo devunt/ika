@@ -66,12 +66,12 @@ class Server:
                         self.channels[channel] = Channel(self.users, *params)
             elif RE_USER.match(line):
                 uid, command, *params = ircutils.parseline(line)
-                sender = uid
                 user = self.users[uid]
+                sender = user
                 if command == 'PRIVMSG':
                     target = params[0]
                     if target.startswith(self.sid):
-                        self.services[target].process_command(sender, *params[1:])
+                        self.services[target].process_command(user, *params[1:])
                 elif command == 'OPERTYPE':
                     user.opertype = params[0]
                 elif command == 'NICK':

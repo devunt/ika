@@ -22,16 +22,15 @@ class Group(Command):
     )
 
     @asyncio.coroutine
-    def execute(self, uid):
-        user = self.service.server.users[uid]
+    def execute(self, user):
         accountname = user.metadata.get('accountname')
         session = Session()
         account = session.query(Account).filter(Nick.name == accountname).first()
         if len(account.aliases) >= 3:
-            self.service.msg(uid, '\x02{}\x02 계정에 등록할 수 있는 닉네임 제한을 초과했습니다 (3개).', account.name.name)
+            self.service.msg(user, '\x02{}\x02 계정에 등록할 수 있는 닉네임 제한을 초과했습니다 (3개).', account.name.name)
             return
         if session.query(exists().where(Nick.name == user.nick)).scalar():
-            self.service.msg(uid, '이미 등록되어 있는 닉네임입니다.')
+            self.service.msg(user, '이미 등록되어 있는 닉네임입니다.')
             return
         nick = Nick()
         nick.name = user.nick
@@ -41,4 +40,4 @@ class Group(Command):
         account.aliases.append(nick)
         session.add(account)
         session.commit()
-        self.service.msg(uid, '\x02{}\x02 계정에 \x02{}\x02 닉네임을 추가했습니다.', account.name.name, nick.name)
+        self.service.msg(user, '\x02{}\x02 계정에 \x02{}\x02 닉네임을 추가했습니다.', account.name.name, nick.name)

@@ -21,10 +21,9 @@ class Register(Command):
     )
 
     @asyncio.coroutine
-    def execute(self, uid, name, password):
-        user = self.service.server.users[uid]
+    def execute(self, user, name, password):
         if 'accountname' in user.metadata:
-            self.service.msg(uid, '이미 \x02{}\x02 계정으로 로그인되어 있습니다.', user.metadata['accountname'])
+            self.service.msg(user, '이미 \x02{}\x02 계정으로 로그인되어 있습니다.', user.metadata['accountname'])
             return
         if name is None:
             name = user.nick
@@ -36,8 +35,8 @@ class Register(Command):
                 nick.last_use = datetime.now()
                 account.last_login = datetime.now()
                 session.commit()
-                self.service.msg(uid, '환영합니다! \x02{}\x02 계정으로 로그인되었습니다.', account.name.name)
-                self.service.server.writeserverline('METADATA {} accountname :{}', uid, account.name.name)
+                self.service.msg(user, '환영합니다! \x02{}\x02 계정으로 로그인되었습니다.', account.name.name)
+                self.service.server.writeserverline('METADATA {} accountname :{}', user.uid, account.name.name)
                 user.metadata['accountname'] = account.name.name
                 return
-        self.service.msg(uid, '등록되지 않은 계정이거나 잘못된 비밀번호입니다. 계정명이나 비밀번호를 모두 제대로 입력했는지 다시 한번 확인해주세요.')
+        self.service.msg(user, '등록되지 않은 계정이거나 잘못된 비밀번호입니다. 계정명이나 비밀번호를 모두 제대로 입력했는지 다시 한번 확인해주세요.')

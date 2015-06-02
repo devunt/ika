@@ -54,24 +54,23 @@ class Command:
         self.service = service
 
     @asyncio.coroutine
-    def execute(self, uid, **kwparams):
-        self.service.msg(uid, '아직 구현되지 않은 명령어입니다.')
+    def execute(self, user, **kwparams):
+        self.service.msg(user, '아직 구현되지 않은 명령어입니다.')
         raise RuntimeError('You must override `execute` method of Command class')
 
     @asyncio.coroutine
-    def run(self, uid, param):
-        user = self.service.server.users[uid]
+    def run(self, user, param):
         if (self.permission is Permission.LOGIN_REQUIRED) and ('accountname' not in user.metadata):
-            self.service.msg(uid, '로그인되어 있지 않습니다. \x02/msg {} 로그인\x02 명령을 이용해 로그인해주세요.', self.service.name)
+            self.service.msg(user, '로그인되어 있지 않습니다. \x02/msg {} 로그인\x02 명령을 이용해 로그인해주세요.', self.service.name)
         elif (self.permission is Permission.OPERATOR) and (user.opertype != 'NetAdmin'):
-            self.service.msg(uid, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
+            self.service.msg(user, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
         else:
             r = re.compile(r'^{}$'.format(self.regex))
             m = r.match(param)
             if m:
-                asyncio.async(self.execute(uid, **m.groupdict()))
+                asyncio.async(self.execute(user, **m.groupdict()))
             else:
-                self.service.msg(uid, '사용법이 올바르지 않습니다. \x02/msg {} 도움말 {}\x02 를 입력해보세요.', self.service.name, self.name)
+                self.service.msg(user, '사용법이 올바르지 않습니다. \x02/msg {} 도움말 {}\x02 를 입력해보세요.', self.service.name, self.name)
 
 
 class Listener:
@@ -104,18 +103,22 @@ class Service:
     def gecos(self):
         return '사용법: /msg {} 도움말'.format(self.name)
 
-    def msg(self, uid, line, *args, **kwargs):
+    def msg(self, user_or_uid, line, *args, **kwargs):
+        if isinstance(user_or_uid, User):
+            uid = user_or_uid.uid
+        else:
+            uid = user_or_uid
         self.server.writeuserline(self.uid, 'NOTICE {} :{}'.format(uid, line), *args, **kwargs)
 
-    def process_command(self, uid, line):
+    def process_command(self, user, line):
         split = line.split(maxsplit=1)
         if len(split) == 1:
             split.append('')
         command, param = split
         if command in self.commands:
-            asyncio.async(self.commands[command].run(uid, param))
+            asyncio.async(self.commands[command].run(user, param))
         else:
-            self.msg(uid, '존재하지 않는 명령어입니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.name)
+            self.msg(user, '존재하지 않는 명령어입니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.name)
 
     def register_modules(self):
         from ika.services.help import Help

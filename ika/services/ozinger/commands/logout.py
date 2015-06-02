@@ -19,8 +19,7 @@ class Register(Command):
     )
 
     @asyncio.coroutine
-    def execute(self, uid):
-        user = self.service.server.users[uid]
-        self.service.server.writeserverline('METADATA {} accountname :', uid)
+    def execute(self, user):
+        self.service.server.writeserverline('METADATA {} accountname :', user.uid)
         del user.metadata['accountname']
-        self.service.msg(uid, '로그아웃했습니다.')
+        self.service.msg(user, '로그아웃했습니다.')

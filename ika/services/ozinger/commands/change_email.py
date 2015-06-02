@@ -21,14 +21,13 @@ class ChangeEmail(Command):
     )
 
     @asyncio.coroutine
-    def execute(self, uid, password, new_email):
-        user = self.service.server.users[uid]
+    def execute(self, user, password, new_email):
         accountname = user.metadata.get('accountname')
         session = Session()
         account = session.query(Account).filter(Nick.name == accountname).first()
         if account.password == password:
             account.email = new_email
             session.commit()
-            self.service.msg(uid, '\x02{}\x02 계정의 이메일이 \x02{}\x02 로 변경되었습니다.', account.name.name, new_email)
+            self.service.msg(user, '\x02{}\x02 계정의 이메일이 \x02{}\x02 로 변경되었습니다.', account.name.name, new_email)
         else:
-            self.service.msg(uid, '\x02{}\x02 계정의 비밀번호와 일치하지 않습니다.', account.name.name)
+            self.service.msg(user, '\x02{}\x02 계정의 비밀번호와 일치하지 않습니다.', account.name.name)
