@@ -30,9 +30,6 @@ class Register(Command):
         nick.name = user.nick
         nick.last_use = datetime.now()
 
-        session.add(nick)
-        session.commit()
-
         account = Account()
         account.email = email
         account.name = nick

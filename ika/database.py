@@ -3,7 +3,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship, validates
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy_utils import PasswordType
 
 from ika.conf import settings
@@ -38,4 +38,5 @@ class Account(Base):
 
 
 engine = create_engine(settings.database)
-Session = sessionmaker(bind=engine)
+session_factory = sessionmaker(bind=engine)
+Session = scoped_session(session_factory)
