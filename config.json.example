@@ -15,14 +15,15 @@
 
 	"services": {
 		"ozinger": [
-			"check_registered",
-			"welcome",
 			"commands.change_email",
 			"commands.change_name",
 			"commands.change_password",
 			"commands.login",
 			"commands.logout",
-			"commands.register"
+			"commands.register",
+
+			"events.welcome",
+			"events.check_registered"
 		],
 		"legacy.chanserv": [
 		],
