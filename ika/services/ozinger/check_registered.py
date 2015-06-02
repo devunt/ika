@@ -14,7 +14,8 @@ class CheckRegistered(Listener):
 
     @asyncio.coroutine
     def NICK(self, user, *params):
-        self.check(user.uid, params[0])
+        if user.account is None:
+            self.check(user.uid, params[0])
 
     @asyncio.coroutine
     def UID(self, server, *params):
