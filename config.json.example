@@ -18,6 +18,7 @@
 			"check_registered",
 			"welcome",
 			"commands.change_email",
+			"commands.change_name",
 			"commands.change_password",
 			"commands.login",
 			"commands.logout",
