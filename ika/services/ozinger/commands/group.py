@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy.sql import exists
 
 from ika.classes import Command
+from ika.enums import Permission
 from ika.database import Nick, Account, Session
 
 
@@ -12,6 +13,7 @@ class Group(Command):
         '닉네임추가',
         '닉추가',
     )
+    permission = Permission.LOGIN_REQUIRED
     description = (
         '현재 오징어 IRC 네트워크에 로그인되어 있는 계정에 현재 사용중인 닉네임을 추가합니다.',
         ' ',
@@ -23,9 +25,6 @@ class Group(Command):
     def execute(self, uid):
         user = self.service.server.users[uid]
         accountname = user.metadata.get('accountname')
-        if accountname is None:
-            self.service.msg(uid, '로그인되어 있지 않습니다. \x02/msg {} 로그인\x02 명령을 이용해 로그인해주세요.', self.service.name)
-            return
         session = Session()
         account = session.query(Account).filter(Nick.name == accountname).first()
         if len(account.aliases) >= 3:

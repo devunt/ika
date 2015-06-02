@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime
 
 from ika.classes import Command
+from ika.enums import Permission
 from ika.database import Nick, Account, Session
 
 
@@ -10,6 +11,7 @@ class Register(Command):
     aliases = (
         '인증해제',
     )
+    permission = Permission.LOGIN_REQUIRED
     description = (
         '오징어 IRC 네트워크에서 로그아웃합니다.',
         ' ',
@@ -19,7 +21,6 @@ class Register(Command):
     @asyncio.coroutine
     def execute(self, uid):
         user = self.service.server.users[uid]
-        if 'accountname' in user.metadata:
-            self.service.server.writeserverline('METADATA {} accountname :', uid)
-            del user.metadata['accountname']
-            self.service.msg(uid, '로그아웃했습니다.')
+        self.service.server.writeserverline('METADATA {} accountname :', uid)
+        del user.metadata['accountname']
+        self.service.msg(uid, '로그아웃했습니다.')

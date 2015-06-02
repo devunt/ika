@@ -4,6 +4,7 @@ import re
 from importlib import import_module
 
 from ika.conf import settings
+from ika.enums import Permission
 from ika.logger import logger
 
 
@@ -46,6 +47,7 @@ class Command:
     )
     syntax = ''
     regex = r''
+    permission = Permission.EVERYONE
 
     def __init__(self, service):
         self.service = service
@@ -57,12 +59,18 @@ class Command:
 
     @asyncio.coroutine
     def run(self, uid, param):
-        r = re.compile(r'^{}$'.format(self.regex))
-        m = r.match(param)
-        if m:
-            asyncio.async(self.execute(uid, **m.groupdict()))
+        user = self.service.server.users[uid]
+        if (self.permission is Permission.LOGIN_REQUIRED) and ('accountname' not in user.metadata):
+            self.service.msg(uid, '로그인되어 있지 않습니다. \x02/msg {} 로그인\x02 명령을 이용해 로그인해주세요.', self.service.name)
+        elif (self.permission is Permission.OPERATOR) and (user.opertype != 'NetAdmin'):
+            self.service.msg(uid, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
         else:
-            self.service.msg(uid, '사용법이 올바르지 않습니다. \x02/msg {} 도움말 {}\x02 를 입력해보세요.', self.service.name, self.name)
+            r = re.compile(r'^{}$'.format(self.regex))
+            m = r.match(param)
+            if m:
+                asyncio.async(self.execute(uid, **m.groupdict()))
+            else:
+                self.service.msg(uid, '사용법이 올바르지 않습니다. \x02/msg {} 도움말 {}\x02 를 입력해보세요.', self.service.name, self.name)
 
 
 class Listener:

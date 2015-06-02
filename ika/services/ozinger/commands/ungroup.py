@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy.sql import exists
 
 from ika.classes import Command
+from ika.enums import Permission
 from ika.database import Nick, Account, Session
 
 
@@ -14,6 +15,7 @@ class Ungroup(Command):
     )
     syntax = '[제거할 닉네임]'
     regex = r'(?P<name>\S+)?'
+    permission = Permission.LOGIN_REQUIRED
     description = (
         '현재 오징어 IRC 네트워크에 로그인되어 있는 계정에서 닉네임을 제거합니다.',
         ' ',
@@ -25,9 +27,6 @@ class Ungroup(Command):
     def execute(self, uid, name):
         user = self.service.server.users[uid]
         accountname = user.metadata.get('accountname')
-        if accountname is None:
-            self.service.msg(uid, '로그인되어 있지 않습니다. \x02/msg {} 로그인\x02 명령을 이용해 로그인해주세요.', self.service.name)
-            return
         if name is None:
             name = user.nick
         session = Session()
