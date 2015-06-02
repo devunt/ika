@@ -61,11 +61,10 @@ class Server:
                     if params[1] == 'accountname':
                         session = Session()
                         account = session.query(Account).filter(Nick.name == params[-1]).first()
-                        if account is not None:
-                            self.users[params[0]].account = account
+                        if (account is not None) and (account.name.name == params[-1]):
                             self.users[params[0]].metadata['accountname'] = account.name.name
                         else:
-                            self.sendserverline('METADATA {} accountname :', params[0])
+                            self.writeserverline('METADATA {} accountname :', params[0])
                     else:
                         self.users[params[0]].metadata[params[1]] = params[-1]
                 elif command == 'FJOIN':

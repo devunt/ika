@@ -5,6 +5,7 @@ from importlib import import_module
 
 from ika.conf import settings
 from ika.enums import Permission
+from ika.database import Account, Nick, Session
 from ika.logger import logger
 
 
@@ -39,7 +40,13 @@ class User:
         self.timestamp = int(self.timestamp)
         self.signon = int(self.signon)
         self.opertype = None
-        self.account = None
+
+    @property
+    def account(self):
+        name = self.metadata.get('accountname')
+        if name is not None:
+            return Session().query(Account).filter(Nick.name==name).first()
+        return None
 
 
 class Command:
