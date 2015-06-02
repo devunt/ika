@@ -30,7 +30,7 @@ class Channel:
         del user.channels[self.name]
 
 
-class Account:
+class User:
     def __init__(self, *params):
         self.metadata = dict()
         self.channels = dict()
