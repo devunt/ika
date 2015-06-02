@@ -10,6 +10,7 @@ Dependency
 ----------
 
 * Python >= 3.4.0
+* see ``requirements.txt``
 
 
 How to run
