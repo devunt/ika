@@ -38,6 +38,7 @@ class User:
             self.ident, self.ip, self.signon, self.modes, self.gecos = params
         self.timestamp = int(self.timestamp)
         self.signon = int(self.signon)
+        self.opertype = None
 
 
 class Command:
