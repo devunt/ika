@@ -27,7 +27,6 @@ class ChangePassword(Command):
         session = Session()
         if user.account.password == password:
             user.account.password = new_password
-            session.add(user.account)
             session.commit()
             self.service.msg(user, '\x02{}\x02 계정의 비밀번호가 \x02{}\x02 로 변경되었습니다.', user.account.name.name, new_password)
         else:
