@@ -39,6 +39,7 @@ class User:
         self.timestamp = int(self.timestamp)
         self.signon = int(self.signon)
         self.opertype = None
+        self.account = None
 
 
 class Command:

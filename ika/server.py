@@ -6,6 +6,7 @@ from importlib import import_module
 from ika.classes import Channel, User
 from ika.conf import settings
 from ika.constants import Versions
+from ika.database import Account, Nick, Session
 from ika.event import EventHandler
 from ika.logger import logger
 from ika.utils import ircutils, timeutils
@@ -57,7 +58,16 @@ class Server:
                 elif command == 'UID':
                     self.users[params[0]] = User(*params)
                 elif command == 'METADATA':
-                    self.users[params[0]].metadata[params[1]] = params[-1]
+                    if params[1] == 'accountname':
+                        session = Session()
+                        account = session.query(Account).filter(Nick.name == params[-1]).first()
+                        if account is not None:
+                            self.users[params[0]].account = account
+                            self.users[params[0]].metadata['accountname'] = account.name.name
+                        else:
+                            self.sendserverline('METADATA {} accountname :', params[0])
+                    else:
+                        self.users[params[0]].metadata[params[1]] = params[-1]
                 elif command == 'FJOIN':
                     channel = params[0]
                     if channel in self.channels:

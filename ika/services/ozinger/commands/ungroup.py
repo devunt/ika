@@ -25,18 +25,16 @@ class Ungroup(Command):
 
     @asyncio.coroutine
     def execute(self, user, name):
-        accountname = user.metadata.get('accountname')
         if name is None:
             name = user.nick
         session = Session()
-        account = session.query(Account).filter(Nick.name == accountname).first()
         nick = session.query(Nick).filter(Nick.name == name).first()
         if nick is None:
-            self.service.msg(user, '\x02{}\x02 계정에 \x02{}\x02 닉네임이 등록되어 있지 않습니다.', accountname, name)
+            self.service.msg(user, '\x02{}\x02 계정에 \x02{}\x02 닉네임이 등록되어 있지 않습니다.', user.account.name.name, name)
         elif account.name is nick:
             self.service.msg(user, '\x02{}\x02 닉네임이 해당 계정의 기본 닉네임으로 지정되어 있어 제거할 수 없습니다. 기본 닉네임을 수정해주세요.', name)
         else:
-            account.aliases.remove(nick)
-            session.add(account)
+            user.account.aliases.remove(nick)
+            session.add(user.account)
             session.commit()
-            self.service.msg(user, '\x02{}\x02 계정에서 \x02{}\x02 닉네임을 제거했습니다.', accountname, name)
+            self.service.msg(user, '\x02{}\x02 계정에서 \x02{}\x02 닉네임을 제거했습니다.', user.account.name.name, name)

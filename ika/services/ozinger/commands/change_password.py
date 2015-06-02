@@ -24,12 +24,10 @@ class ChangePassword(Command):
 
     @asyncio.coroutine
     def execute(self, user, password, new_password):
-        accountname = user.metadata.get('accountname')
         session = Session()
-        account = session.query(Account).filter(Nick.name == accountname).first()
-        if account.password == password:
-            account.password = new_password
+        if user.account.password == password:
+            user.account.password = new_password
             session.commit()
-            self.service.msg(user, '\x02{}\x02 계정의 비밀번호가 \x02{}\x02 로 변경되었습니다.', account.name.name, new_password)
+            self.service.msg(user, '\x02{}\x02 계정의 비밀번호가 \x02{}\x02 로 변경되었습니다.', user.account.name.name, new_password)
         else:
-            self.service.msg(user, '\x02{}\x02 계정의 비밀번호와 일치하지 않습니다.', account.name.name)
+            self.service.msg(user, '\x02{}\x02 계정의 비밀번호와 일치하지 않습니다.', user.account.name.name)
