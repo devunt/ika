@@ -48,6 +48,10 @@ class User:
             return Session().query(Account).filter(Nick.name==name).first()
         return None
 
+    @property
+    def is_operator(self):
+        return self.opertype == 'NetAdmin'
+
 
 class Command:
     aliases = ()
@@ -70,7 +74,7 @@ class Command:
     def run(self, user, param):
         if (self.permission is Permission.LOGIN_REQUIRED) and ('accountname' not in user.metadata):
             self.service.msg(user, '로그인되어 있지 않습니다. \x02/msg {} 로그인\x02 명령을 이용해 로그인해주세요.', self.service.name)
-        elif (self.permission is Permission.OPERATOR) and (user.opertype != 'NetAdmin'):
+        elif (self.permission is Permission.OPERATOR) and user.is_operator:
             self.service.msg(user, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
         else:
             r = re.compile(r'^{}$'.format(self.regex))
