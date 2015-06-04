@@ -1,4 +1,5 @@
 import asyncio
+import copy
 import inspect
 import re
 from importlib import import_module
@@ -92,7 +93,8 @@ class Server:
                     if channel in self.channels:
                         self.channels[channel].remove_user(user)
                 elif command == 'QUIT':
-                    for _, channel in self.users[uid].channels.items():
+                    channels = copy.deepcopy(self.users[uid].channels)
+                    for _, channel in channels.items():
                         channel.remove_user(user)
                     del self.users[uid]
             else:
