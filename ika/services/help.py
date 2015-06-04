@@ -15,25 +15,25 @@ class Help(Command):
     )
 
     @asyncio.coroutine
-    def execute(self, uid, command):
+    def execute(self, user, command):
         if command:
             if command in self.service.commands:
                 target = self.service.commands[command]
             else:
-                self.service.msg(uid, '해당 명령이 존재하지 않아 도움말을 찾을 수 없습니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.service.name)
+                self.service.msg(user, '해당 명령이 존재하지 않아 도움말을 찾을 수 없습니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.service.name)
                 return
         else:
             target = self.service
-        self.service.msg(uid, '==== \x02{}\x02 도움말 ====', target.name)
+        self.service.msg(user, '==== \x02{}\x02 도움말 ====', target.name)
         if isinstance(target, Command):
-            self.service.msg(uid, '사용법: \x02/msg {} {} {}\x02', self.service.name, target.name, target.syntax)
-        self.service.msg(uid, ' ')
+            self.service.msg(user, '사용법: \x02/msg {} {} {}\x02', self.service.name, target.name, target.syntax)
+        self.service.msg(user, ' ')
         for description in target.description:
-            self.service.msg(uid, description)
+            self.service.msg(user, description)
         if isinstance(target, Service):
-            self.service.msg(uid, ' ')
+            self.service.msg(user, ' ')
             commands = list()
             for _, command in self.service.commands.items():
                 if command not in commands:
                     commands.append(command)
-                    self.service.msg(uid, '\x02{:\u3000<10}\x02{}', command.name, command.description[0])
+                    self.service.msg(user, '\x02{:\u3000<10}\x02{}', command.name, command.description[0])
