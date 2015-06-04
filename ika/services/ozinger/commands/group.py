@@ -33,6 +33,7 @@ class Group(Command):
         nick = Nick()
         nick.name = user.nick
         nick.last_use = datetime.now()
-        user.account.aliases.append(nick)
+        account = user.account
+        account.aliases.append(nick)
         session.commit()
         self.service.msg(user, '\x02{}\x02 계정에 \x02{}\x02 닉네임을 추가했습니다.', user.account.name.name, nick.name)

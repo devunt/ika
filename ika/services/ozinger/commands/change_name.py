@@ -34,9 +34,10 @@ class ChangeName(Command):
                 return
             elif nick in user.account.aliases:
                 old_name = user.account.name.name
-                user.account.aliases.append(user.account.name)
-                user.account.aliases.remove(nick)
-                user.account.name = nick
+                account = user.account
+                account.aliases.append(user.account.name)
+                account.aliases.remove(nick)
+                account.name = nick
                 session.commit()
                 user.metadata['accountname'] = user.account.name.name
                 self.service.writeserverline('METADATA {} accountname :{}', user.uid, user.account.name.name)

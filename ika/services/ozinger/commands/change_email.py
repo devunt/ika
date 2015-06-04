@@ -24,7 +24,8 @@ class ChangeEmail(Command):
     def execute(self, user, password, new_email):
         session = Session()
         if user.account.password == password:
-            user.account.email = new_email
+            account = user.account
+            account.email = new_email
             session.commit()
             self.service.msg(user, '\x02{}\x02 계정의 이메일이 \x02{}\x02 로 변경되었습니다.', user.account.name.name, new_email)
         else:
