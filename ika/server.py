@@ -94,7 +94,7 @@ class Server:
                 elif command == 'QUIT':
                     for _, channel in self.users[uid].channels.items():
                         channel.remove_user(user)
-                        del self.users[uid]
+                    del self.users[uid]
             else:
                 command, *params = ircutils.parseline(line)
                 sender = None
