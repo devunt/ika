@@ -85,6 +85,8 @@ class Server:
                     user.opertype = params[0]
                 elif command == 'NICK':
                     user.nick = params[0]
+                elif command == 'FHOST':
+                    user.dhost = params[0]
                 elif command == 'PART':
                     channel = params[0]
                     if channel in self.channels:
