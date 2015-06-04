@@ -1,6 +1,7 @@
 import asyncio
 
 from ika.classes import Command, Service
+from ika.enums import Permission
 
 
 class Help(Command):
@@ -34,6 +35,9 @@ class Help(Command):
             self.service.msg(user, ' ')
             commands = list()
             for _, command in self.service.commands.items():
+                if ((command.permission is Permission.LOGIN_REQUIRED) and ('accountname' not in user.metadata)) or \
+                        ((command.permission is Permission.OPERATOR) and (not user.is_operator)):
+                    continue
                 if command not in commands:
                     commands.append(command)
                     self.service.msg(user, '\x02{:\u3000<10}\x02{}', command.name, command.description[0])
