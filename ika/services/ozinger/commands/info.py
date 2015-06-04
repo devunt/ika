@@ -38,5 +38,6 @@ class Information(Command):
         self.service.msg(user, '\x02=== {} 계정 정보 ===\x02', account.name.name)
         self.service.msg(user, '이메일: {}', account.email)
         self.service.msg(user, '대표 계정명: {}', account.name.name)
-        self.service.msg(user, '보조 계정명: {}', ', '.join([nick.name for nick in account.aliases]))
+        self.service.msg(user, '보조 계정명: {}', (', '.join([nick.name for nick in account.aliases])) or '없음')
+        self.service.msg(user, '가상 호스트: {}', account.vhost or '없음')
         self.service.msg(user, '마지막 로그인: {}', account.last_login)

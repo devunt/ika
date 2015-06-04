@@ -37,6 +37,8 @@ class Register(Command):
                 session.commit()
                 self.service.msg(user, '환영합니다! \x02{}\x02 계정으로 로그인되었습니다.', account.name.name)
                 self.service.writeserverline('METADATA {} accountname :{}', user.uid, account.name.name)
+                if account.vhost is not None:
+                    self.service.writesvsuserline('CHGHOST {} {}', user.uid, account.vhost)
                 user.metadata['accountname'] = account.name.name
                 return
         self.service.msg(user, '등록되지 않은 계정이거나 잘못된 비밀번호입니다. 계정명이나 비밀번호를 모두 제대로 입력했는지 다시 한번 확인해주세요.')

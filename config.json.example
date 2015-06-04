@@ -18,6 +18,7 @@
 			"commands.change_email",
 			"commands.change_name",
 			"commands.change_password",
+			"commands.force_change_vhost",
 			"commands.info",
 			"commands.login",
 			"commands.logout",
