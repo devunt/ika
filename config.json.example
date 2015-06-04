@@ -19,6 +19,7 @@
 			"commands.change_name",
 			"commands.change_password",
 			"commands.force_change_vhost",
+			"commands.ghost",
 			"commands.info",
 			"commands.login",
 			"commands.logout",
