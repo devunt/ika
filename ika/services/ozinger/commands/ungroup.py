@@ -36,5 +36,6 @@ class Ungroup(Command):
         else:
             account = user.account
             account.aliases.remove(nick)
+            session.delete(nick)
             session.commit()
             self.service.msg(user, '\x02{}\x02 계정에서 \x02{}\x02 닉네임을 제거했습니다.', user.account.name.name, name)
