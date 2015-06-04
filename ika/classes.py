@@ -120,7 +120,13 @@ class Service:
             uid = user_or_uid.uid
         else:
             uid = user_or_uid
-        self.server.writeuserline(self.uid, 'NOTICE {} :{}'.format(uid, line), *args, **kwargs)
+        self.writesvsuserline('NOTICE {} :{}'.format(uid, line), *args, **kwargs)
+
+    def writesvsuserline(self, line, *args, **kwargs):
+        self.server.writeuserline(self.uid, line, *args, **kwargs)
+
+    def writeserverline(self, line, *args, **kwargs):
+        self.server.writeserverline(line, *args, **kwargs)
 
     def process_command(self, user, line):
         split = line.split(maxsplit=1)

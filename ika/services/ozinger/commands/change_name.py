@@ -39,7 +39,7 @@ class ChangeName(Command):
                 user.account.name = nick
                 session.commit()
                 user.metadata['accountname'] = user.account.name.name
-                self.service.server.writeserverline('METADATA {} accountname :{}', user.uid, user.account.name.name)
+                self.service.writeserverline('METADATA {} accountname :{}', user.uid, user.account.name.name)
                 self.service.msg(user, '\x02{}\x02 계정의 대표 닉네임이 \x02{}\x02 로 변경되었습니다.', old_name, new_name)
                 return
         self.service.msg(user, '\x02{}\x02 계정에 \x02{}\x02 닉네임이 존재하지 않습니다. \x02/msg {} 그룹\x02 명령을 이용해 해당 닉네임을 계정에 추가해보세요.', user.account.name.name, new_name, self.service.name)
