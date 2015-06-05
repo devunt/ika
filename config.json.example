@@ -31,6 +31,8 @@
 		"legacy.chanserv": [
 		],
 		"legacy.nickserv": [
+			"commands.ghost",
+			"commands.identify"
 		]
 	},
 
