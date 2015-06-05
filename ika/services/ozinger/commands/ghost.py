@@ -22,7 +22,6 @@ class Ghost(Command):
 
     @asyncio.coroutine
     def execute(self, user, nick):
-        session = Session()
         account = Account.find_by_nick(nick)
         if account is not user.account:
             self.service.msg(user, '해당 닉네임이 \x02{}\x02 계정에 속해 있지 않습니다.', user.account.name.name)

@@ -2,7 +2,7 @@ import asyncio
 
 from ika.classes import Command
 from ika.enums import Permission
-from ika.database import Account
+from ika.database import Account, Session
 
 
 class ForceChangeVirtualHost(Command):
@@ -24,6 +24,7 @@ class ForceChangeVirtualHost(Command):
         if account is None:
             self.service.msg(user, '등록되지 않은 계정입니다.')
             return
+        session = Session()
         account.vhost = new_vhost
         session.commit()
         self.service.writesvsuserline('CHGHOST {} {}', user.uid, account.vhost or user.host)
