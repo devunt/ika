@@ -47,4 +47,6 @@ class Account(Base):
     def find_by_nick(cls, nick):
         session = Session()
         nick = session.query(Nick).filter(Nick.name == nick).first()
+        if nick is None:
+            return None
         return nick.account or nick.account_alias
