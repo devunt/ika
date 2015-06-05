@@ -2,7 +2,7 @@ import asyncio
 
 from ika.classes import Command
 from ika.enums import Permission
-from ika.database import Account, Nick, Session
+from ika.database import Account
 
 
 class ForceChangeVirtualHost(Command):
@@ -20,8 +20,7 @@ class ForceChangeVirtualHost(Command):
 
     @asyncio.coroutine
     def execute(self, user, name, new_vhost):
-        session = Session()
-        account = session.query(Account).filter(Nick.name == name).first()
+        account = Account.find_by_nick(name)
         if account is None:
             self.service.msg(user, '등록되지 않은 계정입니다.')
             return

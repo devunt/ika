@@ -2,7 +2,7 @@ import asyncio
 
 from ika.classes import Command
 from ika.enums import Permission
-from ika.database import Account, Nick, Session
+from ika.database import Account
 
 
 class Ghost(Command):
@@ -23,7 +23,7 @@ class Ghost(Command):
     @asyncio.coroutine
     def execute(self, user, nick):
         session = Session()
-        account = session.query(Account).filter(Nick.name == nick).first()
+        account = Account.find_by_nick(nick)
         if account is not user.account:
             self.service.msg(user, '해당 닉네임이 \x02{}\x02 계정에 속해 있지 않습니다.', user.account.name.name)
             return

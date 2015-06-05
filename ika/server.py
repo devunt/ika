@@ -7,7 +7,7 @@ from importlib import import_module
 from ika.classes import Channel, User
 from ika.conf import settings
 from ika.constants import Versions
-from ika.database import Account, Nick, Session
+from ika.database import Account
 from ika.event import EventHandler
 from ika.logger import logger
 from ika.utils import ircutils, timeutils
@@ -60,8 +60,7 @@ class Server:
                     self.users[params[0]] = User(*params)
                 elif command == 'METADATA':
                     if params[1] == 'accountname':
-                        session = Session()
-                        account = session.query(Account).filter(Nick.name == params[-1]).first()
+                        account = Account.find_by_nick(params[-1])
                         if (account is not None) and (account.name.name == params[-1]):
                             self.users[params[0]].metadata['accountname'] = account.name.name
                         else:

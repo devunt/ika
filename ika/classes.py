@@ -5,7 +5,7 @@ from importlib import import_module
 
 from ika.conf import settings
 from ika.enums import Permission
-from ika.database import Account, Nick, Session
+from ika.database import Account
 from ika.logger import logger
 
 
@@ -45,7 +45,7 @@ class User:
     def account(self):
         name = self.metadata.get('accountname')
         if name is not None:
-            return Session().query(Account).filter(Nick.name == name).first()
+            return Account.find_by_nick(name)
         return None
 
     @property
