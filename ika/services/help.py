@@ -18,6 +18,7 @@ class Help(Command):
     @asyncio.coroutine
     def execute(self, user, command):
         if command:
+            command = command.upper()
             if command in self.service.commands:
                 target = self.service.commands[command]
             else:
