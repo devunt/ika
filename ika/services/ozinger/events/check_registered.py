@@ -1,8 +1,7 @@
 import asyncio
 
 from ika.classes import Listener
-from ika.database import Session
-from ika.database import Nick
+from ika.database import Nick, Session
 
 
 class CheckRegistered(Listener):

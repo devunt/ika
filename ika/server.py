@@ -111,7 +111,7 @@ class Server:
                         self.link.sid = params[3]
                         self.writeserverline('BURST {}', timeutils.unixtime())
                         self.writeserverline('VERSION :{} {}', Versions.IKA, self.name)
-                        idx = 621937810 # int('AAAAAA', 36)
+                        idx = 621937810  # int('AAAAAA', 36)
                         for service in self.services_instances:
                             service.id = ircutils.base36encode(idx)
                             names = list(service.aliases)

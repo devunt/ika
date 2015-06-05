@@ -21,7 +21,7 @@ class ForceChangeVirtualHost(Command):
     @asyncio.coroutine
     def execute(self, user, name, new_vhost):
         session = Session()
-        account = session.query(Account).filter(Nick.name==name).first()
+        account = session.query(Account).filter(Nick.name == name).first()
         if account is None:
             self.service.msg(user, '등록되지 않은 계정입니다.')
             return

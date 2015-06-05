@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 
 from ika.classes import Command
-from ika.database import Nick, Account, Session
+from ika.database import Nick, Session
 
 
 class Login(Command):

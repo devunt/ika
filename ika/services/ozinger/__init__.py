@@ -1,4 +1,3 @@
-import asyncio
 from ika.classes import Service
 
 

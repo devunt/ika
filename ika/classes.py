@@ -45,7 +45,7 @@ class User:
     def account(self):
         name = self.metadata.get('accountname')
         if name is not None:
-            return Session().query(Account).filter(Nick.name==name).first()
+            return Session().query(Account).filter(Nick.name == name).first()
         return None
 
     @property

@@ -1,9 +1,7 @@
 import asyncio
-from datetime import datetime
 
 from ika.classes import Command
 from ika.enums import Permission
-from ika.database import Nick, Account, Session
 
 
 class Register(Command):

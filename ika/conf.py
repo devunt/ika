@@ -1,5 +1,6 @@
-import sys, os
 import json
+import os
+import sys
 
 from ika.utils import edict
 

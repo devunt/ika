@@ -4,7 +4,7 @@ from sqlalchemy.sql import exists
 
 from ika.classes import Command
 from ika.enums import Permission
-from ika.database import Nick, Account, Session
+from ika.database import Nick, Session
 
 
 class Group(Command):
