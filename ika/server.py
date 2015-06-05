@@ -86,6 +86,9 @@ class Server:
                         self.services[target].process_command(user, *params[1:])
                 elif command == 'OPERTYPE':
                     user.opertype = params[0]
+                elif command == 'IDLE':
+                    service = self.services[params[0]]
+                    self.writeuserline(service.uid, 'IDLE {} {} 0', uid, timeutils.unixtime())
                 elif command == 'NICK':
                     user.nick = params[0]
                 elif command == 'FHOST':
