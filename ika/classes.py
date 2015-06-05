@@ -23,18 +23,18 @@ class Channel:
             mode, uid = usermode.split(',')
             self.usermodes[uid] = mode
             self.users[uid] = users[uid]
-            self.users[uid].channels[self.name] = self
+            self.users[uid].channels.append(self.name)
 
     def remove_user(self, user):
         del self.users[user.uid]
         del self.usermodes[user.uid]
-        del user.channels[self.name]
+        user.channels.remove(self.name)
 
 
 class User:
     def __init__(self, *params):
         self.metadata = dict()
-        self.channels = dict()
+        self.channels = list()
         self.uid, self.timestamp, self.nick, self.host, self.dhost, \
             self.ident, self.ip, self.signon, self.modes, self.gecos = params
         self.timestamp = int(self.timestamp)

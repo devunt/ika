@@ -89,12 +89,14 @@ class Server:
                     user.dhost = params[0]
                 elif command == 'PART':
                     channel = params[0]
-                    if channel in self.channels:
-                        self.channels[channel].remove_user(user)
+                    self.channels[channel].remove_user(user)
+                    if len(self.channels[channel].users) == 0:
+                        del self.channels[channel]
                 elif command == 'QUIT':
-                    channels = copy.deepcopy(self.users[uid].channels)
-                    for _, channel in channels.items():
-                        channel.remove_user(user)
+                    for channel in self.users[uid].channels:
+                        self.channels[channel].remove_user(user)
+                    if len(self.channels[channel].users) == 0:
+                        del self.channels[channel]
                     del self.users[uid]
             else:
                 command, *params = ircutils.parseline(line)
