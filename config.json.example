@@ -37,5 +37,6 @@
 	},
 
 	"admin_channel": "#ika",
-	"logging": "DEBUG"
+	"logging": "DEBUG",
+	"raven_dsn": null
 }
