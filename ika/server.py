@@ -139,7 +139,7 @@ class Server:
         line = yield from self.reader.readline()
         if line == b'':
             raise RuntimeError('Disconnected')
-        line = line.decode().rstrip('\r\n')
+        line = line.decode(errors='ignore').rstrip('\r\n')
         logger.debug('>>> {}'.format(line))
         return line
 
