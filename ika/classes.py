@@ -133,6 +133,7 @@ class Service:
         if len(split) == 1:
             split.append('')
         command, param = split
+        command = command.upper()
         if command in self.commands:
             asyncio.async(self.commands[command].run(user, param))
         else:
@@ -159,7 +160,7 @@ class Service:
                     names = list(instance.aliases)
                     names.insert(0, instance.name)
                     for name in names:
-                        self.commands[name] = instance
+                        self.commands[name.upper()] = instance
                 elif isinstance(instance, Listener):
                     for event in self.server.ev.events:
                         if hasattr(instance, event):
