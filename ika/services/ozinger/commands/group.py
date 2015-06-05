@@ -18,14 +18,14 @@ class Group(Command):
         '현재 오징어 IRC 네트워크에 로그인되어 있는 계정에 현재 사용중인 닉네임을 추가합니다.',
         ' ',
         '이 명령을 사용할 시 현재 로그인되어 있는 계정에 현재 사용중인 닉네임을 추가합니다.',
-        '계정 1개에는 최대 3개의 닉네임을 추가적으로 등록할 수 있습니다.',
+        '계정 1개에는 최대 5개의 닉네임을 추가적으로 등록할 수 있습니다.',
     )
 
     @asyncio.coroutine
     def execute(self, user):
         session = Session()
-        if len(user.account.aliases) >= 3:
-            self.service.msg(user, '\x02{}\x02 계정에 등록할 수 있는 닉네임 제한을 초과했습니다 (3개).', user.account.name.name)
+        if len(user.account.aliases) >= 5:
+            self.service.msg(user, '\x02{}\x02 계정에 등록할 수 있는 닉네임 제한을 초과했습니다 (5개).', user.account.name.name)
             return
         if session.query(exists().where(Nick.name == user.nick)).scalar():
             self.service.msg(user, '이미 등록되어 있는 닉네임입니다.')
