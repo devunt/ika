@@ -55,7 +55,7 @@ class Server:
                         timestamp = timeutils.unixtime()
                         modes = ''
                     self.writeserverline('FJOIN {} {} +{} :{}', settings.admin_channel, timestamp, modes,
-                        ' '.join(map(lambda x: 'o,{}'.format(x), self.services.keys())))
+                        ' '.join(map(lambda x: 'a,{}'.format(x), self.services.keys())))
                 elif command == 'UID':
                     self.users[params[0]] = User(*params)
                 elif command == 'METADATA':
