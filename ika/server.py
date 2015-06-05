@@ -59,14 +59,17 @@ class Server:
                 elif command == 'UID':
                     self.users[params[0]] = User(*params)
                 elif command == 'METADATA':
-                    if params[1] == 'accountname':
-                        account = Account.find_by_nick(params[-1])
-                        if (account is not None) and (account.name.name == params[-1]):
-                            self.users[params[0]].metadata['accountname'] = account.name.name
-                        else:
-                            self.writeserverline('METADATA {} accountname :', params[0])
+                    if params[0].startswith('#'):
+                        self.channels[params[0]].metadata[params[1]] = params[-1]
                     else:
-                        self.users[params[0]].metadata[params[1]] = params[-1]
+                        if params[1] == 'accountname':
+                            account = Account.find_by_nick(params[-1])
+                            if (account is not None) and (account.name.name == params[-1]):
+                                self.users[params[0]].metadata['accountname'] = account.name.name
+                            else:
+                                self.writeserverline('METADATA {} accountname :', params[0])
+                        else:
+                            self.users[params[0]].metadata[params[1]] = params[-1]
                 elif command == 'FJOIN':
                     channel = params[0]
                     if channel in self.channels:

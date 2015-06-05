@@ -14,6 +14,7 @@ class Channel:
     def __init__(self, users, *params):
         self.users = dict()
         self.usermodes = dict()
+        self.metadata = dict()
         self.name = params[0]
         self.timestamp = int(params[1])
         self.fjoin(users, *params)
