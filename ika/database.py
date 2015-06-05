@@ -29,7 +29,7 @@ class Account(Base):
     email = Column(String(255), unique=True)
     password = Column(PasswordType(max_length=128,
         schemes=['bcrypt_sha256', 'md5_crypt'], deprecated=['md5_crypt']))
-    vhost = Column(String(255), unique=True)
+    vhost = Column(String(255))
     last_login = Column(DateTime)
 
     @validates('email')
