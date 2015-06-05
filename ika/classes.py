@@ -1,6 +1,7 @@
 import asyncio
 import inspect
 import re
+import sys
 from importlib import import_module
 
 from ika.conf import settings
@@ -80,7 +81,13 @@ class Command:
             r = re.compile(r'^{}$'.format(self.regex))
             m = r.match(param)
             if m:
-                asyncio.async(self.execute(user, **m.groupdict()))
+                try:
+                    yield from self.execute(user, **m.groupdict())
+                except Exception as ex:
+                    ty, exc, tb = sys.exc_info()
+                    self.service.msg(user, '\x02{}\x02 명령을 처리하는 도중 문제가 발생했습니다. 잠시 후 다시 한번 시도해주세요.', self.name)
+                    self.service.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.admin_channel, ty, exc)
+                    raise ex
             else:
                 self.service.msg(user, '사용법이 올바르지 않습니다. \x02/msg {} 도움말 {}\x02 를 입력해보세요.', self.service.name, self.name)
 
