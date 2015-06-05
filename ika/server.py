@@ -87,6 +87,12 @@ class Server:
                     user.nick = params[0]
                 elif command == 'FHOST':
                     user.dhost = params[0]
+                elif command == 'KICK':
+                    channel = params[0]
+                    target = self.users[params[1]]
+                    self.channels[channel].remove_user(target)
+                    if len(self.channels[channel].users) == 0:
+                        del self.channels[channel]
                 elif command == 'PART':
                     channel = params[0]
                     self.channels[channel].remove_user(user)
