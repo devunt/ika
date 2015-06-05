@@ -5,7 +5,7 @@ from ika.classes import Command
 from ika.database import Nick, Account, Session
 
 
-class Register(Command):
+class Login(Command):
     name = '로그인'
     aliases = (
         '인증',
