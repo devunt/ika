@@ -53,4 +53,4 @@ class Nick(Base):
     @classmethod
     def find_by_name(cls, name):
         session = Session()
-        return session.query(Nick).filter(func.lower(Nick.name) == func.lower(nick)).first()
+        return session.query(Nick).filter(func.lower(Nick.name) == func.lower(name)).first()
