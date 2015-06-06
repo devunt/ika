@@ -29,3 +29,5 @@ class Ghost(Command):
         for target in self.service.server.users.values():
             if target.nick == nick:
                 self.service.writesvsuserline('KILL {} :{}!{}@{} 에 의한 고스트', target.uid, user.nick, user.ident, user.dhost)
+                self.service.msg(user, '\x02{}\x02 닉네임을 사용중인 사용자의 연결을 종료시켰습니다.', target.nick)
+                return
