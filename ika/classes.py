@@ -6,7 +6,7 @@ from importlib import import_module
 
 from ika.conf import settings
 from ika.enums import Permission
-from ika.database import Account
+from ika.database import Account, Session
 from ika.logger import logger
 
 
@@ -86,6 +86,8 @@ class Command:
                     yield from self.execute(user, **m.groupdict())
                 except Exception as ex:
                     ty, exc, tb = sys.exc_info()
+                    session = Session()
+                    session.rollback()
                     self.service.msg(user, '\x02{}\x02 명령을 처리하는 도중 문제가 발생했습니다. 잠시 후 다시 한번 시도해주세요.', self.name)
                     self.service.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.admin_channel, ty, exc)
                     raise ex
