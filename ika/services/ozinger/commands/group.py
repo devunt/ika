@@ -1,6 +1,5 @@
 import asyncio
 from datetime import datetime
-from sqlalchemy.sql import exists
 
 from ika.classes import Command
 from ika.enums import Permission
@@ -27,7 +26,7 @@ class Group(Command):
         if len(user.account.aliases) >= 5:
             self.service.msg(user, '\x02{}\x02 계정에 등록할 수 있는 닉네임 제한을 초과했습니다 (5개).', user.account.name.name)
             return
-        if session.query(exists().where(Nick.name == user.nick)).scalar():
+        if Nick.find_by_name(user.nick):
             self.service.msg(user, '이미 등록되어 있는 닉네임입니다.')
             return
         nick = Nick()

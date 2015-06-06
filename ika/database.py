@@ -17,17 +17,6 @@ session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
 
 
-class Nick(Base):
-    __tablename__ = 'nick'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(32), unique=True)
-    account_id = Column(Integer, ForeignKey('account.id'))
-    account = relationship('Account', foreign_keys='Nick.account_id', backref=backref('name', uselist=False))
-    account_alias_id = Column(Integer, ForeignKey('account.id'))
-    account_alias = relationship('Account', foreign_keys='Nick.account_alias_id', backref='aliases')
-    last_use = Column(DateTime, default=func.now())
-
-
 class Account(Base):
     __tablename__ = 'account'
     id = Column(Integer, primary_key=True)
@@ -45,8 +34,23 @@ class Account(Base):
 
     @classmethod
     def find_by_nick(cls, nick):
-        session = Session()
-        nick = session.query(Nick).filter(Nick.name == nick).first()
+        nick = Nick.find_by_name(nick)
         if nick is None:
             return None
         return nick.account or nick.account_alias
+
+
+class Nick(Base):
+    __tablename__ = 'nick'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(32), unique=True)
+    account_id = Column(Integer, ForeignKey('account.id'))
+    account = relationship('Account', foreign_keys='Nick.account_id', backref=backref('name', uselist=False))
+    account_alias_id = Column(Integer, ForeignKey('account.id'))
+    account_alias = relationship('Account', foreign_keys='Nick.account_alias_id', backref='aliases')
+    last_use = Column(DateTime, default=func.now())
+
+    @classmethod
+    def find_by_name(cls, name):
+        session = Session()
+        return session.query(Nick).filter(func.lower(Nick.name) == func.lower(nick)).first()

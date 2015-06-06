@@ -26,7 +26,7 @@ class ChangeName(Command):
     @asyncio.coroutine
     def execute(self, user, new_name):
         session = Session()
-        nick = session.query(Nick).filter(Nick.name == new_name).first()
+        nick = Nick.find_by_name(new_name)
         if nick:
             if nick is user.account.name:
                 self.service.msg(user, '\x02{}\x02 계정의 대표 닉네임이 이미 \x02{}\x02 입니다.', user.account.name.name, new_name)

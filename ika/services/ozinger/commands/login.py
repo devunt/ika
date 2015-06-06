@@ -28,7 +28,7 @@ class Login(Command):
         if name is None:
             name = user.nick
         session = Session()
-        nick = session.query(Nick).filter_by(name=name).first()
+        nick = Nick.find_by_name(name)
         if nick:
             account = nick.account or nick.account_alias
             if account.password == password:

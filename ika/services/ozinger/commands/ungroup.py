@@ -26,7 +26,7 @@ class Ungroup(Command):
         if name is None:
             name = user.nick
         session = Session()
-        nick = session.query(Nick).filter(Nick.name == name).first()
+        nick = Nick.find_by_name(name)
         if nick is None:
             self.service.msg(user, '\x02{}\x02 계정에 \x02{}\x02 닉네임이 등록되어 있지 않습니다.', user.account.name.name, name)
         elif user.account.name is nick:
