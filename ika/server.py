@@ -190,7 +190,8 @@ class Server:
         for instance in self.services_instances:
             instance.reload_modules()
 
-    def disconnect(self, reason='No reason was specified'):
+    def disconnect(self, reason=''):
         for uid in self.services.keys():
             self.writeuserline(uid, 'QUIT :{}'.format(reason))
         self.writeserverline('SQUIT {} :{}'.format(self.link.name, reason))
+        self.writeserverline('ERROR :Service disconnected ({})'.format(reason))

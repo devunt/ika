@@ -20,4 +20,4 @@ class Stop(Command):
     @asyncio.coroutine
     def execute(self, user, reason):
         self.service.msg(user, '장비를 정지합니다.')
-        self.service.server.disconnect(reason)
+        self.service.server.disconnect('Manually interrupted by command ({})'.format(reason or 'No reason was specified'))
