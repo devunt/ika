@@ -182,3 +182,8 @@ class Server:
                     and member.__module__ == 'ika.services.{}'.format(modulename))[0]
                 instance = cls(self)
                 self.services_instances.append(instance)
+
+    def disconnect(self, reason='No reason was specified'):
+        for uid in self.services.keys():
+            self.writeuserline(uid, 'QUIT :{}'.format(reason))
+        self.writeserverline('SQUIT {} :{}'.format(self.link.name, reason))
