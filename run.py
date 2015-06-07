@@ -3,6 +3,7 @@
 import asyncio
 
 from ika.database import Base, engine
+from ika.logger import logger
 from ika.server import Server
 
 
@@ -17,6 +18,8 @@ def main():
         loop.run_until_complete(ika.connect())
     except KeyboardInterrupt:
         ika.disconnect('Manually interrupted by console access')
+    except:
+        logger.exception('Exception has occured in the main loop')
     finally:
         loop.close()
 

@@ -143,6 +143,8 @@ class Server:
                                 self.services[uid] = service
                                 idx += 1
                         self.writeserverline('ENDBURST')
+                elif command == 'ERROR':
+                    raise RuntimeError('Remote server has returned an error: {}'.format(params[-1]))
             if hasattr(self.ev, command):
                 getattr(self.ev, command).fire(sender, *params)
             # TODO: Implement each functions
