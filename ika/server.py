@@ -183,6 +183,11 @@ class Server:
                 instance = cls(self)
                 self.services_instances.append(instance)
 
+    def reload_services(self):
+        settings.reload()
+        for instance in self.services_instances:
+            instance.reload_modules()
+
     def disconnect(self, reason='No reason was specified'):
         for uid in self.services.keys():
             self.writeuserline(uid, 'QUIT :{}'.format(reason))

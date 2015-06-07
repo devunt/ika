@@ -2,10 +2,11 @@ import asyncio
 import inspect
 import re
 import sys
-from importlib import import_module
+from importlib import import_module, reload
 
 from ika.conf import settings
 from ika.enums import Permission
+from ika.event import EventHandler
 from ika.database import Account, Session
 from ika.logger import logger
 
@@ -150,16 +151,16 @@ class Service:
             self.msg(user, '존재하지 않는 명령어입니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.name)
 
     def register_modules(self):
-        from ika.services.help import Help
-        help = Help(self)
-        names = list(help.aliases)
-        names.insert(0, help.name)
+        help = reload(import_module('ika.services.help'))
+        helpc = help.Help(self)
+        names = list(helpc.aliases)
+        names.insert(0, helpc.name)
         for name in names:
-            self.commands[name] = help
+            self.commands[name] = helpc
         service = self.__module__.lstrip('ika.services')
         for modulename in settings.services[service]:
             try:
-                module = import_module('ika.services.{}.{}'.format(service, modulename))
+                module = reload(import_module('ika.services.{}.{}'.format(service, modulename)))
             except ImportError:
                 logger.exception('Missing module!')
             else:
@@ -176,3 +177,8 @@ class Service:
                         if hasattr(instance, event):
                             hook = getattr(self.server.ev, event)
                             hook += getattr(instance, event)
+
+    def reload_modules(self):
+        self.commands = dict()
+        self.server.ev = EventHandler()
+        self.register_modules()
