@@ -151,7 +151,7 @@ class Service:
             self.msg(user, '존재하지 않는 명령어입니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.name)
 
     def register_modules(self):
-        help = reload(import_module('ika.services.help'))
+        help = import_module('ika.services.help')
         helpc = help.Help(self)
         names = list(helpc.aliases)
         names.insert(0, helpc.name)
@@ -160,7 +160,7 @@ class Service:
         service = self.__module__.lstrip('ika.services')
         for modulename in settings.services[service]:
             try:
-                module = reload(import_module('ika.services.{}.{}'.format(service, modulename)))
+                module = import_module('ika.services.{}.{}'.format(service, modulename))
             except ImportError:
                 logger.exception('Missing module!')
             else:
@@ -179,6 +179,8 @@ class Service:
                             hook += getattr(instance, event)
 
     def reload_modules(self):
+        for instance in set(self.commands.values()):
+            reload(inspect.getmodule(instance))
+            del instance
         self.commands = dict()
-        self.server.ev = EventHandler()
         self.register_modules()

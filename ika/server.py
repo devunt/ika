@@ -187,6 +187,7 @@ class Server:
 
     def reload_services(self):
         settings.reload()
+        self.ev = EventHandler()
         for instance in self.services_instances:
             instance.reload_modules()
 
