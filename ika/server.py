@@ -60,7 +60,7 @@ class Server:
                     self.users[params[0]] = User(*params)
                 elif command == 'METADATA':
                     if params[0] == '*':
-                        continue
+                        pass
                     elif params[0].startswith('#'):
                         self.channels[params[0]].metadata[params[1]] = params[-1]
                     else:
