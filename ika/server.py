@@ -59,7 +59,9 @@ class Server:
                 elif command == 'UID':
                     self.users[params[0]] = User(*params)
                 elif command == 'METADATA':
-                    if params[0].startswith('#'):
+                    if params[0] == '*':
+                        continue
+                    elif params[0].startswith('#'):
                         self.channels[params[0]].metadata[params[1]] = params[-1]
                     else:
                         if params[1] == 'accountname':
