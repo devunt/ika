@@ -21,10 +21,11 @@ class Mode(Command):
         try:
             if target.startswith('#'):
                 _target = target
-                timestamp = self.service.server.channels[target].timestamp
+                channels = {k.lower():v for k, v in self.service.server.channels.items()}
+                timestamp = channels[target.lower()].timestamp
             else:
                 for u in self.service.server.users.values():
-                    if u.nick == target:
+                    if u.nick.lower() == target.lower():
                         _target = u.uid
                         timestamp = u.timestamp
                         break
