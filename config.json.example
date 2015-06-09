@@ -28,7 +28,10 @@
 			"events.welcome",
 			"events.check_registered"
 		],
-		"legacy.chanserv": [
+		"operserv": [
+			"commands.mode",
+			"commands.reload",
+			"commands.stop"
 		],
 		"legacy.nickserv": [
 			"commands.ghost",
