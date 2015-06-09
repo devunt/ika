@@ -29,6 +29,7 @@
 			"events.check_registered"
 		],
 		"operserv": [
+			"commands.git_pull",
 			"commands.mode",
 			"commands.reload",
 			"commands.stop"
