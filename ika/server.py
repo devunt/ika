@@ -140,7 +140,7 @@ class Server:
                             names.insert(0, service.name)
                             for name in names:
                                 uid = '{}{}'.format(self.sid, ircutils.base36encode(idx))
-                                self.writeserverline('UID {uid} {timestamp} {nick} {host} {host} {ident} 0 {timestamp} +Iiko :{gecos}',
+                                self.writeserverline('UID {uid} {timestamp} {nick} {host} {host} {ident} 0.0.0.0 {timestamp} +Iiko :{gecos}',
                                     uid=uid,
                                     nick=name,
                                     ident=service.ident,
