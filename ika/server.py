@@ -24,10 +24,12 @@ class Server:
         self.sid = settings.server.sid
         self.link = settings.link
         self.ev = EventHandler()
+        self._ev = None
         self.services = dict()
         self.services_instances = list()
         self.users = dict()
         self.channels = dict()
+        self.linked = False
 
     @asyncio.coroutine
     def connect(self):
@@ -45,17 +47,22 @@ class Server:
                 sender = server
                 if command == 'PING':
                     self.writeserverline('PONG {} {}', params[1], params[0])
+                elif command == 'BURST':
+                    self._ev = self.ev
+                    self.ev = None
                 elif command == 'ENDBURST':
-                    for service in self.services_instances:
-                        service.register_modules()
-                    if settings.admin_channel in self.channels:
-                        timestamp = self.channels[settings.admin_channel].timestamp
-                        modes = self.channels[settings.admin_channel].modes
-                    else:
-                        timestamp = timeutils.unixtime()
-                        modes = ''
-                    self.writeserverline('FJOIN {} {} +{} :{}', settings.admin_channel, timestamp, modes,
-                        ' '.join(map(lambda x: 'a,{}'.format(x), self.services.keys())))
+                    self.ev = self._ev
+                    self._ev = None
+                    if not self.linked:
+                        self.linked = True
+                        if settings.admin_channel in self.channels:
+                            timestamp = self.channels[settings.admin_channel].timestamp
+                            modes = self.channels[settings.admin_channel].modes
+                        else:
+                            timestamp = timeutils.unixtime()
+                            modes = ''
+                        self.writeserverline('FJOIN {} {} +{} :{}', settings.admin_channel, timestamp, modes,
+                            ' '.join(map(lambda x: 'a,{}'.format(x), self.services.keys())))
                 elif command == 'UID':
                     self.users[params[0]] = User(*params)
                 elif command == 'METADATA':
@@ -186,6 +193,7 @@ class Server:
                     and member.__module__ == 'ika.services.{}'.format(modulename))[0]
                 instance = cls(self)
                 self.services_instances.append(instance)
+                instance.register_modules()
 
     def reload_services(self):
         settings.reload()
