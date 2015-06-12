@@ -22,6 +22,9 @@ class Identify(Command):
 
     @asyncio.coroutine
     def execute(self, user, name, password):
-        ozinger = tuple(filter(lambda x: isinstance(x, Ozinger), self.service.server.services_instances))[0]
-        login = tuple(filter(lambda x: isinstance(x, Login), ozinger.commands.values()))[0]
+        try:
+            ozinger = tuple(filter(lambda x: isinstance(x, Ozinger), self.service.server.services_instances))[0]
+            login = tuple(filter(lambda x: isinstance(x, Login), ozinger.commands.values()))[0]
+        except:
+            self.service.msg(user, '현재 이 명령은 사용이 불가능합니다. \x02/msg {} {} {}\x02을 이용해주세요.', Ozinger.name. Login.name, Login.syntax)
         asyncio.async(Login.execute(login, user, name, password))
