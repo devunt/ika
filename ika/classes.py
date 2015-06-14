@@ -184,3 +184,11 @@ class Service:
             del instance
         self.commands = dict()
         self.register_modules()
+
+
+class Legacy:
+    def __init__(self, *args, **kwargs):
+        self.description = self.description + (
+            ' ',
+            '\x02이 기능은 하위호환용 기능입니다.\x02',
+        )
