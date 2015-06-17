@@ -1,7 +1,7 @@
 from ika.classes import Legacy, Service
 
 
-class NickServ(Legecy, Service):
+class NickServ(Legacy, Service):
     name = '오징오징어'
     aliases = (
         'NickServ',
