@@ -67,7 +67,7 @@ class Command:
 
     def __init__(self, service):
         self.service = service
-        super().__init__(*args, **kwargs)
+        super().__init__()
 
     @asyncio.coroutine
     def execute(self, user, **kwparams):
@@ -111,7 +111,7 @@ class Service:
     def __init__(self, server):
         self.commands = dict()
         self.server = server
-        super().__init__(*args, **kwargs)
+        super().__init__()
 
     @property
     def uid(self):
