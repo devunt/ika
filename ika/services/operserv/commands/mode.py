@@ -2,7 +2,6 @@ import asyncio
 
 from ika.classes import Command
 from ika.enums import Permission
-from ika.utils import timeutils
 
 
 class Mode(Command):
@@ -21,7 +20,7 @@ class Mode(Command):
         try:
             if target.startswith('#'):
                 _target = target
-                channels = {k.lower():v for k, v in self.service.server.channels.items()}
+                channels = {k.lower(): v for k, v in self.service.server.channels.items()}
                 timestamp = channels[target.lower()].timestamp
             else:
                 for u in self.service.server.users.values():
