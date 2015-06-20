@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship, validates
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.sql import func
-from sqlalchemy_utils import PasswordType
+from sqlalchemy_utils import JSONType, PasswordType
 
 from ika.conf import settings
 
@@ -54,3 +54,21 @@ class Nick(Base):
     def find_by_name(cls, name):
         session = Session()
         return session.query(Nick).filter(func.lower(Nick.name) == func.lower(name)).first()
+
+
+class Channel(Base):
+    __tablename__ = 'channel'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), unique=True)
+    data = Column(JSONType)
+    created_on = Column(DateTime, default=func.now())
+
+
+class Flag(Base):
+    __tablename__ = 'flag'
+    id = Column(Integer, primary_key=True)
+    channel_id = Column(Integer, ForeignKey('channel.id'))
+    channel = relationship('Channel', backref='flags')
+    target = Column(String(255))
+    type = Column(Integer)
+    created_on = Column(DateTime, default=func.now())
