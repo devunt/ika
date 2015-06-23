@@ -33,5 +33,5 @@ class Mode(Command):
         except KeyError:
             self.service.msg(user, '\x02{}\x02 채널이나 유저가 존재하지 않습니다.', target)
         else:
-            self.service.writesvsuserline('FMODE {} {} {}', target, timestamp, mode)
+            self.service.writesvsuserline('FMODE {} {} {}', _target, timestamp, mode)
             self.service.msg(user, '\x02{}\x02에 \x02{}\x02모드를 설정했습니다.', target, mode)
