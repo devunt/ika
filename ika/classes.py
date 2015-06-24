@@ -67,7 +67,6 @@ class Command:
 
     def __init__(self, service):
         self.service = service
-        super().__init__()
 
     @asyncio.coroutine
     def execute(self, user, **kwparams):
