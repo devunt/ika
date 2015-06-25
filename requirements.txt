@@ -1,9 +1,9 @@
-SQLAlchemy==1.0.5
-SQLAlchemy-Utils==0.30.9
-bcrypt==2.0.0
+SQLAlchemy==1.0.6
+SQLAlchemy-Utils==0.30.11
 cffi==1.1.2
 easydict==1.6
 passlib==1.6.2
+py-bcrypt==0.4
 pycparser==2.14
 raven==5.3.1
 six==1.9.0
