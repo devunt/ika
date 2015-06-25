@@ -69,3 +69,6 @@ config.json
 
 # Database
 *.sqlite3
+
+# Virtualenv
+.venv
