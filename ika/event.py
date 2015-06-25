@@ -20,6 +20,7 @@ class EventHook:
 
 class EventHandler:
     events = (
+        'ENDBURST',
         'FJOIN',
         'FMODE',
         'NICK',

@@ -29,7 +29,7 @@ class Server:
         self.services_instances = list()
         self.users = dict()
         self.channels = dict()
-        self.linked = False
+        self.linked_once = False
 
     @asyncio.coroutine
     def connect(self):
@@ -53,8 +53,9 @@ class Server:
                 elif command == 'ENDBURST':
                     self.ev = self._ev
                     self._ev = None
-                    if not self.linked:
-                        self.linked = True
+                    params = [self.linked_once]
+                    if not self.linked_once:
+                        self.linked_once = True
                         if settings.admin_channel in self.channels:
                             timestamp = self.channels[settings.admin_channel].timestamp
                             modes = self.channels[settings.admin_channel].modes
