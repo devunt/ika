@@ -26,12 +26,12 @@ class Channel:
             mode, uid = usermode.split(',')
             self.usermodes[uid] = mode
             self.users[uid] = users[uid]
-            self.users[uid].channels.append(self.name)
+            self.users[uid].channels.append(self.name.lower())
 
     def remove_user(self, user):
         del self.users[user.uid]
         del self.usermodes[user.uid]
-        user.channels.remove(self.name)
+        user.channels.remove(self.name.lower())
 
 
 class User:
