@@ -9,7 +9,7 @@ class Stop(Command):
     aliases = (
     )
     syntax = '[이유]'
-    regex = r'(?P<reason>)?'
+    regex = r'(?P<reason>.+)?'
     permission = Permission.OPERATOR
     description = (
         '서비스봇을 종료합니다.',
