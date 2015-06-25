@@ -69,6 +69,12 @@ class Channel(Base):
         session = Session()
         return session.query(Channel).filter(func.lower(Channel.name) == func.lower(name)).first()
 
+    def get_flags_by_user(self, user):
+        type = 0
+        for flag in self.flags:
+            if flag.match_target(user.mask) or (flag.target == user.account.name.name):
+                type |= flag.type
+        return type
 
 class Flag(Base):
     __tablename__ = 'flag'

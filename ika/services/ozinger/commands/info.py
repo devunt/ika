@@ -33,11 +33,7 @@ class Information(Command):
                         return
                 else:
                     if channel is not None:
-                        for flag in channel.flags:
-                            if (flag.type & Flags.OWNER) != 0:
-                                if (flag.match_target(user.mask) or flag.match_target(user.account.name.name)):
-                                    break
-                        else:
+                        if (channel.get_flags_by_user(user) & Flags.OWNER) == 0:
                             self.service.msg(user, '권한이 없습니다.')
                             return
                     else:
