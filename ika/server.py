@@ -70,7 +70,7 @@ class Server:
                     if params[0] == '*':
                         pass
                     elif params[0].startswith('#'):
-                        self.channels[params[0]].metadata[params[1]] = params[-1]
+                        self.channels[params[0].lower()].metadata[params[1]] = params[-1]
                     else:
                         if params[1] == 'accountname':
                             account = Account.find_by_nick(params[-1])
@@ -81,7 +81,7 @@ class Server:
                         else:
                             self.users[params[0]].metadata[params[1]] = params[-1]
                 elif command == 'FJOIN':
-                    channel = params[0]
+                    channel = params[0].lower()
                     if channel in self.channels:
                         self.channels[channel].fjoin(self.users, *params)
                     else:
@@ -104,13 +104,13 @@ class Server:
                 elif command == 'FHOST':
                     user.dhost = params[0]
                 elif command == 'KICK':
-                    channel = params[0]
+                    channel = params[0].lower()
                     target = self.users[params[1]]
                     self.channels[channel].remove_user(target)
                     if len(self.channels[channel].users) == 0:
                         del self.channels[channel]
                 elif command == 'PART':
-                    channel = params[0]
+                    channel = params[0].lower()
                     self.channels[channel].remove_user(user)
                     if len(self.channels[channel].users) == 0:
                         del self.channels[channel]
