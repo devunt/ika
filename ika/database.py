@@ -72,7 +72,7 @@ class Channel(Base):
     def get_flags_by_user(self, user):
         type = 0
         for flag in self.flags:
-            if flag.match_target(user.mask) or (flag.target == user.account.name.name):
+            if flag.match_target(user.mask) or (user.account and (flag.target == user.account.name.name)):
                 type |= flag.type
         return type
 
