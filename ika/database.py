@@ -63,6 +63,11 @@ class Channel(Base):
     data = Column(JSONType)
     created_on = Column(DateTime, default=func.now())
 
+    @classmethod
+    def find_by_name(cls, name):
+        session = Session()
+        return session.query(Channel).filter(func.lower(Channel.name) == func.lower(name)).first()
+
 
 class Flag(Base):
     __tablename__ = 'flag'
