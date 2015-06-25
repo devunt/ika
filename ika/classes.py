@@ -93,7 +93,7 @@ class Command:
                     ty, exc, tb = sys.exc_info()
                     session = Session()
                     session.rollback()
-                    self.service.msg(user, '\x02{}\x02 명령을 처리하는 도중 문제가 발생했습니다. 잠시 후 다시 한번 시도해주세요.', self.name)
+                    self.service.msg(user, '\x02{}\x02 명령을 처리하는 도중 문제가 발생했습니다. 잠시 후 다시 한번 시도해주세요. 문제가 계속된다면 #ozinger 에 말씀해주세요.', self.name)
                     self.service.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.admin_channel, ty, exc)
                     raise ex
             else:
