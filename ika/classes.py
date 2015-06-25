@@ -45,6 +45,10 @@ class User:
         self.opertype = None
 
     @property
+    def mask(self):
+        return '{}!{}@{}'.format(self.nick, self.ident, self.dhost)
+
+    @property
     def account(self):
         name = self.metadata.get('accountname')
         if name is not None:
