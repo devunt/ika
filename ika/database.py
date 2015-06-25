@@ -1,3 +1,4 @@
+import re
 from sqlalchemy import create_engine
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import DateTime, Integer, String
@@ -77,3 +78,9 @@ class Flag(Base):
     target = Column(String(255))
     type = Column(Integer)
     created_on = Column(DateTime, default=func.now())
+
+    def match_target(self, target):
+        regex = re.escape(self.target)
+        regex = regex.replace('\*', '.+?')
+        pattern = re.compile(regex)
+        return (pattern.match(target) is not None)
