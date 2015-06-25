@@ -17,8 +17,10 @@ class ChannelJoin(Listener):
     @asyncio.coroutine
     def FJOIN(self, server, *params):
         channel = Channel.find_by_name(params[0])
+        if not channel:
+            return
         real_channel = self.service.server.channels.get(channel.name.lower())
-        if (not channel) or (not real_channel):
+        if not real_channel:
             return
         usermodes = params[-1].split()
         for usermode in usermodes:
