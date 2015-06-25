@@ -9,6 +9,9 @@ class Login(Command):
     name = '로그인'
     aliases = (
         '인증',
+        'LOGIN',
+        'IDENTIFY',
+        'ID',
     )
     syntax = '[계정명] <비밀번호>'
     regex = r'((?P<name>\S+) )?(?P<password>\S+)'

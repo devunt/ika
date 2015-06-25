@@ -8,6 +8,7 @@ from ika.database import Account
 class Ghost(Command):
     name = '고스트'
     aliases = (
+        'GHOST',
     )
     syntax = '<닉네임>'
     regex = r'(?P<nick>\S+)'

@@ -9,6 +9,8 @@ class Register(Command):
     name = '등록'
     aliases = (
         '가입',
+        'REGISTER',
+        'SIGNUP',
     )
     syntax = '<이메일 주소> <비밀번호>'
     regex = r'(?P<email>\S+) (?P<password>\S+)'

@@ -10,6 +10,7 @@ class Ungroup(Command):
     aliases = (
         '닉네임제거',
         '닉제거',
+        'UNGROUP',
     )
     syntax = '[제거할 닉네임]'
     regex = r'(?P<name>\S+)?'

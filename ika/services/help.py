@@ -8,6 +8,8 @@ class Help(Command):
     name = '도움말'
     aliases = (
         '도움',
+        'HELP',
+        '?'
     )
     syntax = '[명령어 이름]'
     regex = r'(?P<command>\S+)?'
@@ -42,3 +44,6 @@ class Help(Command):
                 if command not in commands:
                     commands.append(command)
                     self.service.msg(user, '\x02{:\u3000<10}\x02{}', command.name, command.description[0])
+        if len(target.aliases) > 0:
+            self.service.msg(user, ' ')
+            self.service.msg(user, '다른 이름들: \x02{}\x02'.format('\x02, \x02'.join(target.aliases)))

@@ -11,6 +11,7 @@ class ChangeName(Command):
         '계정명바꾸기',
         '이름변경',
         '이름바꾸기',
+        'CHANGENAME',
     )
     syntax = '<새 계정명>'
     regex = r'(?P<new_name>\S+)'

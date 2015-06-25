@@ -9,6 +9,7 @@ class ChangeEmail(Command):
     name = '이메일변경'
     aliases = (
         '이메일바꾸기',
+        'CHANGEEMAIL',
     )
     syntax = '<현재 비밀번호> <새 이메일>'
     regex = r'(?P<password>\S+) (?P<new_email>\S+)'

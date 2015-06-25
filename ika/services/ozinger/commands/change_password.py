@@ -11,6 +11,8 @@ class ChangePassword(Command):
         '비밀번호바꾸기',
         '비번변경',
         '비번바꾸기',
+        'CHANGEPASSWORD',
+        'CHANGEPASS',
     )
     syntax = '<현재 비밀번호> <새 비밀번호>'
     regex = r'(?P<password>\S+) (?P<new_password>\S+)'

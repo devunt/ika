@@ -8,6 +8,7 @@ class Logout(Command):
     name = '로그아웃'
     aliases = (
         '인증해제',
+        'LOGOUT',
     )
     permission = Permission.LOGIN_REQUIRED
     description = (

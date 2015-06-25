@@ -8,6 +8,7 @@ from ika.database import Account, Session
 class ForceChangeVirtualHost(Command):
     name = '강제가상호스트변경'
     aliases = (
+        'FVHOST',
     )
     syntax = '<계정명> [새 가상 호스트]'
     regex = r'(?P<name>\S+)( (?P<new_vhost>\S+))?'
