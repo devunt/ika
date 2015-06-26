@@ -26,6 +26,7 @@ class EventHandler:
         'NICK',
         'OPERTYPE',
         'PART',
+        'PRIVMSG',
         'QUIT',
         'TOPIC',
         'UID',
