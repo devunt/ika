@@ -61,7 +61,7 @@ class Channel(Base):
     __tablename__ = 'channel'
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True)
-    data = Column(JSONType)
+    data = Column(JSONType, default=dict())
     created_on = Column(DateTime, default=func.now())
 
     @classmethod
