@@ -8,6 +8,7 @@ from ika.enums import Flags
 class ChannelJoin(Listener):
     modemap = {
         Flags.OWNER: 'q',
+        Flags.FOUNDER: 'q',
         Flags.PROTECT: 'a',
         Flags.OP: 'o',
         Flags.HALFOP: 'h',

@@ -8,7 +8,8 @@ class Permission(Enum):
 
 
 class Flags(IntEnum):
-    OWNER = 32
+    OWNER = 64
+    FOUNDER = 32
     PROTECT = 4
     OP = 16
     HALFOP = 8
