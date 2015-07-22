@@ -172,6 +172,8 @@ class Server:
     def writeline(self, line, *args, **kwargs):
         if isinstance(line, str):
             line = line.format(*args, **kwargs)
+        if '\n' in line:
+            raise ValueError('writeline: Message should not be multi-lined')
         self.writer.write(line.encode() + b'\r\n')
         logger.debug('<<< {}'.format(line))
 
