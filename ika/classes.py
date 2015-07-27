@@ -147,7 +147,7 @@ class Service:
     def process_command(self, user, line):
         split = line.split(maxsplit=1)
         if len(split) == 0:
-            self.msg(user, '명령을 입력해주세요. \x02/msg {} 도움말\x02를 입력하시면 사용할 수 있는 명령의 목록을 볼 수 있습니다.', self.name)
+            self.msg(user, '명령을 입력해주세요. \x02/msg {} 도움말\x02 을 입력하시면 사용할 수 있는 명령의 목록을 볼 수 있습니다.', self.name)
         else:
             if len(split) == 1:
                 split.append('')
