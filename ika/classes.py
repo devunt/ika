@@ -146,14 +146,17 @@ class Service:
 
     def process_command(self, user, line):
         split = line.split(maxsplit=1)
-        if len(split) == 1:
-            split.append('')
-        command, param = split
-        command = command.upper()
-        if command in self.commands:
-            asyncio.async(self.commands[command].run(user, param))
+        if len(split) == 0:
+            self.msg(user, '명령을 입력해주세요. \x02/msg {} 도움말\x02를 입력하시면 사용할 수 있는 명령의 목록을 볼 수 있습니다.', self.name)
         else:
-            self.msg(user, '존재하지 않는 명령어입니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.name)
+            if len(split) == 1:
+                split.append('')
+            command, param = split
+            command = command.upper()
+            if command in self.commands:
+                asyncio.async(self.commands[command].run(user, param))
+            else:
+                self.msg(user, '존재하지 않는 명령어입니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.name)
 
     def register_modules(self):
         help = import_module('ika.services.help')
