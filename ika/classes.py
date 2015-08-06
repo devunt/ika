@@ -94,7 +94,7 @@ class Command:
                     session = Session()
                     session.rollback()
                     self.service.msg(user, '\x02{}\x02 명령을 처리하는 도중 문제가 발생했습니다. 잠시 후 다시 한번 시도해주세요. 문제가 계속된다면 #ozinger 에 말씀해주세요.', self.name)
-                    self.service.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.admin_channel, ty, exc.splitlines()[0])
+                    self.service.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.admin_channel, ty, str(exc).splitlines()[0])
                     raise ex
             else:
                 self.service.msg(user, '사용법이 올바르지 않습니다. \x02/msg {} 도움말 {}\x02 를 입력해보세요.', self.service.name, self.name)
