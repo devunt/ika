@@ -18,10 +18,10 @@ class Ozinger(Service):
     joined_channels = list()
 
     def join_channel(self, channel):
-        self.writeserverline('FJOIN {} {} +{} :a,{}',
+        self.writeserverline('FJOIN {} {} +{} :ao,{}',
             channel.name, channel.timestamp, channel.modes, self.uid)
-        self.joined_channels.append(channel.name)
+        self.joined_channels.append(channel.name.lower())
 
     def part_channel(self, channel, reason=None):
         self.writesvsuserline('PART {} :{}', channel, reason or 'No reason was specified')
-        self.joined_channels.remove(channel)
+        self.joined_channels.remove(channel.lower())
