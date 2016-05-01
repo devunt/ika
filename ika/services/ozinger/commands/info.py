@@ -26,25 +26,26 @@ class Information(Command):
             channel = Channel.find_by_name(name)
             if user.is_operator:
                 if channel is None:
-                    self.service.msg(user, '등록되지 않은 채널입니다.')
+                    self.service.msg(user, '해당 채널 \x02{}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.', name)
                     return
             else:
                 if channel is not None:
                     if (channel.get_flags_by_user(user) & Flags.OWNER) == 0:
-                        self.service.msg(user, '권한이 없습니다.')
+                        self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
                         return
                 else:
-                    self.service.msg(user, '권한이 없습니다.')
+                    # 채널이 존재하지 않으나 권한이 없는 이용자에게는 채널의 존재 여부를 알려줄 수 없음
+                    self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
                     return
             self.service.msg(user, '\x02=== {} 채널 정보 ===\x02', channel.name)
             self.service.msg(user, '채널 등록일: {}', channel.created_on)
         else:
             account = Account.find_by_nick(name)
             if (not user.is_operator) and (account != user.account):
-                self.service.msg(user, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
+                self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
                 return
             if account is None:
-                self.service.msg(user, '등록되지 않은 계정입니다.')
+                self.service.msg(user, '해당 계정 \x02{}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.', name)
                 return
             self.service.msg(user, '\x02=== {} 계정 정보 ===\x02', account.name.name)
             self.service.msg(user, '이메일: {}', account.email)
