@@ -37,12 +37,17 @@ class ChannelFlags(Command):
 
         channel = Channel.find_by_name(name)
 
-        if (channel is None) or (channel.get_flags_by_user(user) & Flags.OWNER) == 0:
+        if channel is None:
             if user.is_operator:
                 self.service.msg(user, '해당 채널 \x02{}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.', name)
             else:
                 self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
             return
+        
+        if (channel.get_flags_by_user(user) & Flags.OWNER) == 0:
+            if not user.is_operator:
+                self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
+                return
 
         self.service.msg(user, '\x02=== {} 채널 권한 정보 ===\x02', channel.name)
         self.service.msg(user, ' ')
