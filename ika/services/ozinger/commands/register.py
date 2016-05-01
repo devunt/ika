@@ -32,6 +32,10 @@ class Register(Command):
             self.service.msg(user, '해당 닉네임 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', user.nick)
             return
 
+        if session.query(Account).filter(Account.email == email).exists():
+            self.service.msg(user, '해당 이메일 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', email)
+            return
+
         nick = Nick()
         nick.name = user.nick
         nick.last_use = datetime.now()
