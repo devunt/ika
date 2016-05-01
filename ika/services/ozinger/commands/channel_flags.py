@@ -23,12 +23,12 @@ class ChannelFlags(Command):
     )
 
     flagmap = {
-        Flags.OWNER: 'Q',
-        Flags.FOUNDER: 'F',
-        Flags.PROTECT: 'A',
-        Flags.OP: 'O',
-        Flags.HALFOP: 'H',
-        Flags.VOICE: 'V',
+        Flags.OWNER: '\x0306Q\x03',
+        Flags.FOUNDER: '\x0306F\x03',
+        Flags.PROTECT: '\x0304A\x03',
+        Flags.OP: '\x0309O\x03',
+        Flags.HALFOP: '\x0311H\x03',
+        Flags.VOICE: '\x0307V\x03',
     }
 
     @asyncio.coroutine
@@ -43,7 +43,7 @@ class ChannelFlags(Command):
             else:
                 self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
             return
-        
+
         if (channel.get_flags_by_user(user) & Flags.OWNER) == 0:
             if not user.is_operator:
                 self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
@@ -51,8 +51,8 @@ class ChannelFlags(Command):
 
         self.service.msg(user, '\x02=== {} 채널 권한 정보 ===\x02', channel.name)
         self.service.msg(user, ' ')
-        self.service.msg(user, '\x02{:32}{:32}{}\x02', '계정명 또는 마스크', '권한', '변경된 시각')
+        # self.service.msg(user, '\x02{}    {}    {}\x02', '계정명 또는 마스크', '권한', '변경된 시각')
 
         for flag in channel.flags:
             flags = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
-            self.service.msg(user, '{:32}{:32}{}', flag.target, flags, flag.created_on)
+            self.service.msg(user, '\x02{}\x02 - {} ({} 에 마지막으로 변경됨)', flag.target, flags, flag.created_on)
