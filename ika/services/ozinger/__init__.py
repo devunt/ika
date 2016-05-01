@@ -2,10 +2,9 @@ from ika.classes import Service
 
 
 class Ozinger(Service):
-    name = '>_<'
+    name = '^^'
     aliases = (
         '오징어',
-        '^^',
     )
     description = (
         '통합 서비스봇입니다.',
