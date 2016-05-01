@@ -63,6 +63,7 @@ class Channel(Base):
     name = Column(String(255), unique=True)
     data = Column(JSONType, default=dict())
     created_on = Column(DateTime, default=func.now())
+    flags = relationship('Flag', backref='channel', order_by='desc(Flag.type)')
 
     @classmethod
     def find_by_name(cls, name):
@@ -81,7 +82,6 @@ class Flag(Base):
     __tablename__ = 'flag'
     id = Column(Integer, primary_key=True)
     channel_id = Column(Integer, ForeignKey('channel.id'))
-    channel = relationship('Channel', backref='flags')
     target = Column(String(255))
     type = Column(Integer)
     created_on = Column(DateTime, default=func.now())
