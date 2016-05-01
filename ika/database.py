@@ -76,6 +76,7 @@ class Channel(Base):
                 type |= flag.type
         return type
 
+
 class Flag(Base):
     __tablename__ = 'flag'
     id = Column(Integer, primary_key=True)
@@ -85,8 +86,13 @@ class Flag(Base):
     type = Column(Integer)
     created_on = Column(DateTime, default=func.now())
 
+    @classmethod
+    def flags_by_target(cls, target):
+        session = Session()
+        return session.query(Nick).filter(func.lower(Nick.name) == func.lower(target)).first()
+
     def match_target(self, target):
         regex = re.escape(self.target)
         regex = regex.replace('\*', '.+?')
         pattern = re.compile(regex)
-        return (pattern.match(target) is not None)
+        return pattern.match(target) is not None
