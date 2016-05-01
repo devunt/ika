@@ -15,10 +15,13 @@ class Ozinger(Service):
         '하위호환성 유지를 위해 사용하지 못하고 남겨둬야 하는 점 양해 부탁드립니다',
         '소스코드: https://github.com/devunt/ika',
     )
+    joined_channels = list()
 
     def join_channel(self, channel):
         self.writeserverline('FJOIN {} {} +{} :a,{}',
             channel.name, channel.timestamp, channel.modes, self.uid)
+        self.joined_channels.append(channel.name)
 
     def part_channel(self, channel, reason=None):
         self.writesvsuserline('PART {} :{}', channel, reason or 'No reason was specified')
+        self.joined_channels.remove(channel)
