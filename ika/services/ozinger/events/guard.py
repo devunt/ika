@@ -31,7 +31,7 @@ class Guard(Listener):
     def PART(self, user, channel, *params):
         if channel.lower() not in self.service.joined_channels:
             return
-        real_channel = self.service.server.channels.get(channel)
+        real_channel = self.service.server.channels.get(channel.lower())
         if not real_channel:
             self.service.part_channel(channel, 'Never left without saying goodbye')
 
