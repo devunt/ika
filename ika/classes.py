@@ -19,6 +19,7 @@ class Channel:
         self.name = params[0]
         self.timestamp = int(params[1])
         self.fjoin(users, *params)
+        self.modes = ''
 
     def fjoin(self, users, *params):
         self.modes = ' '.join(params[2:-1])[1:]

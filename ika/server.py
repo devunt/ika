@@ -30,6 +30,8 @@ class Server:
         self.users = dict()
         self.channels = dict()
         self.linked_once = False
+        self.reader = None
+        self.writer = None
 
     @asyncio.coroutine
     def connect(self):
