@@ -72,7 +72,7 @@ class Channel(Base):
     def get_flags_by_user(self, user):
         type = 0
         for flag in self.flags:
-            if flag.match_target(user.mask) or (user.account and (flag.target == user.account.name.name)):
+            if flag.match_mask(user.mask) or (user.account and (flag.target == user.account.name.name)):
                 type |= flag.type
         return type
 
@@ -91,8 +91,11 @@ class Flag(Base):
         session = Session()
         return session.query(Nick).filter(func.lower(Nick.name) == func.lower(target)).first()
 
-    def match_target(self, target):
+    def match_mask(self, mask):
+        if ('!' not in self.target) or ('@' not in self.target):
+            return False
         regex = re.escape(self.target)
         regex = regex.replace('\*', '.+?')
+        regex = '^{}$'.format(regex)
         pattern = re.compile(regex)
-        return pattern.match(target) is not None
+        return pattern.match(mask) is not None
