@@ -7,4 +7,5 @@ class Identify(Login, Legacy):
     name = 'IDENTIFY'
     aliases = (
         'ID',
+        '인증',
     )
