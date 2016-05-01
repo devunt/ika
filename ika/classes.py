@@ -6,7 +6,6 @@ from importlib import import_module, reload
 
 from ika.conf import settings
 from ika.enums import Permission
-from ika.event import EventHandler
 from ika.database import Account, Session
 from ika.logger import logger
 
