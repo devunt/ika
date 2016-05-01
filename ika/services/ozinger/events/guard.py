@@ -24,12 +24,12 @@ class Guard(Listener):
         real_channel = self.service.server.channels.get(channel.name.lower())
         if not real_channel:
             return
-        if real_channel.name not in self.service.joined_channels:
+        if real_channel.name.lower() not in self.service.joined_channels:
             self.service.join_channel(real_channel)
 
     @asyncio.coroutine
     def PART(self, user, channel, *params):
-        if channel not in self.service.joined_channels:
+        if channel.lower() not in self.service.joined_channels:
             return
         real_channel = self.service.server.channels.get(channel)
         if not real_channel:
