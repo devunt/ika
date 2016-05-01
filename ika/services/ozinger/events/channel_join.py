@@ -28,8 +28,6 @@ class ChannelJoin(Listener):
             uid = usermode.split(',')[1]
             user = self.service.server.users[uid]
             flags = channel.get_flags_by_user(user)
-            modes = ''
             for flag, mode in self.modemap.items():
                 if (flags & flag) != 0:
-                    modes += mode
-            self.service.writesvsuserline('FMODE {} {} +{} {}', real_channel.name, real_channel.timestamp, modes, user.uid)
+                    self.service.writesvsuserline('FMODE {} {} +{} {}', real_channel.name, real_channel.timestamp, mode, user.uid)
