@@ -85,7 +85,7 @@ class Server:
                 elif command == 'FJOIN':
                     channel = params[0].lower()
                     if channel in self.channels:
-                        self.channels[channel].fjoin(self.users, *params)
+                        self.channels[channel].process_fjoin(self.users, *params)
                     else:
                         self.channels[channel] = Channel(self.users, *params)
             elif RE_USER.match(line):

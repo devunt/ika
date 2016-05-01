@@ -18,10 +18,10 @@ class Channel:
         self.metadata = dict()
         self.name = params[0]
         self.timestamp = int(params[1])
-        self.fjoin(users, *params)
         self.modes = ''
+        self.process_fjoin(users, *params)
 
-    def fjoin(self, users, *params):
+    def process_fjoin(self, users, *params):
         self.modes = ' '.join(params[2:-1])[1:]
         for usermode in params[-1].split():
             mode, uid = usermode.split(',')
