@@ -72,3 +72,6 @@ config.json
 
 # Virtualenv
 .venv
+
+# Idea
+.idea
