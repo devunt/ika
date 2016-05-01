@@ -24,7 +24,7 @@ class Guard(Listener):
         real_channel = self.service.server.channels.get(channel.name.lower())
         if not real_channel:
             return
-        if self.service.uid not in real_channel.users.keys():
+        if real_channel.name not in self.service.joined_channels:
             self.service.join_channel(real_channel)
 
     @asyncio.coroutine
