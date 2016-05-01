@@ -54,5 +54,5 @@ class ChannelFlags(Command):
         # self.service.msg(user, '\x02{}    {}    {}\x02', '계정명 또는 마스크', '권한', '변경된 시각')
 
         for flag in channel.flags:
-            flags = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
-            self.service.msg(user, '\x02{:<32}\x02 {:<16} ({} 에 마지막으로 변경됨)', flag.target, flags, flag.created_on)
+            flags_str = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
+            self.service.msg(user, '  \x02{:<32}\x02 {:<16} ({} 에 마지막으로 변경됨)', flag.target, flags_str, flag.created_on)
