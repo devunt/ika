@@ -1,5 +1,4 @@
 import asyncio
-from datetime import datetime
 
 from ika.classes import Command
 from ika.database import Channel, Flag, Session
@@ -7,52 +6,48 @@ from ika.enums import Flags, Permission
 
 
 class ChannelFlags(Command):
-    name = '채널등록'
+    name = '채널권한'
     aliases = (
-        '새채널',
-        'NEWCHANNEL',
-        'REGISTERCHANNEL',
+        '권한',
+        'CHANNELFLAGS',
+        'FLAGS',
     )
     syntax = '<#채널명>'
     regex = r'(?P<name>#\S+)'
     permission = Permission.LOGIN_REQUIRED
     description = (
-        '오징어 IRC 네트워크에 채널을 등록합니다.',
+        '오징어 IRC 네트워크에 등록되어 있는 채널의 권한을 보거나 설정합니다,'
         ' ',
-        '이 명령을 사용할 시 오징어 IRC 네트워크에 해당 이름의 채널을 등록하며,',
-        '그 뒤로 네트워크에서 제공하는 여러 편의 기능등을 이용하실 수 있습니다.',
-        '채널 등록은 해당 채널에 옵이 있는 사용자만 할 수 있습니다.',
+        '이 명령을 사용할 시 오징어 IRC 네트워크에 등록되어 있는 채널의 이용 권한을 보거나 설정하며,',
+        '개설자(파운더), 주인, 보호된 사용자, 관리자(옵), 부관리자(하프옵), 발언권(보이스) 등의 권한이 설정 가능합니다.',
     )
+
+    flagmap = {
+        Flags.OWNER: 'Q',
+        Flags.FOUNDER: 'F',
+        Flags.PROTECT: 'A',
+        Flags.OP: 'O',
+        Flags.HALFOP: 'H',
+        Flags.VOICE: 'V',
+    }
 
     @asyncio.coroutine
     def execute(self, user, name):
-        session = Session()
+        #session = Session()
 
-        real_channel = self.service.server.channels.get(name)
-        if not real_channel:
-            self.service.msg(user, '해당 채널 \x02{}\x02 가 존재하지 않습니다.', name)
+        channel = Channel.find_by_name(name)
+
+        if (channel is None) or (channel.get_flags_by_user(user) & Flags.OWNER) == 0:
+            if user.is_operator:
+                self.service.msg(user, '해당 채널 \x02{}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.', name)
+            else:
+                self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
             return
 
-        if 'o' not in real_channel.usermodes[user.uid]:
-            self.service.msg(user, '해당 채널 \x02{}\x02 에 \x02{}\x02 유저에 대한 옵이 없습니다.', name, user.nick)
-            return
+        self.service.msg(user, '\x02=== {} 채널 권한 정보 ===\x02', channel.name)
+        self.service.msg(user, ' ')
+        self.service.msg(user, '\x02{:32}{:32}{}\x02', '계정명 또는 마스크', '권한', '변경된 시각')
 
-        if Channel.find_by_name(name):
-            self.service.msg(user, '해당 채널 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', name)
-            return
-
-        channel = Channel()
-        channel.name = name
-
-        flag = Flag()
-        flag.channel = channel
-        flag.target = user.account.name.name
-        flag.type = Flags.OWNER
-
-        session.add(flag)
-        session.commit()
-
-        self.service.msg(user, '해당 채널 \x02{}\x02 의 등록이 완료되었습니다.', name)
-
-        self.service.join_channel(real_channel)
-        self.service.writesvsuserline('FMODE {} {} +{} {}', name, real_channel.timestamp, 'q', user.uid)
+        for flag in channel.flags:
+            flags = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
+            self.service.msg(user, '{:32}{:32}{}', flag.target, flags, flag.created_on)
