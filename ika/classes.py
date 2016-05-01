@@ -79,7 +79,7 @@ class Command:
 
     @asyncio.coroutine
     def run(self, user, param):
-        if (self.permission is Permission.LOGIN_REQUIRED) and ('accountname' not in user.metadata):
+        if (self.permission is Permission.LOGIN_REQUIRED) and (user.account is None):
             self.service.msg(user, '로그인되어 있지 않습니다. \x02/msg {} 로그인\x02 명령을 이용해 로그인해주세요.', self.service.name)
         elif (self.permission is Permission.OPERATOR) and (not user.is_operator):
             self.service.msg(user, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
@@ -154,13 +154,13 @@ class Service:
             command, param = split
             command = command.upper()
             if command in self.commands:
-                asyncio.async(self.commands[command].run(user, param))
+                asyncio.ensure_future(self.commands[command].run(user, param))
             else:
                 self.msg(user, '존재하지 않는 명령어입니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.name)
 
     def register_modules(self):
-        help = import_module('ika.services.help')
-        helpc = help.Help(self)
+        helpm = import_module('ika.services.help')
+        helpc = helpm.Help(self)
         names = list(helpc.aliases)
         names.insert(0, helpc.name)
         for name in names:
