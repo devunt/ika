@@ -1,8 +1,9 @@
 import asyncio
+from sqlalchemy.sql import func
 
 from ika.classes import Command
 from ika.enums import Permission
-from ika.database import Nick, Session
+from ika.database import Flag, Nick, Session
 
 
 class ChangeName(Command):
@@ -38,6 +39,10 @@ class ChangeName(Command):
                 account.aliases.append(user.account.name)
                 account.aliases.remove(nick)
                 account.name = nick
+
+                flags = session.query(Flag).filter(func.lower(Flag.target) == func.lower(old_name))
+                flags.update({'target': new_name})
+
                 session.commit()
                 user.metadata['accountname'] = user.account.name.name
                 self.service.writeserverline('METADATA {} accountname :{}', user.uid, user.account.name.name)
