@@ -51,7 +51,6 @@ class ChannelFlags(Command):
 
         self.service.msg(user, '\x02=== {} 채널 권한 정보 ===\x02', channel.name)
         self.service.msg(user, ' ')
-        # self.service.msg(user, '\x02{}    {}    {}\x02', '계정명 또는 마스크', '권한', '변경된 시각')
 
         for flag in channel.flags:
             flags_str = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
