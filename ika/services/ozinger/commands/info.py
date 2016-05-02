@@ -38,7 +38,10 @@ class Information(Command):
                     self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
                     return
             self.service.msg(user, '\x02=== {} 채널 정보 ===\x02', channel.name)
+            self.service.msg(user, '채널 설립자: {}', ', '.join(map(lambda x: x.target, filter(lambda x: (x.type & Flags.FOUNDER) != 0, channel.flags))))
+            self.service.msg(user, '채널 주인: {}', ', '.join(map(lambda x: x.target, filter(lambda x: (x.type & Flags.OWNER) != 0, channel.flags))))
             self.service.msg(user, '채널 등록일: {}', channel.created_on)
+            self.service.msg(user, '채널 메타데이터: {}', channel.data)
         else:
             account = Account.find_by_nick(name)
             if (not user.is_operator) and (account != user.account):
