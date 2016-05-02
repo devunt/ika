@@ -89,7 +89,7 @@ class Flag(Base):
     @classmethod
     def flags_by_target(cls, target):
         session = Session()
-        return session.query(Nick).filter(func.lower(Nick.name) == func.lower(target)).first()
+        return session.query(Flag).filter(func.lower(Flag.target) == func.lower(target))
 
     def match_mask(self, mask):
         if ('!' not in self.target) or ('@' not in self.target):
