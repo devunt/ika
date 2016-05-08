@@ -47,7 +47,7 @@ class RegisterChannel(Command):
         flag = Flag()
         flag.channel = channel
         flag.target = user.account.name.name
-        flag.type = Flags.OWNER
+        flag.type = int(Flags.OWNER)
 
         session.add(flag)
         session.commit()
