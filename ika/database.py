@@ -73,7 +73,7 @@ class Channel(Base):
     def get_flags_by_user(self, user):
         type = 0
         for flag in self.flags:
-            if flag.match_mask(user.mask) or (user.account and (flag.target == user.account.name.name)):
+            if flag.match_mask(user.mask) or (user.account and (flag.target.lower() == user.account.name.name.lower())):
                 type |= flag.type
         return type
 
@@ -97,5 +97,5 @@ class Flag(Base):
         regex = re.escape(self.target)
         regex = regex.replace('\*', '.+?')
         regex = '^{}$'.format(regex)
-        pattern = re.compile(regex)
+        pattern = re.compile(regex, re.IGNORECASE)
         return pattern.match(mask) is not None
