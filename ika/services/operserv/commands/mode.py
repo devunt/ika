@@ -26,7 +26,7 @@ class Mode(Command):
                 params = mode.split()
                 if len(params) == 2:
                     users = {v.nick.lower(): k for k, v in self.service.server.users.items()}
-                    user = users.get(params[2])
+                    user = users.get(params[2].lower())
                     if user is not None:
                         method = 'update' if params[0][0] == '+' else 'difference_update'
                         getattr(self.service.server.channels[target.lower()].usermodes[user.uid], method)(params[0][1:])
