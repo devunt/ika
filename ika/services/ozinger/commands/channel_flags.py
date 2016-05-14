@@ -69,7 +69,7 @@ class ChannelFlags(Command):
                 flags_str = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
                 self.service.msg(user, '  \x02{:<32}\x02 {:<16} ({} 에 마지막으로 변경됨)', flag.target, flags_str, flag.created_on)
         else:
-            flag = channel.flags.filter(func.lower(Flag.target) == func.lower(target)).first()
+            flag = session.query(Flag).filter((Flag.channel_id == channel.id) & (func.lower(Flag.target) == func.lower(target))).first()
 
             if flag is None:
                 flag = Flag()
