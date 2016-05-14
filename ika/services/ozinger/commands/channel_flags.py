@@ -14,7 +14,7 @@ class ChannelFlags(Command):
         'FLAGS',
     )
     syntax = '<#채널명> [대상] [권한]'
-    regex = r'(?P<name>#\S+)( (?P<target)\S+) (?P<flags>[+-][QFAOHV]+[+-QFAOHV]*))'
+    regex = r'(?P<name>#\S+)( (?P<target>\S+) (?P<flags>[+-][QFAOHV]+[+-QFAOHV]*))'
     permission = Permission.LOGIN_REQUIRED
     description = (
         '오징어 IRC 네트워크에 등록되어 있는 채널의 권한을 보거나 설정합니다,'
