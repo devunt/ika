@@ -105,6 +105,11 @@ class Server:
                     user.nick = params[0]
                 elif command == 'FHOST':
                     user.dhost = params[0]
+                elif command == 'FMODE':
+                    modes = params[2]
+                    method = 'add' if modes[0] == '+' else 'remove'
+                    for mode in modes[1:]:
+                        getattr(self.channels[params[0].lower()].usermodes[params[3]], method)(mode)
                 elif command == 'KICK':
                     channel = params[0].lower()
                     target = self.users[params[1]]

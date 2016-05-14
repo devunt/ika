@@ -24,7 +24,7 @@ class Channel:
         self.modes = ' '.join(params[2:-1])[1:]
         for usermode in params[-1].split():
             mode, uid = usermode.split(',')
-            self.usermodes[uid] = mode
+            self.usermodes[uid] = set(mode)
             self.users[uid] = users[uid]
             self.users[uid].channels.append(self.name.lower())
 

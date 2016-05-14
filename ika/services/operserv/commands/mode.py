@@ -22,6 +22,15 @@ class Mode(Command):
                 _target = target
                 channels = {k.lower(): v for k, v in self.service.server.channels.items()}
                 timestamp = channels[target.lower()].timestamp
+
+                params = mode.split()
+                if len(params) == 2:
+                    users = {v.nick.lower(): k for k, v in self.service.server.users.items()}
+                    user = users.get(params[2])
+                    if user is not None:
+                        method = 'add' if params[0][0] == '+' else 'remove'
+                        for m in params[0][1:]:
+                            getattr(self.service.server.channels[target.lower()].usermodes[user.uid], method)(m)
             else:
                 for u in self.service.server.users.values():
                     if u.nick.lower() == target.lower():
