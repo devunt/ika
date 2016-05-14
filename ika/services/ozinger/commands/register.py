@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from sqlalchemy.sql import func
 
 from ika.classes import Command
 from ika.database import Account, Nick, Session
@@ -28,11 +29,11 @@ class Register(Command):
     def execute(self, user, email, password):
         session = Session()
 
-        if Nick.find_by_name(user.nick):
+        if Nick.find_by_name(user.nick) is not None:
             self.service.msg(user, '해당 닉네임 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', user.nick)
             return
 
-        if session.query(Account).filter(Account.email == email).exists():
+        if session.query(Account).filter(func.lower(Account.email) == func.lower(email)).first() is not None:
             self.service.msg(user, '해당 이메일 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', email)
             return
 
