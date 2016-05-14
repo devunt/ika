@@ -91,7 +91,8 @@ class ChannelFlags(Command):
 
             if type == 0:
                 if flag is not None:
-                    flag.delete()
+                    session.delete(flag)
+                    session.commit()
                     self.service.msg(user, '\x02{}\x02 채널의 \x02{}\x02 대상의 권한을 제거했습니다.', name, target)
                 else:
                     self.service.msg(user, '설정될 수 있는 권한이 없습니다.')
