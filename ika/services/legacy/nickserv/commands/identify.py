@@ -8,4 +8,5 @@ class Identify(Login, Legacy):
     aliases = (
         'ID',
         '인증',
+        '로그인',
     )
