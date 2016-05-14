@@ -14,7 +14,7 @@ class ChannelFlags(Command):
         'FLAGS',
     )
     syntax = '<#채널명> [대상] [권한]'
-    regex = r'(?P<name>#\S+)( (?P<target>\S+) (?P<flags>[+-][QFAOHV]+[+-QFAOHV]*))?'
+    regex = r'(?P<name>#\S+)( (?P<target>\S+) (?P<flags>[+-][QFAOHV]+[+-FAOHV]*))?'
     permission = Permission.LOGIN_REQUIRED
     description = (
         '오징어 IRC 네트워크에 등록되어 있는 채널의 권한을 보거나 설정합니다,'
@@ -67,14 +67,15 @@ class ChannelFlags(Command):
 
             for flag in channel.flags:
                 flags_str = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
-                self.service.msg(user, '  \x02{:<32}\x02 {:<16} ({} 에 마지막으로 변경됨)', flag.target, flags_str, flag.created_on)
+                self.service.msg(user, '  \x02{:<32}\x02 {:<16} ({} 에 마지막으로 변경됨)',
+                                 flag.target, flags_str, flag.created_on)
         else:
-            flag = session.query(Flag).filter((Flag.channel_id == channel.id) & (func.lower(Flag.target) == func.lower(target))).first()
-
+            flag = session.query(Flag).filter(
+                (Flag.channel_id == channel.id) & (func.lower(Flag.target) == func.lower(target))).first()
             if flag is None:
-                flag = Flag()
-                flag.channel = channel
-                flag.target = target
+                type = 0
+            else:
+                type = flag.type
 
             for _flag in flags:
                 if _flag == '+':
@@ -84,13 +85,24 @@ class ChannelFlags(Command):
                 else:
                     flagnum = int(self.reverse_flagmap[_flag])
                     if is_adding:
-                        flag.type |= flagnum
+                        type |= flagnum
                     else:
-                        flag.type &= ~flagnum
+                        type &= ~flagnum
 
-            flag.created_on = func.now()
+            if type == 0:
+                if flag is not None:
+                    flag.delete()
+                    self.service.msg(user, '\x02{}\x02 채널의 \x02{}\x02 대상의 권한을 제거했습니다.', name, target)
+                else:
+                    self.service.msg(user, '설정될 수 있는 권한이 없습니다.')
+            else:
+                if flag is None:
+                    flag = Flag()
+                    flag.channel = channel
+                    flag.target = target
+                flag.type = type
 
-            session.add(flag)
-            session.commit()
+                session.add(flag)
+                session.commit()
 
-            self.service.msg(user, '\x02{}\x02 채널의 \x02{}\x02 대상에게 해당 권한을 설정했습니다.', name, target)
+                self.service.msg(user, '\x02{}\x02 채널의 \x02{}\x02 대상에게 해당 권한을 설정했습니다.', name, target)

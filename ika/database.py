@@ -84,7 +84,7 @@ class Flag(Base):
     channel_id = Column(Integer, ForeignKey('channel.id'))
     target = Column(String(255))
     type = Column(Integer)
-    created_on = Column(DateTime, default=func.now())
+    created_on = Column(DateTime, default=func.now(), onupdate=func.current_timestamp())
 
     @classmethod
     def flags_by_target(cls, target):
