@@ -33,7 +33,7 @@ class RegisterChannel(Command):
             self.service.msg(user, '해당 채널 \x02{}\x02 가 존재하지 않습니다.', name)
             return
 
-        if 'o' not in real_channel.usermodes[user.uid]:
+        if 'o' not in real_channel.usermodes.get(user.uid, set()):
             self.service.msg(user, '해당 채널 \x02{}\x02 에 \x02{}\x02 유저에 대한 옵이 없습니다.', name, user.nick)
             return
 
