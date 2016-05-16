@@ -106,10 +106,13 @@ class Server:
                 elif command == 'FHOST':
                     user.dhost = params[0]
                 elif command == 'FMODE':
-                    modes = params[2]
-                    method = 'update' if modes[0] == '+' else 'difference_update'
-                    if params[3] in self.channels[params[0].lower()].usermodes.keys():
-                        getattr(self.channels[params[0].lower()].usermodes[params[3]], method)(modes[1:])
+                    if len(params) == 3: # channel/user mode
+                        pass # TODO: To be implemented
+                    elif len(params) == 4: # channel user mode
+                        modes = params[2]
+                        method = 'update' if modes[0] == '+' else 'difference_update'
+                        if params[3] in self.channels[params[0].lower()].usermodes.keys():
+                            getattr(self.channels[params[0].lower()].usermodes[params[3]], method)(modes[1:])
                 elif command == 'KICK':
                     channel = params[0].lower()
                     target = self.users[params[1]]
