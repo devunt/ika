@@ -28,7 +28,7 @@ class RegisterChannel(Command):
     def execute(self, user, name):
         session = Session()
 
-        real_channel = self.service.server.channels.get(name)
+        real_channel = self.service.server.channels.get(name.lower())
         if not real_channel:
             self.service.msg(user, '해당 채널 \x02{}\x02 가 존재하지 않습니다.', name)
             return
