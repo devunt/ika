@@ -2,8 +2,9 @@ from ika.classes import Service
 
 
 class OperServ(Service):
-    name = '오퍼쨩'
+    name = '오징어'
     aliases = (
+        '오퍼쨩',
         'OperServ',
     )
     description = (
