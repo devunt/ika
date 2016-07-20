@@ -168,7 +168,7 @@ class Service:
         service = self.__module__.lstrip('ika.services')
         for modulename in settings.services[service]:
             try:
-                module = import_module('ika.services.{}.{}'.format(service, modulename))
+                module = reload(import_module('ika.services.{}.{}'.format(service, modulename)))
             except ImportError:
                 logger.exception('Missing module!')
             else:
@@ -187,9 +187,6 @@ class Service:
                             hook += getattr(instance, event)
 
     def reload_modules(self):
-        for instance in set(self.commands.values()):
-            reload(inspect.getmodule(instance))
-            del instance
         self.commands = dict()
         self.register_modules()
 
