@@ -33,4 +33,5 @@ class ChannelJoin(Listener):
                 if (flags & flag) != 0:
                     modes += mode
             if len(modes) > 0:
-                self.service.writesvsuserline('FMODE {} {} +{} {}', real_channel.name, real_channel.timestamp, modes, user.uid)
+                self.service.writesvsuserline('FMODE {} {} +{} {}', real_channel.name, real_channel.timestamp, modes,
+                                              ' '.join((user.uid,) * len(modes)))
