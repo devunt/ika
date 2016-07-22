@@ -34,9 +34,15 @@ class ForceSynchronise(Command):
         if name is None:
             channels = Channel.query.all();
         else:
-            channels = (Channel.find_by_name(name),)
+            channel = Channel.find_by_name(name)
+            if channel is None:
+                self.service.msg(user, '등록되지 않은 채널입니다.')
+            channels = (channel,)
+        channelcount = 0
         for channel in channels:
             real_channel = self.service.server.channels.get(channel.name.lower())
+            if real_channel is None:
+                continue
             for uid, cuser in real_channel.users.items():
                 flags = channel.get_flags_by_user(cuser)
                 modes = str()
@@ -46,4 +52,5 @@ class ForceSynchronise(Command):
                 if len(modes) > 0:
                     self.service.writesvsuserline('FMODE {} {} +{} {}', real_channel.name, real_channel.timestamp, modes,
                                                   ' '.join((cuser.uid,) * len(modes)))
-        self.service.msg(user, '{}개 채널에 권한이 동기화되었습니다.', len(channels))
+            channelcount += 1
+        self.service.msg(user, '{}개 채널에 권한이 동기화되었습니다.', channelcount)
