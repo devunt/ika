@@ -46,3 +46,4 @@ class ForceSynchronise(Command):
                 if len(modes) > 0:
                     self.service.writesvsuserline('FMODE {} {} +{} {}', real_channel.name, real_channel.timestamp, modes,
                                                   ' '.join((user.uid,) * len(modes)))
+        self.service.msg(user, '{}개 채널에 권한이 동기화되었습니다.', len(channels))
