@@ -29,7 +29,7 @@ class ForceSynchronise(Command):
             channels = (Channel.find_by_name(name),)
         for channel in channels:
             real_channel = self.service.server.channels.get(channel.name.lower())
-            for uid, user in real_channel.users:
+            for uid, user in real_channel.users.items():
                 flags = channel.get_flags_by_user(user)
                 modes = str()
                 for flag, mode in self.modemap.items():
