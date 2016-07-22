@@ -37,6 +37,7 @@ class ForceSynchronise(Command):
             channel = Channel.find_by_name(name)
             if channel is None:
                 self.service.msg(user, '등록되지 않은 채널입니다.')
+                return
             channels = (channel,)
         channelcount = 0
         for channel in channels:
