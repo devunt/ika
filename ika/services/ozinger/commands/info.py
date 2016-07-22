@@ -10,19 +10,20 @@ class Information(Command):
     aliases = (
         'INFO',
     )
-    syntax = '<계정명 또는 채널명>'
-    regex = r'(?P<name>\S+)'
+    syntax = '[계정명 또는 채널명]'
+    regex = r'(?P<name>\S+)?'
     permission = Permission.LOGIN_REQUIRED
     description = (
         '오징어 IRC 네트워크에 등록되어 있는 계정 또는 채널의 정보를 확인합니다.',
         ' ',
         '이 명령을 사용할 시 오징어 IRC 네트워크에 이미 등록되어 있는 계정 또는 채널에 대한 정보를 확인할 수 있습니다.',
         '자신의 계정이나 자신이 주인으로 등록되어 있는 채널 외 대상의 정보를 보기 위해서는 오퍼레이터 인증이 필요합니다.',
+        '아무 인자도 없이 실행했을 경우 현재 로그인되어 있는 계정의 정보를 확인합니다.',
     )
 
     @asyncio.coroutine
     def execute(self, user, name):
-        if name.startswith('#'):
+        if (name is not None) and name.startswith('#'):
             channel = Channel.find_by_name(name)
             if user.is_operator:
                 if channel is None:
@@ -43,7 +44,10 @@ class Information(Command):
             self.service.msg(user, '채널 등록일: {}', channel.created_on)
             self.service.msg(user, '채널 메타데이터: {}', channel.data)
         else:
-            account = Account.find_by_nick(name)
+            if name is None:
+                account = user.account
+            else:
+                account = Account.find_by_nick(name)
             if (not user.is_operator) and (account != user.account):
                 self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
                 return
