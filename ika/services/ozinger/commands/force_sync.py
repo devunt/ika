@@ -1,7 +1,7 @@
 import asyncio
 
 from ika.classes import Command
-from ika.enums import Permission
+from ika.enums import Flags, Permission
 from ika.database import Channel
 
 
@@ -20,6 +20,14 @@ class ForceSynchronise(Command):
         '채널명을 지정할 시 해당 채널만, 지정하지 않을 시 네트워크에 등록되어 있는 모든 채널들을 동기화합니다.',
         '단, 기존에 추가되어 있는 권한은 회수되지 않으며 기존에 부여되지 않았던 권한만 추가적으로 부여됩니다.',
     )
+    modemap = {
+        Flags.OWNER: 'q',
+        Flags.FOUNDER: 'q',
+        Flags.PROTECT: 'a',
+        Flags.OP: 'o',
+        Flags.HALFOP: 'h',
+        Flags.VOICE: 'v',
+    }
 
     @asyncio.coroutine
     def execute(self, user, name):
