@@ -37,13 +37,13 @@ class ForceSynchronise(Command):
             channels = (Channel.find_by_name(name),)
         for channel in channels:
             real_channel = self.service.server.channels.get(channel.name.lower())
-            for uid, user in real_channel.users.items():
-                flags = channel.get_flags_by_user(user)
+            for uid, cuser in real_channel.users.items():
+                flags = channel.get_flags_by_user(cuser)
                 modes = str()
                 for flag, mode in self.modemap.items():
                     if (flags & flag) != 0:
                         modes += mode
                 if len(modes) > 0:
                     self.service.writesvsuserline('FMODE {} {} +{} {}', real_channel.name, real_channel.timestamp, modes,
-                                                  ' '.join((user.uid,) * len(modes)))
+                                                  ' '.join((cuser.uid,) * len(modes)))
         self.service.msg(user, '{}개 채널에 권한이 동기화되었습니다.', len(channels))
