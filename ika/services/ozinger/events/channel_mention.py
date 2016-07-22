@@ -7,7 +7,7 @@ from ika.classes import Listener
 class ChannelMention(Listener):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.pattern = re.compile(r'^{}(,|:)( (?P<line>.+))?$'.format(self.service.name))
+        self.pattern = re.compile(r'^{}(,|:)( (?P<line>.+))?$'.format(re.escape(self.service.name)))
 
     @asyncio.coroutine
     def PRIVMSG(self, user, target, msg):
