@@ -2,7 +2,7 @@ import asyncio
 
 from ika.classes import Command
 from ika.enums import Flags, Permission
-from ika.database import Channel
+from ika.database import Channel, Session
 
 
 class ForceSynchronise(Command):
@@ -32,7 +32,8 @@ class ForceSynchronise(Command):
     @asyncio.coroutine
     def execute(self, user, name):
         if name is None:
-            channels = Channel.query.all();
+            session = Session()
+            channels = session.query(Channel).all()
         else:
             channel = Channel.find_by_name(name)
             if channel is None:
