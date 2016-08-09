@@ -26,7 +26,7 @@ class Server:
         self.ev = EventHandler()
         self._ev = None
         self.services = dict()
-        self.services_instances = list()
+        self.services_instances = dict()
         self.users = dict()
         self.channels = dict()
         self.linked_once = False
@@ -145,7 +145,7 @@ class Server:
                         self.writeserverline('BURST {}', timeutils.unixtime())
                         self.writeserverline('VERSION :{} {}', Versions.IKA, self.name)
                         idx = 621937810  # int('AAAAAA', 36)
-                        for service in self.services_instances:
+                        for service in self.services_instances.values():
                             service.id = ircutils.base36encode(idx)
                             names = list(service.aliases)
                             names.insert(0, service.name)
@@ -205,13 +205,13 @@ class Server:
                 _, cls = inspect.getmembers(module, lambda member: inspect.isclass(member)
                     and member.__module__ == 'ika.services.{}'.format(modulename))[0]
                 instance = cls(self)
-                self.services_instances.append(instance)
+                self.services_instances[cls.__name__] = instance
                 instance.register_modules()
 
     def reload_services(self):
         settings.reload()
         self.ev = EventHandler()
-        for instance in self.services_instances:
+        for instance in self.services_instances.values():
             instance.reload_modules()
 
     def disconnect(self, reason=''):

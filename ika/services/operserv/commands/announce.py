@@ -21,8 +21,9 @@ class Announce(Command):
 
     @asyncio.coroutine
     def execute(self, user, text):
+        uid = self.service.server.services_instances['Ozinger'].uid
         channelcount = len(self.service.server.channels)
         self.service.msg(user, '{}개 채널에 공지사항을 발송합니다.', channelcount)
         for channelname in self.service.server.channels.keys():
-            self.service.writesvsuserline('PRIVMSG {} : \x02[공지]\x02 {}', channelname, text)
+            self.service.server.writeuserline('PRIVMSG {} : \x02[공지]\x02 {}', uid, channelname, text)
         self.service.msg(user, '{}개 채널에 공지사항을 발송했습니다.', channelcount)
