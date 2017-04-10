@@ -73,7 +73,7 @@ class Service:
                 split.append('')
             command, param = split
             if command in self.commands:
-                asyncio.async(self.commands[command].run(user, param))
+                asyncio.ensure_future(self.commands[command].run(user, param))
             else:
                 self.msg(user, f'존재하지 않는 명령어입니다. \x02/msg {self.name} 도움말\x02 을 입력해보세요.')
 

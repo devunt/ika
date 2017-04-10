@@ -15,7 +15,7 @@ class EventHook:
 
     def __call__(self, *args, **kwargs):
         for handler in self.__handlers:
-            asyncio.async(handler(*args, **kwargs))
+            asyncio.ensure_future(handler(*args, **kwargs))
 
 
 class EventListener:
