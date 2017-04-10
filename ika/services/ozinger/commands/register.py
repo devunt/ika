@@ -1,9 +1,7 @@
-import asyncio
-from datetime import datetime
-from sqlalchemy.sql import func
+# from datetime import datetime
 
-from ika.classes import Command
-from ika.database import Account, Nick, Session
+from ika.service import Command
+from ika.models import Account, Nickname
 
 
 class Register(Command):
@@ -25,29 +23,25 @@ class Register(Command):
         '\x1f기존에 다른 곳에서 사용하지 않는 비밀번호의 사용을 권장\x1f합니다.',
     )
 
-    @asyncio.coroutine
-    def execute(self, user, email, password):
-        session = Session()
+    async def execute(self, user, email, password):
+        if Nickname.get(user.nick) is not None:
+            self.err(user, '해당 닉네임 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', user.nick)
 
-        if Nick.find_by_name(user.nick) is not None:
-            self.service.msg(user, '해당 닉네임 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', user.nick)
-            return
-
-        if session.query(Account).filter(func.lower(Account.email) == func.lower(email)).first() is not None:
-            self.service.msg(user, '해당 이메일 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', email)
-            return
-
-        nick = Nick()
-        nick.name = user.nick
-        nick.last_use = datetime.now()
+        if Account.objects.filter(email__iexact=email).exists():
+            self.err(user, '해당 이메일 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', email)
 
         account = Account()
         account.email = email
-        account.name = nick
-        account.password = password
-        account.last_login = datetime.now()
+        account.set_password(password)
+        # account.last_login = datetime.now()
+        account.save()
 
-        session.add(account)
-        session.commit()
+        nick = Nickname()
+        nick.name = user.nick
+        nick.account = account
+        nick.is_account_name = True
+        # nick.last_use = datetime.now()
+        nick.save()
 
-        self.service.msg(user, '해당 닉네임 \x02{}\x02 의 계정 등록이 완료되었습니다. 앞으로 \x02/msg {} 로그인 {}\x02 명령을 통해 로그인할 수 있습니다. 지금 로그인 해보세요.', nick.name, self.service.name, password)
+        self.msg(user, f'해당 닉네임 \x02{nick.name}\x02 의 계정 등록이 완료되었습니다. '
+                       f'앞으로 \x02/msg {self.service.name} 로그인 {password}\x02 명령을 통해 로그인할 수 있습니다. 지금 로그인 해보세요.')

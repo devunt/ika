@@ -1,7 +1,7 @@
-from ika.classes import Legacy, Service
+from ika.service import Legacy, Service
 
 
-class ChanServ(Service, Legacy):
+class ChanServ(Legacy, Service):
     name = 'ㅇㅈㅇ'
     aliases = (
         'ChanServ',

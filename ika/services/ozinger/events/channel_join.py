@@ -1,7 +1,5 @@
-import asyncio
-
-from ika.classes import Listener
-from ika.database import Channel
+from ika.service import Listener
+from ika.models import Channel
 from ika.enums import Flags
 
 
@@ -15,23 +13,23 @@ class ChannelJoin(Listener):
         Flags.VOICE: 'v',
     }
 
-    @asyncio.coroutine
-    def FJOIN(self, server, *params):
-        channel = Channel.find_by_name(params[0])
+    async def fjoin(self, cname, timestamp, modes, umodes):
+        channel = Channel.get(cname)
         if not channel:
             return
-        real_channel = self.service.server.channels.get(channel.name.lower())
-        if not real_channel:
+
+        irc_channel = self.server.channels.get(channel.name)
+        if not irc_channel:
             return
-        usermodes = params[-1].split()
+
+        usermodes = umodes[-1].split()
         for usermode in usermodes:
             uid = usermode.split(',')[1]
-            user = self.service.server.users[uid]
+            user = self.server.users[uid]
             flags = channel.get_flags_by_user(user)
             modes = str()
             for flag, mode in self.modemap.items():
                 if (flags & flag) != 0:
                     modes += mode
             if len(modes) > 0:
-                self.service.writesvsuserline('FMODE {} {} +{} {}', real_channel.name, real_channel.timestamp, modes,
-                                              ' '.join((user.uid,) * len(modes)))
+                self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, f'+{modes}', ' '.join((user.uid,) * len(modes)))

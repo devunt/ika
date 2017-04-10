@@ -1,9 +1,6 @@
-import asyncio
-from datetime import datetime
-
-from ika.classes import Command
-from ika.database import Channel, Flag, Session
-from ika.enums import Flags, Permission
+from ika.service import Command, Permission
+from ika.models import Channel, Flag
+from ika.enums import Flags
 
 
 class RegisterChannel(Command):
@@ -14,7 +11,7 @@ class RegisterChannel(Command):
         'REGISTERCHANNEL',
     )
     syntax = '<#채널명>'
-    regex = r'(?P<name>#\S+)'
+    regex = r'(?P<cname>#\S+)'
     permission = Permission.LOGIN_REQUIRED
     description = (
         '오징어 IRC 네트워크에 채널을 등록합니다.',
@@ -24,35 +21,28 @@ class RegisterChannel(Command):
         '채널 등록은 해당 채널에 옵이 있는 사용자만 할 수 있습니다.',
     )
 
-    @asyncio.coroutine
-    def execute(self, user, name):
-        session = Session()
+    async def execute(self, user, cname):
+        irc_channel = self.server.channels.get(cname)
+        if not irc_channel:
+            self.err(user, f'해당 채널 \x02{cname}\x02 가 존재하지 않습니다.')
 
-        real_channel = self.service.server.channels.get(name.lower())
-        if not real_channel:
-            self.service.msg(user, '해당 채널 \x02{}\x02 가 존재하지 않습니다.', name)
-            return
+        if 'o' not in irc_channel.usermodes.get(user.uid, set()):
+            self.err(user, f'해당 채널 \x02{cname}\x02 에 \x02{user.nick}\x02 유저에 대한 옵이 없습니다.')
 
-        if 'o' not in real_channel.usermodes.get(user.uid, set()):
-            self.service.msg(user, '해당 채널 \x02{}\x02 에 \x02{}\x02 유저에 대한 옵이 없습니다.', name, user.nick)
-            return
-
-        if Channel.find_by_name(name):
-            self.service.msg(user, '해당 채널 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', name)
-            return
+        if Channel.get(cname):
+            self.err(user, f'해당 채널 \x02{cname}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.')
 
         channel = Channel()
-        channel.name = name
+        channel.name = cname
+        channel.save()
 
         flag = Flag()
         flag.channel = channel
-        flag.target = user.account.name.name
+        flag.target = user.account.name
         flag.type = int(Flags.OWNER)
+        flag.save()
 
-        session.add(flag)
-        session.commit()
+        self.msg(user, f'해당 채널 \x02{cname}\x02 의 등록이 완료되었습니다.')
 
-        self.service.msg(user, '해당 채널 \x02{}\x02 의 등록이 완료되었습니다.', name)
-
-        self.service.join_channel(real_channel)
-        self.service.writesvsuserline('FMODE {} {} +{} {}', name, real_channel.timestamp, 'q', user.uid)
+        self.service.join_channel(irc_channel)
+        self.writesvsuserline('FMODE', cname, irc_channel.timestamp, '+q', user.uid)

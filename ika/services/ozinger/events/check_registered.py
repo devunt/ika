@@ -1,20 +1,17 @@
-import asyncio
-
-from ika.classes import Listener
-from ika.database import Nick
+from ika.service import Listener
+from ika.models import Account
 
 
 class CheckRegistered(Listener):
-    def check(self, uid, name):
-        nick = Nick.find_by_name(name)
-        if nick and (nick.account or nick.account_alias):
-            self.service.msg(uid, '이 닉네임은 이미 오징어 IRC 네트워크에 등록되어 있는 닉네임입니다. 계정의 주인이시라면 \x02/msg {} 로그인\x02 을, 주인이 아니시라면 지금 닉네임을 다른 것으로 바꿔 주세요.', self.service.name)
+    def _check(self, uid, name):
+        if Account.get(name):
+            self.msg(uid, f'이 닉네임은 이미 오징어 IRC 네트워크에 등록되어 있는 닉네임입니다. '
+                          f'계정의 주인이시라면 \x02/msg {self.service.name} 로그인\x02 을, '
+                          f'주인이 아니시라면 지금 닉네임을 다른 것으로 바꿔 주세요.')
 
-    @asyncio.coroutine
-    def NICK(self, user, *params):
-        if user.account is None:
-            self.check(user.uid, params[0])
+    async def nick(self, uid, nick):
+        if self.server.users[uid].account is None:
+            self._check(uid, nick)
 
-    @asyncio.coroutine
-    def UID(self, server, *params):
-        self.check(params[0], params[2])
+    async def uid(self, uid, timestamp, nick, host, dhost, ident, ipaddress, signon, modes, gecos):
+        self._check(uid, nick)

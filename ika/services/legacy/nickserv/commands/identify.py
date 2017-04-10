@@ -1,9 +1,8 @@
-from ika.classes import Legacy
+from ika.service import Legacy
+from ika.services.ozinger.commands.login import Login as _Login
 
-from ika.services.ozinger.commands.login import Login
 
-
-class Identify(Login, Legacy):
+class Identify(Legacy, _Login):
     name = 'IDENTIFY'
     aliases = (
         'ID',

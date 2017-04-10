@@ -1,9 +1,7 @@
-import asyncio
-
-from ika.classes import Listener
+from ika.service import Listener
 
 
 class Welcome(Listener):
-    @asyncio.coroutine
-    def UID(self, server, *params):
-        self.service.msg(params[0], '오징어 IRC 네트워크에 오신 것을 환영합니다! 서비스봇 사용을 위해서는 \x02/msg {0} 도움말\x02 또는 \x02/s ?\x02 등을 입력해보세요.', self.service.name)
+    async def uid(self, uid, timestamp, nick, host, dhost, ident, ipaddress, signon, modes, gecos):
+        self.msg(uid, f'오징어 IRC 네트워크에 오신 것을 환영합니다! '
+                      f'서비스봇 사용을 위해서는 \x02/msg {self.service.name} 도움말\x02 또는 \x02/s ?\x02 등을 입력해보세요.')

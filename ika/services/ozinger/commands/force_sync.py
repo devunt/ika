@@ -1,8 +1,6 @@
-import asyncio
-
-from ika.classes import Command
-from ika.enums import Flags, Permission
-from ika.database import Channel, Session
+from ika.service import Command, Permission
+from ika.enums import Flags
+from ika.models import Channel
 
 
 class ForceSynchronise(Command):
@@ -29,30 +27,27 @@ class ForceSynchronise(Command):
         Flags.VOICE: 'v',
     }
 
-    @asyncio.coroutine
-    def execute(self, user, name):
+    async def execute(self, user, name):
         if name is None:
-            session = Session()
-            channels = session.query(Channel).all()
+            channels = Channel.objects.all()
         else:
-            channel = Channel.find_by_name(name)
+            channel = Channel.get(name)
             if channel is None:
-                self.service.msg(user, '등록되지 않은 채널입니다.')
-                return
-            channels = (channel,)
-        channelcount = 0
+                self.err(user, '등록되지 않은 채널입니다.')
+            channels = [channel]
+        count = 0
         for channel in channels:
-            real_channel = self.service.server.channels.get(channel.name.lower())
-            if real_channel is None:
+            irc_channel = self.server.channels.get(channel.name)
+            if irc_channel is None:
                 continue
-            for uid, cuser in real_channel.users.items():
-                flags = channel.get_flags_by_user(cuser)
+            for uid in irc_channel.umodes.keys():
+                joined_user = self.server.users[uid]
+                flags = channel.get_flags_by_user(joined_user)
                 modes = str()
                 for flag, mode in self.modemap.items():
                     if (flags & flag) != 0:
                         modes += mode
                 if len(modes) > 0:
-                    self.service.writesvsuserline('FMODE {} {} +{} {}', real_channel.name, real_channel.timestamp, modes,
-                                                  ' '.join((cuser.uid,) * len(modes)))
-            channelcount += 1
-        self.service.msg(user, '{}개 채널에 권한이 동기화되었습니다.', channelcount)
+                    self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, f'+{modes}', ' '.join((uid,) * len(modes)))
+            count += 1
+        self.msg(user, f'{count}개 채널에 권한이 동기화되었습니다.')

@@ -1,7 +1,6 @@
-import asyncio
 import re
 
-from ika.classes import Listener
+from ika.service import Listener
 
 
 class ChannelMention(Listener):
@@ -9,11 +8,11 @@ class ChannelMention(Listener):
         super().__init__(*args, **kwargs)
         self.pattern = re.compile(r'^{}(,|:)( (?P<line>.+))?$'.format(re.escape(self.service.name)))
 
-    @asyncio.coroutine
-    def PRIVMSG(self, user, target, msg):
-        if not target.startswith('#'):
+    async def privmsg(self, uid, target_uid_or_cname, message):
+        if not target_uid_or_cname.startswith('#'):
             return
-        m = self.pattern.match(msg)
+
+        m = self.pattern.match(message)
         if m:
             line = m.group('line')
-            self.service.process_command(user, line or '도움말')
+            self.service.process_command(self.server.users[uid], line or '도움말')

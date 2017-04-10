@@ -1,8 +1,6 @@
-import asyncio
 import subprocess
 
-from ika.classes import Command
-from ika.enums import Permission
+from ika.service import Command, Permission
 
 
 class GitPull(Command):
@@ -14,8 +12,7 @@ class GitPull(Command):
         'GitHub 저장소에서 최신 버전 소스코드를 받아옵니다.',
     )
 
-    @asyncio.coroutine
-    def execute(self, user):
-        self.service.msg(user, 'pulling start')
-        ret = subprocess.call(('git', 'pull'))
-        self.service.msg(user, 'pulling complete (command returned {})', ret)
+    async def execute(self, user):
+        self.msg(user, 'Pulling start')
+        proc = subprocess.run(['git', 'pull'])
+        self.msg(user, f'Pulling complete (command returned {proc.returncode})')

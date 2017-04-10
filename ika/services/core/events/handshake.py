@@ -14,9 +14,9 @@ class HandshakeCommands(Listener):
             self.service.writeline('ERROR :Server information does not match.')
             raise
         else:
-            self.service.writeserverline('BURST', unixtime())
-            self.service.writeserverline('VERSION', __version__)
-            self.service.writeserverline('ENDBURST')
+            self.writeserverline('BURST', unixtime())
+            self.writeserverline('VERSION', __version__)
+            self.writeserverline('ENDBURST')
             """
                  idx = 621937810  # int('AAAAAA', 36)
                         for service in self.services_instances.values():

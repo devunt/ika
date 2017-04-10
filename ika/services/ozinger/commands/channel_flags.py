@@ -1,9 +1,6 @@
-import asyncio
-from sqlalchemy import func
-
-from ika.classes import Command
-from ika.database import Channel, Flag, Session
-from ika.enums import Flags, Permission
+from ika.service import Command, Permission
+from ika.models import Channel, Flag
+from ika.enums import Flags
 
 
 class ChannelFlags(Command):
@@ -14,7 +11,7 @@ class ChannelFlags(Command):
         'FLAGS',
     )
     syntax = '<#채널명> [대상] [권한]'
-    regex = r'(?P<name>#\S+)( (?P<target>\S+) (?P<flags>[+-][QFAOHV]+[+-FAOHV]*))?'
+    regex = r'(?P<cname>#\S+)( (?P<target>\S+) (?P<flags>[+-][QFAOHV]+[+-FAOHV]*))?'
     permission = Permission.LOGIN_REQUIRED
     description = (
         '오징어 IRC 네트워크에 등록되어 있는 채널의 권한을 보거나 설정합니다,'
@@ -43,40 +40,34 @@ class ChannelFlags(Command):
         'V': Flags.VOICE,
     }
 
-    @asyncio.coroutine
-    def execute(self, user, name, target, flags):
-        session = Session()
-
-        channel = Channel.find_by_name(name)
+    async def execute(self, user, cname, target, flags):
+        channel = Channel.get(cname)
 
         if channel is None:
             if user.is_operator:
-                self.service.msg(user, '해당 채널 \x02{}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.', name)
+                self.err(user, f'해당 채널 \x02{cname}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.')
             else:
-                self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
-            return
+                self.err(user, '해당 명령을 실행할 권한이 없습니다.')
 
         if (channel.get_flags_by_user(user) & Flags.OWNER) == 0:
             if not user.is_operator:
-                self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
-                return
+                self.err(user, '해당 명령을 실행할 권한이 없습니다.')
 
         if (target is None) or (flags is None):
-            self.service.msg(user, '\x02=== {} 채널 권한 정보 ===\x02', channel.name)
-            self.service.msg(user, ' ')
+            self.msg(user, f'\x02=== {channel.name} 채널 권한 정보 ===\x02')
+            self.msg(user, ' ')
 
             for flag in channel.flags:
                 flags_str = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
-                self.service.msg(user, '  \x02{:<32}\x02 {:<16} ({} 에 마지막으로 변경됨)',
-                                 flag.target, flags_str, flag.created_on)
+                self.msg(user, f'  \x02{flag.target:<32}\x02 {flags_str:<16} ({flag.created_on} 에 마지막으로 변경됨)')
         else:
-            flag = session.query(Flag).filter(
-                (Flag.channel_id == channel.id) & (func.lower(Flag.target) == func.lower(target))).first()
+            flag = Flag.get(channel, target)
             if flag is None:
-                type = 0
+                _type = 0
             else:
-                type = flag.type
+                _type = flag.type
 
+            is_adding = True
             for _flag in flags:
                 if _flag == '+':
                     is_adding = True
@@ -85,25 +76,22 @@ class ChannelFlags(Command):
                 else:
                     flagnum = int(self.reverse_flagmap[_flag])
                     if is_adding:
-                        type |= flagnum
+                        _type |= flagnum
                     else:
-                        type &= ~flagnum
+                        _type &= ~flagnum
 
-            if type == 0:
+            if _type == 0:
                 if flag is not None:
-                    session.delete(flag)
-                    session.commit()
-                    self.service.msg(user, '\x02{}\x02 채널의 \x02{}\x02 대상의 권한을 제거했습니다.', name, target)
+                    flag.delete()
+                    self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{target}\x02 대상의 권한을 제거했습니다.')
                 else:
-                    self.service.msg(user, '설정될 수 있는 권한이 없습니다.')
+                    self.err(user, '설정될 수 있는 권한이 없습니다.')
             else:
                 if flag is None:
                     flag = Flag()
                     flag.channel = channel
                     flag.target = target
-                flag.type = type
+                flag.type = _type
+                flag.save()
 
-                session.add(flag)
-                session.commit()
-
-                self.service.msg(user, '\x02{}\x02 채널의 \x02{}\x02 대상에게 해당 권한을 설정했습니다.', name, target)
+                self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{target}\x02 대상에게 해당 권한을 설정했습니다.')

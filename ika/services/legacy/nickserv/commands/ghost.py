@@ -1,9 +1,8 @@
-from ika.classes import Legacy
+from ika.service import Legacy
+from ika.services.ozinger.commands.ghost import Ghost as _Ghost
 
-from ika.services.ozinger.commands.ghost import Ghost
 
-
-class Ghost(Ghost, Legacy):
+class Ghost(Legacy, _Ghost):
     name = 'GHOST'
     aliases = (
         '고스트',

@@ -1,7 +1,4 @@
-import asyncio
-
-from ika.classes import Command
-from ika.enums import Permission
+from ika.service import Command, Permission
 
 
 class Reload(Command):
@@ -13,7 +10,6 @@ class Reload(Command):
         '설정을 다시 읽어들이고 서비스봇 모듈들을 새로운 파일로 갱신합니다.',
     )
 
-    @asyncio.coroutine
-    def execute(self, user):
-        self.service.server.reload_services()
-        self.service.msg(user, 'Reload complete')
+    async def execute(self, user):
+        self.server.reload_services()
+        self.msg(user, 'Reload complete')

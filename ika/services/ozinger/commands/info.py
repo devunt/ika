@@ -1,8 +1,6 @@
-import asyncio
-
-from ika.classes import Command
-from ika.enums import Flags, Permission
-from ika.database import Account, Channel
+from ika.service import Command, Permission
+from ika.enums import Flags
+from ika.models import Account, Channel
 
 
 class Information(Command):
@@ -21,43 +19,37 @@ class Information(Command):
         '아무 인자도 없이 실행했을 경우 현재 로그인되어 있는 계정의 정보를 확인합니다.',
     )
 
-    @asyncio.coroutine
-    def execute(self, user, name):
+    async def execute(self, user, name):
         if (name is not None) and name.startswith('#'):
-            channel = Channel.find_by_name(name)
+            channel = Channel.get(name)
             if user.is_operator:
                 if channel is None:
-                    self.service.msg(user, '해당 채널 \x02{}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.', name)
-                    return
+                    self.err(user, f'해당 채널 \x02{name}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.')
             else:
                 if channel is not None:
                     if (channel.get_flags_by_user(user) & Flags.OWNER) == 0:
-                        self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
-                        return
+                        self.err(user, '해당 명령을 실행할 권한이 없습니다.')
                 else:
                     # 채널이 존재하지 않으나 권한이 없는 이용자에게는 채널의 존재 여부를 알려줄 수 없음
-                    self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
-                    return
-            self.service.msg(user, '\x02=== {} 채널 정보 ===\x02', channel.name)
-            self.service.msg(user, '채널 설립자: {}', ', '.join(map(lambda x: x.target, filter(lambda x: (x.type & Flags.FOUNDER) != 0, channel.flags))))
-            self.service.msg(user, '채널 주인: {}', ', '.join(map(lambda x: x.target, filter(lambda x: (x.type & Flags.OWNER) != 0, channel.flags))))
-            self.service.msg(user, '채널 등록일: {}', channel.created_on)
-            self.service.msg(user, '채널 메타데이터: {}', channel.data)
+                    self.err(user, '해당 명령을 실행할 권한이 없습니다.')
+            self.msg(user, '\x02=== {} 채널 정보 ===\x02', channel.name)
+            self.msg(user, '채널 설립자: {}', ', '.join(map(lambda x: x.target, filter(lambda x: (x.type & Flags.FOUNDER) != 0, channel.flags))))
+            self.msg(user, '채널 주인: {}', ', '.join(map(lambda x: x.target, filter(lambda x: (x.type & Flags.OWNER) != 0, channel.flags))))
+            self.msg(user, '채널 등록일: {}', channel.created_on)
+            self.msg(user, '채널 메타데이터: {}', channel.data)
         else:
             if name is None:
                 account = user.account
             else:
-                account = Account.find_by_nick(name)
+                account = Account.get(name)
             if (not user.is_operator) and (account != user.account):
-                self.service.msg(user, '해당 명령을 실행할 권한이 없습니다.')
-                return
+                self.err(user, '해당 명령을 실행할 권한이 없습니다.')
             if account is None:
-                self.service.msg(user, '해당 계정 \x02{}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.', name)
-                return
-            self.service.msg(user, '\x02=== {} 계정 정보 ===\x02', account.name.name)
-            self.service.msg(user, '이메일: {}', account.email)
-            self.service.msg(user, '대표 계정명: {}', account.name.name)
-            self.service.msg(user, '보조 계정명: {}', (', '.join([nick.name for nick in account.aliases])) or '없음')
-            self.service.msg(user, '가상 호스트: {}', account.vhost or '없음')
-            self.service.msg(user, '계정 등록일: {}', account.created_on)
-            self.service.msg(user, '마지막 로그인: {}', account.last_login)
+                self.err(user, f'해당 계정 \x02{name}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.')
+            self.msg(user, '\x02=== {} 계정 정보 ===\x02', account.name.name)
+            self.msg(user, '이메일: {}', account.email)
+            self.msg(user, '대표 계정명: {}', account.name.name)
+            self.msg(user, '보조 계정명: {}', (', '.join([nick.name for nick in account.aliases])) or '없음')
+            self.msg(user, '가상 호스트: {}', account.vhost or '없음')
+            self.msg(user, '계정 등록일: {}', account.created_on)
+            self.msg(user, '마지막 로그인: {}', account.last_login)

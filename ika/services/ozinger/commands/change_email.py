@@ -1,8 +1,4 @@
-import asyncio
-
-from ika.classes import Command
-from ika.enums import Permission
-from ika.database import Session
+from ika.service import Command, Permission
 
 
 class ChangeEmail(Command):
@@ -20,13 +16,11 @@ class ChangeEmail(Command):
         '이 명령을 사용할 시 현재 로그인되어 있는 계정의 이메일을 변경합니다.',
     )
 
-    @asyncio.coroutine
-    def execute(self, user, password, new_email):
-        session = Session()
+    async def execute(self, user, password, new_email):
         if user.account.password == password:
             account = user.account
             account.email = new_email
-            session.commit()
-            self.service.msg(user, '\x02{}\x02 계정의 이메일이 \x02{}\x02 로 변경되었습니다.', user.account.name.name, new_email)
+            account.save()
+            self.msg(user, f'\x02{user.account.name}\x02 계정의 이메일이 \x02{new_email}\x02 로 변경되었습니다.')
         else:
-            self.service.msg(user, '\x02{}\x02 계정의 비밀번호와 일치하지 않습니다.', user.account.name.name)
+            self.err(user, f'\x02{user.account.name}\x02 계정의 비밀번호와 일치하지 않습니다.')

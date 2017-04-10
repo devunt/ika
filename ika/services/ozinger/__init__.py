@@ -1,4 +1,4 @@
-from ika.classes import Service
+from ika.service import Service
 
 
 class Ozinger(Service):
