@@ -15,7 +15,7 @@ class Account(models.Model):
 
     @property
     def aliases(self):
-        return [nickname.name for nickname in self.nicknames.filter(is_account_name=False)]
+        return [nickname.name for nickname in self.nicknames.filter(is_account_name=False).all()]
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
@@ -23,7 +23,7 @@ class Account(models.Model):
     def check_password(self, raw_password):
         def setter(_raw_password):
             self.set_password(_raw_password)
-            self.save(update_fields=["password"])
+            self.save(update_fields=['password'])
         return check_password(raw_password, self.password, setter)
 
     @classmethod
@@ -49,7 +49,7 @@ class Channel(models.Model):
 
     def get_flags_by_user(self, user):
         types = 0
-        for flag in self.flags:
+        for flag in self.flags.all():
             if flag.match_mask(user.mask) or (user.account and (flag.target.lower() == user.account.name.name.lower())):
                 types |= flag.type
         return types
@@ -72,3 +72,11 @@ class Flag(models.Model):
         pattern = pattern.replace('\*', '.+?')
         pattern = '^{}$'.format(pattern)
         return re.match(pattern, mask, re.IGNORECASE) is not None
+
+    @classmethod
+    def get(cls, channel, target) -> 'Flag':
+        return cls.objects.filter(channel=channel, target__iexact=target).first()
+
+    class Meta:
+        unique_together = ('channel', 'target')
+
