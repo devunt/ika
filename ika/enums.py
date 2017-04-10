@@ -14,3 +14,10 @@ class Flags(IntEnum):
     OP = 16
     HALFOP = 8
     VOICE = 2
+
+
+class Message(Enum):
+    INVALID = 0
+    HANDSHAKE = 1
+    SERVER = 2
+    USER = 3
