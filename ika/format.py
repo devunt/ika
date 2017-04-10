@@ -20,15 +20,13 @@ class Color(IntEnum):
     SILVER = 15
 
 
-class Formatter:
-    @staticmethod
-    def bold(msg: str) -> str:
-        return '\x02{}\x02'.format(msg)
+def bold(msg: str) -> str:
+    return f'\x02{msg}\x02'
 
-    @staticmethod
-    def underline(msg: str) -> str:
-        return '\x1f{}\x1f'.format(msg)
 
-    @staticmethod
-    def color(msg: str, color: Color) -> str:
-        return '\x03{:02}{}\x03'.format(color.value, msg)
+def underline(msg: str) -> str:
+    return f'\x1f{msg}\x1f'
+
+
+def colorize(msg: str, color: Color) -> str:
+    return f'\x03{color.value:02}{msg}\x03'
