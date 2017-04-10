@@ -11,6 +11,13 @@ from ika.conf import settings
 from ika.enums import Permission
 from ika.ircobjects import IRCUser
 from ika.logger import logger
+from ika.utils import CaseInsensitiveDict
+
+
+class CommandError(RuntimeError):
+    def __init__(self, user, line):
+        self.user = user
+        self.line = line
 
 
 class Service:
@@ -23,7 +30,7 @@ class Service:
     internal = False
 
     def __init__(self, server):
-        self.commands = dict()
+        self.commands = CaseInsensitiveDict()
         self.server = server
 
     @property
@@ -65,7 +72,6 @@ class Service:
             if len(split) == 1:
                 split.append('')
             command, param = split
-            command = command.upper()
             if command in self.commands:
                 asyncio.async(self.commands[command].run(user, param))
             else:
@@ -80,29 +86,41 @@ class Service:
 
         service_module_name = self.__module__
 
+        module_names = list()
         if names == '*':
-            names = list()
             paths = glob.glob('{}/**/*.py'.format(service_module_name.replace('.', '/')))
             for path in paths:
-                names.append('{}.{}'.format(basename(dirname(path)), basename(path)[:-3]))
+                module_names.append('{}.{}'.format(basename(dirname(path)), basename(path)[:-3]))
+        else:
+            def _make_module_names(prefix, iterable):
+                if isinstance(iterable, dict):
+                    for k, v in iterable.items():
+                        _make_module_names(prefix + k + '.', v)
+                elif isinstance(iterable, list):
+                    for v in iterable:
+                        _make_module_names(prefix, v)
+                elif isinstance(iterable, str):
+                    module_names.append(prefix + iterable)
+            _make_module_names('', names)
 
-        for module_name in names:
+
+        for module_name in module_names:
             try:
-                _module = reload(import_module('{}.{}'.format(service_module_name, module_name)))
+                _module = reload_module(import_module(f'{service_module_name}.{module_name}'))
             except ImportError:
                 logger.exception('Missing module!')
             else:
                 _, cls = inspect.getmembers(_module, lambda member: inspect.isclass(member)
-                    and member.__module__ == '{}.{}'.format(service_module_name, module_name))[0]
+                    and member.__module__ == f'{service_module_name}.{module_name}')[0]
                 instance = cls(self)
                 if isinstance(instance, Command):
                     for command_name in instance.names:
-                        self.commands[command_name.upper()] = instance
+                        self.commands[command_name] = instance
                 elif isinstance(instance, Listener):
                     methods = inspect.getmembers(instance, inspect.ismethod)
-                    for name, method in methods:
-                        if not name.startswith('__'):
-                            hook = getattr(self.server.ev, name.upper())
+                    for method_name, method in methods:
+                        if not method_name.startswith('__'):
+                            hook = getattr(self.server.ev, method_name.upper())
                             hook += method
 
     def reload_modules(self):
@@ -153,6 +171,10 @@ class Command(Module):
         names.insert(0, self.name)
         return names
 
+    @staticmethod
+    def err(user, line, *args, **kwargs):
+        raise CommandError(user, line.format(args, **kwargs))
+
     async def execute(self, **kwargs):
         self.msg(kwargs['user'], '아직 구현되지 않은 명령어입니다.')
         raise NotImplementedError('You must override `execute` method of Command class')
@@ -168,7 +190,9 @@ class Command(Module):
             if m:
                 try:
                     with transaction.atomic():
-                        await self.execute(user, **m.groupdict())
+                        await self.execute(user=user, **m.groupdict())
+                except CommandError as e:
+                    self.msg(e.user, e.line)
                 except:
                     ty, exc, tb = sys.exc_info()
                     self.msg(user, f'\x02{self.name}\x02 명령을 처리하는 도중 문제가 발생했습니다. '
