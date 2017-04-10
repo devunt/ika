@@ -8,6 +8,7 @@ class Account(models.Model):
     password = models.CharField(max_length=128)
     vhost = models.CharField(max_length=255)
     created_on = models.DateTimeField(auto_now_add=True)
+    authenticated_on = models.DateTimeField()
 
     @property
     def name(self):
@@ -44,13 +45,12 @@ class Nickname(models.Model):
 
 class Channel(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    # data = models.Fie(JSONType, default=dict())
     created_on = models.DateTimeField(auto_now_add=True)
 
-    def get_flags_by_user(self, user):
+    def get_flags_by_user(self, irc_user):
         types = 0
         for flag in self.flags.all():
-            if flag.match_mask(user.mask) or (user.account and (flag.target.lower() == user.account.name.name.lower())):
+            if flag.match(irc_user):
                 types |= flag.type
         return types
 
@@ -63,15 +63,15 @@ class Flag(models.Model):
     channel = models.ForeignKey(Channel, related_name='flags')
     target = models.CharField(max_length=255)
     type = models.PositiveSmallIntegerField()
-    created_on = models.DateTimeField(auto_now=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
-    def match_mask(self, mask):
+    def match(self, irc_user):
         if ('!' not in self.target) or ('@' not in self.target):
-            return False
+            return irc_user.nick == self.target
         pattern = re.escape(self.target)
         pattern = pattern.replace('\*', '.+?')
         pattern = '^{}$'.format(pattern)
-        return re.match(pattern, mask, re.IGNORECASE) is not None
+        return re.match(pattern, irc_user.mask, re.IGNORECASE) is not None
 
     @classmethod
     def get(cls, channel, target) -> 'Flag':
@@ -79,4 +79,3 @@ class Flag(models.Model):
 
     class Meta:
         unique_together = ('channel', 'target')
-

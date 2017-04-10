@@ -27,6 +27,5 @@ class Group(Command):
         nickname = Nickname()
         nickname.name = user.nick
         nickname.account = user.account
-        # nickname.last_use = datetime.now()
         nickname.save()
         self.msg(user, f'\x02{user.account.name}\x02 계정에 \x02{nickname.name}\x02 닉네임을 추가했습니다.')

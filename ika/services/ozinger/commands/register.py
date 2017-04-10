@@ -33,14 +33,12 @@ class Register(Command):
         account = Account()
         account.email = email
         account.set_password(password)
-        # account.last_login = datetime.now()
         account.save()
 
         nick = Nickname()
         nick.name = user.nick
         nick.account = account
         nick.is_account_name = True
-        # nick.last_use = datetime.now()
         nick.save()
 
         self.msg(user, f'해당 닉네임 \x02{nick.name}\x02 의 계정 등록이 완료되었습니다. '
