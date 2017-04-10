@@ -1,6 +1,6 @@
 import asyncio
 
-from ika.classes import Command, Service
+from ika.service import Command, Service
 from ika.enums import Permission
 
 
