@@ -3,7 +3,7 @@ import glob
 import inspect
 import re
 import sys
-from importlib import import_module, reload
+from importlib import import_module, reload as reload_module
 from os.path import basename, dirname
 from django.db import transaction
 
@@ -28,7 +28,7 @@ class Service:
 
     @property
     def uid(self):
-        return '{}{}'.format(settings.server.sid, self.id)
+        return f'{settings.server.sid}{self.id}'
 
     @property
     def ident(self):
@@ -39,14 +39,14 @@ class Service:
 
     @property
     def gecos(self):
-        return '사용법: /msg {} 도움말'.format(self.name)
+        return f'사용법: /msg {self.name} 도움말'
 
     def msg(self, user_or_uid, line, *args, **kwargs):
         if isinstance(user_or_uid, IRCUser):
             uid = user_or_uid.uid
         else:
             uid = user_or_uid
-        self.writesvsuserline('NOTICE {} :{}'.format(uid, line), *args, **kwargs)
+        self.writesvsuserline(f'NOTICE {uid} :{line}', *args, **kwargs)
 
     def writesvsuserline(self, line, *args, **kwargs):
         self.server.writeuserline(self.uid, line, *args, **kwargs)
@@ -60,7 +60,7 @@ class Service:
 
         split = line.split(maxsplit=1)
         if len(split) == 0:
-            self.msg(user, '명령을 입력해주세요. \x02/msg {} 도움말\x02 을 입력하시면 사용할 수 있는 명령의 목록을 볼 수 있습니다.', self.name)
+            self.msg(user, f'명령을 입력해주세요. \x02/msg {self.name} 도움말\x02 을 입력하시면 사용할 수 있는 명령의 목록을 볼 수 있습니다.')
         else:
             if len(split) == 1:
                 split.append('')
@@ -69,7 +69,7 @@ class Service:
             if command in self.commands:
                 asyncio.async(self.commands[command].run(user, param))
             else:
-                self.msg(user, '존재하지 않는 명령어입니다. \x02/msg {} 도움말\x02 을 입력해보세요.', self.name)
+                self.msg(user, f'존재하지 않는 명령어입니다. \x02/msg {self.name} 도움말\x02 을 입력해보세요.')
 
     def register_modules(self, names):
         if not self.internal:
@@ -112,6 +112,7 @@ class Service:
 
 class Legacy:
     def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.description = self.description + (
             ' ',
             '\x02이 기능은 하위호환용 기능입니다.\x02',
@@ -152,15 +153,15 @@ class Command(Module):
         names.insert(0, self.name)
         return names
 
-    async def execute(self, user, **kwargs):
-        self.service.msg(user, '아직 구현되지 않은 명령어입니다.')
-        raise RuntimeError('You must override `execute` method of Command class')
+    async def execute(self, **kwargs):
+        self.msg(kwargs['user'], '아직 구현되지 않은 명령어입니다.')
+        raise NotImplementedError('You must override `execute` method of Command class')
 
     async def run(self, user, param):
         if (self.permission is Permission.LOGIN_REQUIRED) and (user.account is None):
-            self.service.msg(user, '로그인되어 있지 않습니다. \x02/msg {} 로그인\x02 명령을 이용해 로그인해주세요.', self.service.name)
+            self.msg(user, f'로그인되어 있지 않습니다. \x02/msg {self.service.name} 로그인\x02 명령을 이용해 로그인해주세요.')
         elif (self.permission is Permission.OPERATOR) and (not user.is_operator):
-            self.service.msg(user, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
+            self.msg(user, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
         else:
             r = re.compile(r'^{}$'.format(self.regex))
             m = r.match(param)
@@ -170,12 +171,12 @@ class Command(Module):
                         await self.execute(user, **m.groupdict())
                 except:
                     ty, exc, tb = sys.exc_info()
-                    self.service.msg(user, '\x02{}\x02 명령을 처리하는 도중 문제가 발생했습니다. '
-                                           '잠시 후 다시 한번 시도해주세요. 문제가 계속된다면 #ozinger 에 말씀해주세요.', self.name)
-                    self.service.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.admin_channel, ty, str(exc).splitlines()[0])
+                    self.msg(user, f'\x02{self.name}\x02 명령을 처리하는 도중 문제가 발생했습니다. '
+                                           '잠시 후 다시 한번 시도해주세요. 문제가 계속된다면 #ozinger 에 말씀해주세요.')
+                    self.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.admin_channel, ty, str(exc).splitlines()[0])
                     raise
             else:
-                self.service.msg(user, '사용법이 올바르지 않습니다. \x02/msg {} 도움말 {}\x02 를 입력해보세요.', self.service.name, self.name)
+                self.msg(user, f'사용법이 올바르지 않습니다. \x02/msg {self.service.name} 도움말 {self.name}\x02 를 입력해보세요.')
 
 
 class Listener(Module):

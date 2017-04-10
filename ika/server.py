@@ -24,7 +24,6 @@ class Server:
         self.users = dict()
         self.channels = CaseInsensitiveDict()
 
-        self.linked_once = False
         self.reader = None
         self.writer = None
 
@@ -40,7 +39,6 @@ class Server:
                 continue
 
             message_type, prefix, command, params = parseline(line)
-
             if message_type is Message.USER:
                 getattr(self.ev, command)(prefix, *params)
             else:
@@ -51,7 +49,7 @@ class Server:
         if line == b'':
             raise RuntimeError('Disconnected')
         line = line.decode(errors='ignore').rstrip('\r\n')
-        logger.debug('>>> {}'.format(line))
+        logger.debug(f'>>> {line}')
         return line
 
     def writeline(self, line, *args, **kwargs):
@@ -76,7 +74,7 @@ class Server:
         if '\n' in line:
             raise ValueError('writeline: Message should not be multi-lined')
         self.writer.write(line.encode() + b'\r\n')
-        logger.debug('<<< {}'.format(line))
+        logger.debug(f'<<< {line}')
         message_type, prefix, command, params = parseline(line)
         if message_type is Message.USER:
             getattr(self.ev, command)(prefix, *params)
@@ -99,12 +97,12 @@ class Server:
 
     def register_service(self, service_name, module_names='*'):
         try:
-            _module = import_module('ika.services.{}'.format(service_name))
+            _module = import_module(f'ika.services.{service_name}')
         except ImportError:
             logger.exception('Missing module!')
         else:
             _, cls = inspect.getmembers(_module, lambda member: inspect.isclass(member)
-                and member.__module__ == 'ika.services.{}'.format(service_name))[0]
+                and member.__module__ == f'ika.services.{service_name}')[0]
             instance = cls(self)
             instance.register_modules(module_names)
             self.service_instances[cls.__name__] = instance
@@ -119,4 +117,4 @@ class Server:
         for uid in self.services.keys():
             self.writeuserline(uid, 'QUIT', reason)
         self.writeserverline('SQUIT', self.link.name, reason)
-        self.writeserverline('ERROR :Service disconnected ({})', reason)
+        self.writeserverline(f'ERROR :Service disconnected ({reason})')
