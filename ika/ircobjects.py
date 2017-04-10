@@ -22,7 +22,7 @@ class IRCUser:
         return '{}!{}@{}'.format(self.nick, self.ident, self.dhost)
 
     @property
-    def account(self):
+    def account(self) -> Account:
         name = self.metadata.get('accountname')
         return name and Account.get(name)
 

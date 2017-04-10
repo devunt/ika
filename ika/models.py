@@ -27,7 +27,7 @@ class Account(models.Model):
         return check_password(raw_password, self.password, setter)
 
     @classmethod
-    def get(cls, name):
+    def get(cls, name) -> 'Account':
         nickname = Nickname.get(name)
         return nickname and nickname.account
 
@@ -38,7 +38,7 @@ class Nickname(models.Model):
     is_account_name = models.BooleanField(default=False)
 
     @classmethod
-    def get(cls, name):
+    def get(cls, name) -> 'Nickname':
         return cls.objects.filter(name__iexact=name).first()
 
 
@@ -47,16 +47,16 @@ class Channel(models.Model):
     # data = models.Fie(JSONType, default=dict())
     created_on = models.DateTimeField(auto_now_add=True)
 
-    @classmethod
-    def get(cls, name):
-        return cls.objects.filter(name__iexact=name).first()
-
     def get_flags_by_user(self, user):
         types = 0
         for flag in self.flags:
             if flag.match_mask(user.mask) or (user.account and (flag.target.lower() == user.account.name.name.lower())):
                 types |= flag.type
         return types
+
+    @classmethod
+    def get(cls, name) -> 'Channel':
+        return cls.objects.filter(name__iexact=name).first()
 
 
 class Flag(models.Model):
