@@ -13,26 +13,19 @@ class EventHook:
         self.__handlers.remove(handler)
         return self
 
-    def fire(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs):
         for handler in self.__handlers:
             asyncio.async(handler(*args, **kwargs))
 
 
-class EventHandler:
-    events = (
-        'ENDBURST',
-        'FJOIN',
-        'FMODE',
-        'NICK',
-        'OPERTYPE',
-        'PART',
-        'PRIVMSG',
-        'QUIT',
-        'TOPIC',
-        'UID',
-    )
-
+class EventListener:
     def __init__(self):
-        for event in self.events:
+        self.__hooks = dict()
+
+    def __getattr__(self, item):
+        if item in self.__hooks.keys():
+            hook = self.__hooks[item]
+        else:
             hook = EventHook()
-            setattr(self, event, hook)
+            self.__hooks[item] = hook
+        return hook
