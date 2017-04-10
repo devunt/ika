@@ -1,18 +1,29 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
 
 import asyncio
+import os
+import sys
+from django.core.wsgi import get_wsgi_application
+from django.core.management import execute_from_command_line
 
-from ika.database import Base, engine
 from ika.logger import logger
 from ika.server import Server
 
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ika.conf")
+application = get_wsgi_application()
+
+
 def main():
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'makemigrations' or sys.argv[1] == 'migrate':
+            execute_from_command_line(sys.argv)
+            return
+
     loop = asyncio.get_event_loop()
 
     ika = Server()
     ika.register_services()
-    Base.metadata.create_all(engine)
 
     try:
         loop.run_until_complete(ika.connect())

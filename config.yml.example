@@ -1,4 +1,11 @@
-database: "sqlite:///ika.sqlite3"
+database:
+  # 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+  engine: sqlite3
+  name: ika.sqlite3
+  host:
+  port:
+  user:
+  password:
 
 server:
   name: ika.ozinger.org
