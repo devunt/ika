@@ -1,4 +1,7 @@
-class Color:
+from enum import IntEnum
+
+
+class Color(IntEnum):
     WHITE = 0
     BLACK = 1
     NAVY = 2
@@ -19,13 +22,13 @@ class Color:
 
 class Formatter:
     @staticmethod
-    def bold(msg):
+    def bold(msg: str) -> str:
         return '\x02{}\x02'.format(msg)
 
     @staticmethod
-    def underline(msg):
+    def underline(msg: str) -> str:
         return '\x1f{}\x1f'.format(msg)
 
     @staticmethod
-    def color(msg, code):
-        return '\x03{:02}{}\x03'.format(code, msg)
+    def color(msg: str, color: Color) -> str:
+        return '\x03{:02}{}\x03'.format(color.value, msg)
