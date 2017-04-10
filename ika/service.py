@@ -11,7 +11,7 @@ from ika.conf import settings
 from ika.enums import Permission
 from ika.ircobjects import IRCUser
 from ika.logger import logger
-from ika.utils import CaseInsensitiveDict
+from ika.utils import CaseInsensitiveDict, base36encode, unixtime
 
 
 class CommandError(RuntimeError):
@@ -21,7 +21,7 @@ class CommandError(RuntimeError):
 
 
 class Service:
-    id = 0
+    id = ''
     name = ''
     aliases = ()
     description = (
@@ -35,7 +35,7 @@ class Service:
 
     @property
     def uid(self):
-        return f'{settings.server.sid}{self.id}'
+        return f'{self.server.sid}{self.id}'
 
     @property
     def ident(self):
@@ -77,6 +77,21 @@ class Service:
             else:
                 self.msg(user, f'존재하지 않는 명령어입니다. \x02/msg {self.name} 도움말\x02 을 입력해보세요.')
 
+    def register_irc_bots(self):
+        if self.internal:
+            return
+
+        _id = self.server.gen_next_service_id()
+        self.id = base36encode(_id)
+        nicks = list(self.aliases)
+        nicks.insert(0, self.name)
+        for nick in nicks:
+            uid = f'{self.server.sid}{base36encode(_id)}'
+            self.server.service_bots[uid] = self
+            self.writeserverline('UID', uid, unixtime(), nick, '0.0.0.0', self.server.name, self.ident, '0.0.0.0', unixtime(), '+Iiko', self.gecos)
+            self.server.writeuserline(uid, 'OPERTYPE Services')
+            _id = self.server.gen_next_service_id()
+
     def register_modules(self, names):
         if not self.internal:
             help_module = import_module('ika.services.help')
@@ -102,7 +117,6 @@ class Service:
                 elif isinstance(iterable, str):
                     module_names.append(prefix + iterable)
             _make_module_names('', names)
-
 
         for module_name in module_names:
             try:
@@ -196,7 +210,7 @@ class Command(Module):
                 except:
                     ty, exc, tb = sys.exc_info()
                     self.msg(user, f'\x02{self.name}\x02 명령을 처리하는 도중 문제가 발생했습니다. '
-                                           '잠시 후 다시 한번 시도해주세요. 문제가 계속된다면 #ozinger 에 말씀해주세요.')
+                                   f'잠시 후 다시 한번 시도해주세요. 문제가 계속된다면 #ozinger 에 말씀해주세요.')
                     self.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.admin_channel, ty, str(exc).splitlines()[0])
                     raise
             else:

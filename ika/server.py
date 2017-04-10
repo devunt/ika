@@ -19,7 +19,9 @@ class Server:
         self.ev = EventListener()
 
         self.services = dict()
-        self.service_instances = dict()
+        self.service_bots = dict()
+
+        self._next_service_id = int('AAAAAA', 36)
 
         self.users = dict()
         self.channels = CaseInsensitiveDict()
@@ -105,13 +107,21 @@ class Server:
                 and member.__module__ == f'ika.services.{service_name}')[0]
             instance = cls(self)
             instance.register_modules(module_names)
-            self.service_instances[cls.__name__] = instance
+            self.services[cls.__name__] = instance
+
+    def register_service_irc_bots(self):
+        for service in self.services.values():
+            service.register_irc_bots()
 
     def reload_services(self):
         settings.reload()
         self.ev = EventListener()
         for instance in self.service_instances.values():
             instance.reload_modules()
+
+    def gen_next_service_id(self):
+        self._next_service_id += 1
+        return self._next_service_id
 
     def disconnect(self, reason=''):
         for uid in self.services.keys():
