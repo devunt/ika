@@ -57,15 +57,15 @@ class ChannelFlags(Command):
             self.msg(user, f'\x02=== {channel.name} 채널 권한 정보 ===\x02')
             self.msg(user, ' ')
 
-            for flag in channel.flags:
+            for flag in channel.flags.all():
                 flags_str = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
-                self.msg(user, f'  \x02{flag.target:<32}\x02 {flags_str:<16} ({flag.created_on} 에 마지막으로 변경됨)')
+                self.msg(user, f'  \x02{flag.target:<32}\x02 {flags_str:<16} ({flag.updated_on} 에 마지막으로 변경됨)')
         else:
             flag = Flag.get(channel, target)
             if flag is None:
-                _type = 0
+                types = 0
             else:
-                _type = flag.type
+                types = flag.type
 
             is_adding = True
             for _flag in flags:
@@ -76,11 +76,11 @@ class ChannelFlags(Command):
                 else:
                     flagnum = int(self.reverse_flagmap[_flag])
                     if is_adding:
-                        _type |= flagnum
+                        types |= flagnum
                     else:
-                        _type &= ~flagnum
+                        types &= ~flagnum
 
-            if _type == 0:
+            if types == 0:
                 if flag is not None:
                     flag.delete()
                     self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{target}\x02 대상의 권한을 제거했습니다.')
@@ -91,7 +91,7 @@ class ChannelFlags(Command):
                     flag = Flag()
                     flag.channel = channel
                     flag.target = target
-                flag.type = _type
+                flag.type = types
                 flag.save()
 
                 self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{target}\x02 대상에게 해당 권한을 설정했습니다.')

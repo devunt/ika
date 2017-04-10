@@ -21,6 +21,7 @@ class UserCommands(Listener):
         self.server.users[uid].dhost = dhost
 
     async def fmode(self, uid, target_uid_or_cname, *args):
+        # TODO: Implement
         """
         if len(params) == 3:  # channel/user mode
             pass  # TODO: To be implemented

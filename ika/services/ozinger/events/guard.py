@@ -4,6 +4,7 @@ from ika.models import Channel
 
 class Guard(Listener):
     async def endburst(self):
+        # TODO: Implement
         """
         if linked_once:
             return
