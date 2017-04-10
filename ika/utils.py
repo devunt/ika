@@ -1,66 +1,99 @@
 from time import time
-from easydict import EasyDict as edict
+
+from ika.enums import Message
 
 
-class ircutils:
-    @staticmethod
-    def parseline(line):
-        if line[0] == ':':
-            line = line[1:]
-        params = line.split()
-        retparams = list()
-        for x in range(0, len(params)):
-            if params[x].startswith(':'):
-                retparams.append(' '.join(params[x:])[1:])
-                break
-            retparams.append(params[x])
-        return retparams
+def parseline(line: str) -> (str, str, list):
+    prefix = None
+    message_type = Message.INVALID
+    if line[0] == ':':
+        prefix, line = line.split(' ', 1)
+        prefix = prefix[1:]
+        if len(prefix) == 3:
+            message_type = Message.SERVER
+        elif len(prefix) == 9:
+            message_type = Message.USER
+    else:
+        message_type = Message.HANDSHAKE
+    tokens = line.split(' :', 1)
+    command, *params = tokens[0].split(' ')
+    if len(tokens) == 2:
+        params.append(tokens[1])
+    return message_type, prefix, command, params
 
-    @staticmethod
-    def base36encode(number):
-        if not isinstance(number, int):
-            raise TypeError('number must be an integer')
-        if number < 0:
-            raise ValueError('number must be positive')
-        alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        base36 = ''
-        while number:
-            number, i = divmod(number, 36)
-            base36 = alphabet[i] + base36
-        return base36 or alphabet[0]
 
-    @staticmethod
-    def apply_modes(cmodes, mdict, mlist):
-        modes = mlist[0]
-        params = mlist[1:]
-        remove = False
-        for m in modes:
-            if m == '+':
-                remove = False
-            elif m == '-':
-                remove = True
-            if remove:
-                if m in cmodes[0]:
-                    mdict[m].remove(params.pop(0))
-                    if len(mdict[m]):
-                        del mdict[m]
-                elif m in cmodes[1]:
+def base36encode(number):
+    if not isinstance(number, int):
+        raise TypeError('number must be an integer')
+    if number < 0:
+        raise ValueError('number must be positive')
+    alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    base36 = ''
+    while number:
+        number, i = divmod(number, 36)
+        base36 = alphabet[i] + base36
+    return base36 or alphabet[0]
+
+
+def apply_modes(cmodes, mdict, mlist):
+    modes = mlist[0]
+    params = mlist[1:]
+    remove = False
+    for m in modes:
+        if m == '+':
+            remove = False
+        elif m == '-':
+            remove = True
+        if remove:
+            if m in cmodes[0]:
+                mdict[m].remove(params.pop(0))
+                if len(mdict[m]):
                     del mdict[m]
-                    del params[0]
-                elif m in (cmodes[2] + cmodes[3]):
-                    del mdict[m]
-            else:
-                if m in cmodes[0]:
-                    if m not in mdict:
-                        mdict[m] = list()
-                    mdict[m].append(params.pop(0))
-                elif m in (cmodes[1] + cmodes[2]):
-                    mdict[m] = params.pop(0)
-                elif m in cmodes[3]:
-                    mdict[m] = None
-        return mdict
+            elif m in cmodes[1]:
+                del mdict[m]
+                del params[0]
+            elif m in (cmodes[2] + cmodes[3]):
+                del mdict[m]
+        else:
+            if m in cmodes[0]:
+                if m not in mdict:
+                    mdict[m] = list()
+                mdict[m].append(params.pop(0))
+            elif m in (cmodes[1] + cmodes[2]):
+                mdict[m] = params.pop(0)
+            elif m in cmodes[3]:
+                mdict[m] = None
+    return mdict
 
 
-class timeutils:
-    def unixtime():
-        return int(time())
+def unixtime():
+    return int(time())
+
+
+class Map(dict):
+    __getattr__ = dict.get
+
+    def __init__(self, data=(lambda: {})()):
+        super().__init__()
+        for k, v in data.items():
+            if isinstance(v, dict):
+                v = Map(v)
+            self[k] = v
+
+
+class CaseInsensitiveDict(dict):
+    def __setitem__(self, key, value):
+        return super().__setitem__(key.lower(), value)
+
+    def __getitem__(self, key):
+        return super().__getitem__(key.lower())
+
+    def __delitem__(self, key):
+        return super().__delitem__(key.lower())
+
+    def __contains__(self, key):
+        return super().__contains__(key.lower())
+
+    def get(self, k, *args, **kwargs):
+        return super().get(k.lower(), *args, **kwargs)
+
