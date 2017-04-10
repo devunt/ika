@@ -1,0 +1,53 @@
+database: "sqlite:///ika.sqlite3"
+
+server:
+  name: ika.ozinger.org
+  description: Service bot - ika
+  sid: 1KA
+
+link:
+  name: kanade.irc.ozinger.org
+  host: 127.0.0.1
+  port: 7002
+  password: NYBAFAT
+
+logging:
+  irc:
+    channel: "#ika"
+  sentry:
+    dsn: null
+    level: WARNING
+  console:
+    level: DEBUG
+
+services:
+  ozinger:
+    commands:
+      - change_email
+      - change_name
+      - change_password
+      - force_change_vhost
+      - ghost
+      - group
+      - info
+      - login
+      - register
+      - register_channel
+      - ungroup
+    events:
+      - welcome
+      - channel_join
+      - channel_mention
+      - check_registered
+      - guard
+  operserv:
+    commands:
+      - git_pull
+      - mode,
+      - reload
+      - stop
+  legacy.chanserv:
+  legacy.nickserv:
+    commands:
+      - ghost
+      - identify

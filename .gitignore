@@ -65,10 +65,11 @@ Session.vim
 *~
 
 # Configuration
-config.json
+config.yml
 
 # Database
 *.sqlite3
+*.db
 
 # Virtualenv
 .venv

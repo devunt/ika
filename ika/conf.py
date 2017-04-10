@@ -1,22 +1,18 @@
-import json
 import os
-import sys
+import yaml
 
-from ika.utils import edict
-
-
-basedir = os.path.dirname(sys.argv[0])
-filepath = os.path.join(basedir, 'config.json')
+from ika.utils import Map
 
 
 class Settings:
     def __init__(self):
+        self.settings = Map()
         self.reload()
 
     def reload(self):
-        with open(filepath, 'r') as f:
-            d = json.load(f)
-        self.settings = edict(d)
+        with open(os.path.join('config.yml'), 'r') as f:
+            d = yaml.load(f)
+        self.settings = Map(d)
 
     def __getattr__(self, attr):
         return getattr(self.settings, attr)
