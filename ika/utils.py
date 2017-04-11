@@ -17,6 +17,20 @@ def import_class_from_module(name):
         return cls
 
 
+def tokenize_modestring(line: str) -> (list, list):
+    adds = list()
+    removes = list()
+    target = adds
+    for c in line:
+        if c == '+':
+            target = adds
+        elif c == '-':
+            target = removes
+        else:
+            target.append(c)
+    return adds, removes
+
+
 def parseline(line: str) -> (Message, str, str, list):
     prefix = None
     message_type = Message.INVALID

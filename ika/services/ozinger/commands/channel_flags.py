@@ -1,6 +1,7 @@
 from ika.service import Command, Permission
 from ika.models import Channel, Flag
 from ika.enums import Flags
+from ika.utils import tokenize_modestring
 
 
 class ChannelFlags(Command):
@@ -67,18 +68,11 @@ class ChannelFlags(Command):
             else:
                 types = flag.type
 
-            is_adding = True
-            for _flag in flags:
-                if _flag == '+':
-                    is_adding = True
-                elif _flag == '-':
-                    is_adding = False
-                else:
-                    flagnum = int(self.reverse_flagmap[_flag])
-                    if is_adding:
-                        types |= flagnum
-                    else:
-                        types &= ~flagnum
+            adds, removes = tokenize_modestring(flags)
+            for f in adds:
+                types |= int(self.reverse_flagmap[f])
+            for f in removes:
+                types &= ~int(self.reverse_flagmap[f])
 
             if types == 0:
                 if flag is not None:
