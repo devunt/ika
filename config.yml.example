@@ -49,12 +49,10 @@ services:
       - guard
   operserv:
     commands:
-      - git_pull
-      - mode,
-      - reload
-      - stop
+      - '*'
+    events:
+      - commit_hook
   legacy.chanserv:
+    - '*'
   legacy.nickserv:
-    commands:
-      - ghost
-      - identify
+    - '*'

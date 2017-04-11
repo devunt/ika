@@ -96,29 +96,31 @@ class Service:
             self.writeserverline('FJOIN', settings.logging.irc.channel, timestamp, modes, f'a,{uid}')
             _id = self.server.gen_next_service_id()
 
-    def register_modules(self, names):
+    def register_modules(self, module_names):
         service_name = self.__module__
 
-        module_names = list()
-        if names == '*':
-            paths = glob.glob('{}/**/*.py'.format(service_name.replace('.', '/')))
-            for path in paths:
-                module_names.append('{}.{}'.format(basename(dirname(path)), basename(path)[:-3]))
-        else:
-            def _make_module_names(prefix, iterable):
-                if isinstance(iterable, dict):
-                    for k, v in iterable.items():
-                        _make_module_names(prefix + k + '.', v)
-                elif isinstance(iterable, list):
-                    for v in iterable:
-                        _make_module_names(prefix, v)
-                elif isinstance(iterable, str):
-                    module_names.append(prefix + iterable)
-            _make_module_names('', names)
+        service_module_names = set()
+        def _make_module_names(prefix, value):
+            if isinstance(value, dict):
+                for k, v in value.items():
+                    _make_module_names(prefix + '.' + k, v)
+            elif isinstance(value, list):
+                for v in value:
+                    _make_module_names(prefix, v)
+            elif isinstance(value, str):
+                if value == '*':
+                    paths = glob.glob('{}/**/*.py'.format(prefix.replace('.', '/')), recursive=True)
+                    for path in paths:
+                        name = path[len(prefix) + 1:].replace('/', '.').replace('\\', '.')[:-3]
+                        if not name.startswith('__'):
+                            _make_module_names(prefix, name)
+                else:
+                    service_module_names.add(prefix + '.' + value)
+        _make_module_names(service_name, module_names)
 
         self.register_module('ika.services.help')
-        for module_name in module_names:
-            self.register_module(f'{service_name}.{module_name}')
+        for service_module_name in service_module_names:
+            self.register_module(f'{service_module_name}')
 
     def register_module(self, module_name):
         instance = import_class_from_module(module_name)(self)
