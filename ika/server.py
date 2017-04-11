@@ -112,8 +112,6 @@ class Server:
             service.register_irc_bots()
 
     def reload_services(self):
-        settings.reload()
-
         for service_name, instance in self.services.items():
             instance.unload_modules()
 
@@ -122,12 +120,24 @@ class Server:
             else:
                 instance.register_modules(settings.services[service_name])
 
+    def full_reload_services(self):
+        for instance in self.services.values():
+            instance.unload_irc_bots(reason='Service full reloading by operator command')
+
+        self.core_event_listener = EventListener()
+        self.event_listener = EventListener()
+        self.services = dict()
+        self.service_bots = dict()
+
+        self.register_services()
+        self.register_service_irc_bots()
+
     def gen_next_service_id(self):
         self._next_service_id += 1
         return self._next_service_id
 
     def disconnect(self, reason=''):
-        for uid in self.service_bots.keys():
-            self.writeuserline(uid, 'QUIT', reason)
+        for instance in self.services.values():
+            instance.unload_irc_bots(reason=reason)
         self.writeserverline('SQUIT', self.link.name, reason)
         self.writeserverline(f'ERROR :Service disconnected ({reason})', exempt_event=True)

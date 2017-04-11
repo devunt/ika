@@ -30,6 +30,7 @@ class Service:
     def __init__(self, server):
         self.commands = CaseInsensitiveDict()
         self.event_handlers = list()
+        self.uids = list()
         self.server = server
 
     @property
@@ -86,6 +87,7 @@ class Service:
         nicks.insert(0, self.name)
         for nick in nicks:
             uid = f'{self.server.sid}{base36encode(_id)}'
+            self.uids.append(uid)
             self.server.service_bots[uid] = self
             self.writeserverline('UID', uid, unixtime(), nick, '0.0.0.0', self.server.name, self.ident, '0.0.0.0', unixtime(), '+Iiko', self.gecos)
             self.server.writeuserline(uid, 'OPERTYPE Services')
@@ -134,12 +136,17 @@ class Service:
                     hook += handler
                     self.event_handlers.append((hook, handler))
 
-
     def unload_modules(self):
         for hook, handler in self.event_handlers:
             hook -= handler
         self.commands = CaseInsensitiveDict()
         self.event_handlers = list()
+
+    def unload_irc_bots(self, reason=''):
+        for uid in self.uids:
+            self.server.writeuserline(uid, 'QUIT', reason)
+            del self.server.service_bots[uid]
+        self.uids = list()
 
 
 class Legacy:
