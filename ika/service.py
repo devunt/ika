@@ -140,6 +140,13 @@ class Service:
                     self.event_handlers.append((hook, handler))
 
 
+    def unload_modules(self):
+        for hook, handler in self.event_handlers:
+            hook -= handler
+        self.commands = CaseInsensitiveDict()
+        self.event_handlers = list()
+
+
 class Legacy:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

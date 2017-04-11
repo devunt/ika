@@ -113,9 +113,14 @@ class Server:
 
     def reload_services(self):
         settings.reload()
-        self.ev = EventListener()
-        for instance in self.service_instances.values():
-            instance.reload_modules()
+
+        for service_name, instance in self.services.items():
+            instance.unload_modules()
+
+            if instance.internal:
+                instance.register_modules('*')
+            else:
+                instance.register_modules(settings.services[service_name])
 
     def gen_next_service_id(self):
         self._next_service_id += 1
