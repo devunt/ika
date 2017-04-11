@@ -134,4 +134,4 @@ class Server:
         for uid in self.service_bots.keys():
             self.writeuserline(uid, 'QUIT', reason)
         self.writeserverline('SQUIT', self.link.name, reason)
-        self.writeserverline(f'ERROR :Service disconnected ({reason})')
+        self.writeserverline(f'ERROR :Service disconnected ({reason})', exempt_event=True)
