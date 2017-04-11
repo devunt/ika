@@ -16,7 +16,8 @@ class Server:
         self.sid = settings.server.sid
         self.link = settings.link
 
-        self.ev = EventListener()
+        self.core_event_listener = EventListener()
+        self.event_listener = EventListener()
 
         self.services = dict()
         self.service_bots = dict()
@@ -29,22 +30,20 @@ class Server:
         self.reader = None
         self.writer = None
 
+        self.bursting = False
+
     async def connect(self):
         self.reader, self.writer = await asyncio.open_connection(self.link.host, self.link.port)
         logger.debug('Connected')
 
-        self.writeline('SERVER', self.name, self.link.password, 0, self.sid, self.description)
+        self.writeline('SERVER', self.name, self.link.password, 0, self.sid, self.description, exempt_event=True)
 
         while True:
             line = await self.readline()
             if not line:
                 continue
 
-            message_type, prefix, command, params = parseline(line)
-            if message_type is Message.USER:
-                getattr(self.ev, command)(prefix, *params)
-            else:
-                getattr(self.ev, command)(*params)
+            self.fire_events(line)
 
     async def readline(self):
         line = await self.reader.readline()
@@ -55,6 +54,7 @@ class Server:
         return line
 
     def writeline(self, line, *args, **kwargs):
+        exempt_event = kwargs.pop('exempt_event', False)
         if isinstance(line, str):
             if '{}' in line:
                 line = line.format(*args, **kwargs)
@@ -77,11 +77,8 @@ class Server:
             raise ValueError('writeline: Message should not be multi-lined')
         self.writer.write(line.encode() + b'\r\n')
         logger.debug(f'<<< {line}')
-        message_type, prefix, command, params = parseline(line)
-        if message_type is Message.USER:
-            getattr(self.ev, command)(prefix, *params)
-        elif message_type is Message.SERVER:
-            getattr(self.ev, command)(*params)
+        if not exempt_event:
+            self.fire_events(line, mine=True)
 
     def writeprefixline(self, prefix, line, *args, **kwargs):
         self.writeline(':' + prefix + ' ' + line, *args, **kwargs)
@@ -91,6 +88,16 @@ class Server:
 
     def writeuserline(self, uid, line, *args, **kwargs):
         self.writeprefixline(uid, line, *args, **kwargs)
+
+    def fire_events(self, line, mine=False):
+        message_type, prefix, command, params = parseline(line)
+
+        if message_type is Message.USER:
+            params.insert(0, prefix)
+
+        getattr(self.core_event_listener, command)(*params)
+        if (not mine) and (not self.bursting):
+            getattr(self.event_listener, command)(*params)
 
     def register_services(self):
         self.register_service('core')

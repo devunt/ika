@@ -134,7 +134,10 @@ class Service:
                     methods = inspect.getmembers(instance, inspect.ismethod)
                     for method_name, method in methods:
                         if not method_name.startswith('__'):
-                            hook = getattr(self.server.ev, method_name.upper())
+                            if self.internal:
+                                hook = getattr(self.server.core_event_listener, method_name.upper())
+                            else:
+                                hook = getattr(self.server.event_listener, method_name.upper())
                             hook += method
 
     def reload_modules(self):

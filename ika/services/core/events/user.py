@@ -3,24 +3,24 @@ from ika.utils import unixtime
 
 
 class UserCommands(Listener):
-    async def privmsg(self, uid, target_uid_or_cname, message):
+    def privmsg(self, uid, target_uid_or_cname, message):
         if target_uid_or_cname.startswith(self.server.sid):
             self.server.services[target_uid_or_cname].process_command(self.server.users[uid], message)
 
-    async def opertype(self, uid, opertype):
+    def opertype(self, uid, opertype):
         self.server.users[uid].opertype = opertype
 
-    async def idle(self, uid, target_uid):
         service = self.server.services[target_uid]
         self.server.writeuserline(service.uid, 'IDLE', uid, unixtime(), 0)
+    def idle(self, uid, target_uid, signon=None, idletime=None):
 
-    async def nick(self, uid, nick):
+    def nick(self, uid, nick):
         self.server.users[uid].nick = nick
 
-    async def fhost(self, uid, dhost):
+    def fhost(self, uid, dhost):
         self.server.users[uid].dhost = dhost
 
-    async def fmode(self, uid, target_uid_or_cname, *args):
+    def fmode(self, uid, target_uid_or_cname, *args):
         # TODO: Implement
         """
         if len(params) == 3:  # channel/user mode
@@ -33,16 +33,16 @@ class UserCommands(Listener):
         """
         pass
 
-    async def kick(self, uid, cname, target_uid, reason):
+    def kick(self, uid, cname, target_uid, reason):
         del self.server.channels[cname].umodes[target_uid]
         if len(self.server.channels[cname].umodes) == 0:
             del self.server.channels[cname]
 
-    async def part(self, uid, cname, reason):
+    def part(self, uid, cname, reason):
         del self.server.channels[cname].umodes[uid]
         if len(self.server.channels[cname].umodes) == 0:
             del self.server.channels[cname]
 
-    async def quit(self, uid, reason):
+    def quit(self, uid, reason):
         # TODO: Remove from channel umodes too
         del self.server.users[uid]

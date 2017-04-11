@@ -15,7 +15,9 @@ class EventHook:
 
     def __call__(self, *args, **kwargs):
         for handler in self.__handlers:
-            asyncio.ensure_future(handler(*args, **kwargs))
+            coroutine = handler(*args, **kwargs)
+            if asyncio.iscoroutine(coroutine):
+                asyncio.ensure_future(coroutine)
 
 
 class EventListener:
