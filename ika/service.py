@@ -3,15 +3,13 @@ import glob
 import inspect
 import re
 import sys
-from importlib import import_module, reload as reload_module
 from os.path import basename, dirname
 from django.db import transaction
 
 from ika.conf import settings
 from ika.enums import Permission
 from ika.ircobjects import IRCUser
-from ika.logger import logger
-from ika.utils import CaseInsensitiveDict, base36encode, unixtime
+from ika.utils import CaseInsensitiveDict, base36encode, import_class_from_module, unixtime
 
 
 class CommandError(RuntimeError):
@@ -31,6 +29,7 @@ class Service:
 
     def __init__(self, server):
         self.commands = CaseInsensitiveDict()
+        self.event_handlers = list()
         self.server = server
 
     @property
@@ -101,17 +100,11 @@ class Service:
             _id = self.server.gen_next_service_id()
 
     def register_modules(self, names):
-        if not self.internal:
-            help_module = import_module('ika.services.help')
-            help_command = help_module.Help(self)
-            for command_name in help_command.names:
-                self.commands[command_name] = help_command
-
-        service_module_name = self.__module__
+        service_name = self.__module__
 
         module_names = list()
         if names == '*':
-            paths = glob.glob('{}/**/*.py'.format(service_module_name.replace('.', '/')))
+            paths = glob.glob('{}/**/*.py'.format(service_name.replace('.', '/')))
             for path in paths:
                 module_names.append('{}.{}'.format(basename(dirname(path)), basename(path)[:-3]))
         else:
@@ -126,31 +119,25 @@ class Service:
                     module_names.append(prefix + iterable)
             _make_module_names('', names)
 
+        self.register_module('ika.services.help')
         for module_name in module_names:
-            try:
-                _module = reload_module(import_module(f'{service_module_name}.{module_name}'))
-            except ImportError:
-                logger.exception('Missing module!')
-            else:
-                _, cls = inspect.getmembers(_module, lambda member: inspect.isclass(member)
-                    and member.__module__ == f'{service_module_name}.{module_name}')[0]
-                instance = cls(self)
-                if isinstance(instance, Command):
-                    for command_name in instance.names:
-                        self.commands[command_name] = instance
-                elif isinstance(instance, Listener):
-                    methods = inspect.getmembers(instance, inspect.ismethod)
-                    for method_name, method in methods:
-                        if not method_name.startswith('__'):
-                            if self.internal:
-                                hook = getattr(self.server.core_event_listener, method_name.upper())
-                            else:
-                                hook = getattr(self.server.event_listener, method_name.upper())
-                            hook += method
+            self.register_module(f'{service_name}.{module_name}')
 
-    def reload_modules(self):
-        self.commands = dict()
-        self.register_modules()
+    def register_module(self, module_name):
+        instance = import_class_from_module(module_name)(self)
+        if isinstance(instance, Command):
+            for command_name in instance.names:
+                self.commands[command_name] = instance
+        elif isinstance(instance, Listener):
+            methods = inspect.getmembers(instance, inspect.ismethod)
+            for method_name, handler in methods:
+                if not method_name.startswith('__'):
+                    if self.internal:
+                        hook = getattr(self.server.core_event_listener, method_name.upper())
+                    else:
+                        hook = getattr(self.server.event_listener, method_name.upper())
+                    hook += handler
+                    self.event_handlers.append((hook, handler))
 
 
 class Legacy:

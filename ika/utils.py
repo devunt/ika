@@ -1,6 +1,20 @@
+import inspect
+from importlib import import_module, reload as reload_module
 from time import time
 
 from ika.enums import Message
+
+
+def import_class_from_module(name):
+    try:
+        _module = reload_module(import_module(name))
+    except ImportError:
+        from ika.logger import logger
+        logger.exception(f'Missing module!: {name}')
+    else:
+        _, cls = inspect.getmembers(_module, lambda member: inspect.isclass(member)
+            and member.__module__ == name)[0]
+        return cls
 
 
 def parseline(line: str) -> (str, str, list):

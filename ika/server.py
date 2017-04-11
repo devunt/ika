@@ -1,12 +1,10 @@
 import asyncio
-import inspect
-from importlib import import_module
 
 from ika.conf import settings
 from ika.enums import Message
 from ika.event import EventListener
 from ika.logger import logger
-from ika.utils import CaseInsensitiveDict, parseline
+from ika.utils import CaseInsensitiveDict, import_class_from_module, parseline
 
 
 class Server:
@@ -101,20 +99,13 @@ class Server:
 
     def register_services(self):
         self.register_service('core')
-        for name in settings.services:
-            self.register_service(name, settings.services[name])
+        for service_name in settings.services:
+            self.register_service(service_name, settings.services[service_name])
 
     def register_service(self, service_name, module_names='*'):
-        try:
-            _module = import_module(f'ika.services.{service_name}')
-        except ImportError:
-            logger.exception('Missing module!')
-        else:
-            _, cls = inspect.getmembers(_module, lambda member: inspect.isclass(member)
-                and member.__module__ == f'ika.services.{service_name}')[0]
-            instance = cls(self)
-            instance.register_modules(module_names)
-            self.services[cls.__name__] = instance
+        instance = import_class_from_module(f'ika.services.{service_name}')(self)
+        instance.register_modules(module_names)
+        self.services[service_name] = instance
 
     def register_service_irc_bots(self):
         for service in self.services.values():
