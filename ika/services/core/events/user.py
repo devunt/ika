@@ -1,18 +1,18 @@
 from ika.service import Listener
-from ika.utils import unixtime
 
 
 class UserCommands(Listener):
     def privmsg(self, uid, target_uid_or_cname, message):
         if target_uid_or_cname.startswith(self.server.sid):
-            self.server.services[target_uid_or_cname].process_command(self.server.users[uid], message)
+            self.server.service_bots[target_uid_or_cname].process_command(self.server.users[uid], message)
 
     def opertype(self, uid, opertype):
         self.server.users[uid].opertype = opertype
 
-        service = self.server.services[target_uid]
-        self.server.writeuserline(service.uid, 'IDLE', uid, unixtime(), 0)
     def idle(self, uid, target_uid, signon=None, idletime=None):
+        service = self.server.service_bots.get(target_uid)
+        if service is not None:
+            self.server.writeuserline(service.uid, 'IDLE', uid, self.server.users[service.uid].signon, 0)
 
     def nick(self, uid, nick):
         self.server.users[uid].nick = nick

@@ -131,7 +131,7 @@ class Server:
         return self._next_service_id
 
     def disconnect(self, reason=''):
-        for uid in self.services.keys():
+        for uid in self.service_bots.keys():
             self.writeuserline(uid, 'QUIT', reason)
         self.writeserverline('SQUIT', self.link.name, reason)
         self.writeserverline(f'ERROR :Service disconnected ({reason})')

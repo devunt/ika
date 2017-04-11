@@ -11,7 +11,7 @@ class HandshakeCommands(Listener):
             assert name == settings.link.name
             assert password == settings.link.password
         except AssertionError:
-            self.service.writeline('ERROR :Server information does not match.')
+            self.server.writeline('ERROR :Server information does not match.')
             raise
         else:
             self.writeserverline('BURST', unixtime(), exempt_event=True)

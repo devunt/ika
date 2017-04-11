@@ -222,7 +222,7 @@ class Command(Module):
                     ty, exc, tb = sys.exc_info()
                     self.msg(user, f'\x02{self.name}\x02 명령을 처리하는 도중 문제가 발생했습니다. '
                                    f'잠시 후 다시 한번 시도해주세요. 문제가 계속된다면 #ozinger 에 말씀해주세요.')
-                    self.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.admin_channel, ty, str(exc).splitlines()[0])
+                    self.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.logging.irc.channel, ty, str(exc).splitlines()[0])
                     raise
             else:
                 self.msg(user, f'사용법이 올바르지 않습니다. \x02/msg {self.service.name} 도움말 {self.name}\x02 를 입력해보세요.')
