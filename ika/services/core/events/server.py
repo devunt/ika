@@ -9,6 +9,7 @@ class ServerCommands(Listener):
 
     def endburst(self):
         self.server.bursting = False
+        self.server.register_service_irc_bots()
 
     def ping(self, origin, me):
         self.writeserverline('PONG', me, origin)

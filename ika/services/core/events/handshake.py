@@ -14,7 +14,6 @@ class HandshakeCommands(Listener):
             self.service.writeline('ERROR :Server information does not match.')
             raise
         else:
-            self.server.register_service_irc_bots()
             self.writeserverline('BURST', unixtime(), exempt_event=True)
             self.writeserverline('VERSION', __version__, exempt_event=True)
             self.writeserverline('ENDBURST', exempt_event=True)
