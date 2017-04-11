@@ -59,17 +59,26 @@ class Server:
             else:
                 params = list()
                 trailing = False
+                semi_trailing = False
                 for param in args:
                     if trailing:
                         raise ValueError(
                             'writeline: Parameter with space character should be used once and at the last position')
                     param = str(param)
-                    if (param == '') or (' ' in param):
+                    if param.startswith('+') or param.startswith('-'):
+                        if semi_trailing:
+                            raise ValueError(
+                                'writeline: Parameter starts with + or - character should be used once')
+                        semi_trailing = True
+                        params.append(param)
+                    elif (param == '') or (' ' in param):
                         params.append(':' + param)
                         trailing = True
                     else:
                         params.append(param)
                 if len(params) > 0:
+                    if semi_trailing:
+                        params[-1] = ':' + params[-1]
                     line = '{} {}'.format(line, ' '.join(params))
         if '\n' in line:
             raise ValueError('writeline: Message should not be multi-lined')

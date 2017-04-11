@@ -17,7 +17,7 @@ def import_class_from_module(name):
         return cls
 
 
-def parseline(line: str) -> (str, str, list):
+def parseline(line: str) -> (Message, str, str, list):
     prefix = None
     message_type = Message.INVALID
     if line[0] == ':':
@@ -29,10 +29,20 @@ def parseline(line: str) -> (str, str, list):
             message_type = Message.USER
     else:
         message_type = Message.HANDSHAKE
-    tokens = line.split(' :', 1)
-    command, *params = tokens[0].split(' ')
-    if len(tokens) == 2:
-        params.append(tokens[1])
+    middle_n_trailing = line.split(' :', 1)
+    for token in (' +', ' -'):
+        if token in middle_n_trailing[0]:
+            middle, semi_trailing = middle_n_trailing[0].split(token, 1)
+            semi_trailing = token[1:] + semi_trailing
+            break
+    else:
+        middle = middle_n_trailing[0]
+        semi_trailing = None
+    command, *params = middle.split(' ')
+    if semi_trailing:
+        params.append(semi_trailing)
+    if len(middle_n_trailing) == 2:
+        params.append(middle_n_trailing[1])
     return message_type, prefix, command, params
 
 
