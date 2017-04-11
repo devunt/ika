@@ -90,12 +90,7 @@ class Service:
             self.writeserverline('UID', uid, unixtime(), nick, '0.0.0.0', self.server.name, self.ident, '0.0.0.0', unixtime(), '+Iiko', self.gecos)
             self.server.writeuserline(uid, 'OPERTYPE Services')
             irc_channel = self.server.channels.get(settings.logging.irc.channel)
-            if irc_channel:
-                timestamp = irc_channel.timestamp
-                modes = irc_channel.modes
-            else:
-                timestamp = unixtime()
-                modes = '+'
+            timestamp, modes = (irc_channel.timestamp, irc_channel.modes) if irc_channel else (unixtime(), '+')
             self.writeserverline('FJOIN', settings.logging.irc.channel, timestamp, modes, f'a,{uid}')
             _id = self.server.gen_next_service_id()
 
