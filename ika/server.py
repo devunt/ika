@@ -108,29 +108,41 @@ class Server:
         self.services[service_name] = instance
 
     def register_service_irc_bots(self):
-        for service in self.services.values():
-            service.register_irc_bots()
+        for service_name in self.services.keys():
+            self.register_service_irc_bot(service_name)
+
+    def register_service_irc_bot(self, service_name):
+        self.services[service_name].register_irc_bots()
+
+    def unload_service(self, service_name):
+        instance = self.services[service_name]
+        instance.unload_irc_bots(reason='Service unloaded')
+        instance.unload_modules()
+
+        del self.services[service_name]
+
+    def reload_service_modules(self):
+        for service_name in self.services.keys():
+            self.reload_service_module(service_name)
+
+    def reload_service_module(self, service_name):
+        instance = self.services[service_name]
+        instance.unload_modules()
+        if instance.internal:
+            instance.register_modules('*')
+        else:
+            instance.register_modules(settings.services[service_name])
 
     def reload_services(self):
-        for service_name, instance in self.services.items():
-            instance.unload_modules()
-
-            if instance.internal:
-                instance.register_modules('*')
-            else:
-                instance.register_modules(settings.services[service_name])
-
-    def full_reload_services(self):
-        for instance in self.services.values():
-            instance.unload_irc_bots(reason='Service full reloading by operator command')
-
-        self.core_event_listener = EventListener()
-        self.event_listener = EventListener()
-        self.services = dict()
-        self.service_bots = dict()
-
+        for service_name in list(self.services.keys()):
+            self.unload_service(service_name)
         self.register_services()
         self.register_service_irc_bots()
+
+    def reload_service(self, service_name):
+        self.unload_service(service_name)
+        self.register_service(service_name)
+        self.register_service_irc_bot(service_name)
 
     def gen_next_service_id(self):
         self._next_service_id += 1
