@@ -71,6 +71,9 @@ class IRCUser(IRCModeMixin):
         # For backref
         self.channels = set()
 
+    def __repr__(self):
+        return f'<IRCUser {self.mask}>'
+
     @property
     def mask(self):
         return '{}!{}@{}'.format(self.nick, self.ident, self.dhost)
@@ -96,6 +99,9 @@ class IRCChannel(IRCModeMixin):
 
         self.umodes = dict()
         self.metadata = dict()
+
+    def __repr__(self):
+        return f'<IRCChannel {self.name}>'
 
     @property
     def umodestring(self):

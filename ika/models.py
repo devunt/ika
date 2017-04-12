@@ -10,6 +10,9 @@ class Account(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     authenticated_on = models.DateTimeField()
 
+    def __repr__(self):
+        return f'<Account {self.name} ({self.email})>'
+
     @property
     def name(self):
         return self.nicknames.get(is_account_name=True).name
@@ -38,6 +41,9 @@ class Nickname(models.Model):
     account = models.ForeignKey(Account, related_name='nicknames')
     is_account_name = models.BooleanField(default=False)
 
+    def __repr__(self):
+        return f'<Nickname {self.name} ({self.account})>'
+
     @classmethod
     def get(cls, name) -> 'Nickname':
         return cls.objects.filter(name__iexact=name).first()
@@ -46,6 +52,9 @@ class Nickname(models.Model):
 class Channel(models.Model):
     name = models.CharField(max_length=255, unique=True)
     created_on = models.DateTimeField(auto_now_add=True)
+
+    def __repr__(self):
+        return f'<Channel {self.name}>'
 
     def get_flags_by_user(self, irc_user):
         types = 0
@@ -64,6 +73,9 @@ class Flag(models.Model):
     target = models.CharField(max_length=255)
     type = models.PositiveSmallIntegerField()
     updated_on = models.DateTimeField(auto_now=True)
+
+    def __repr__(self):
+        return f'<Flag {self.channel} - {self.target} - {self.type}>'
 
     def match(self, irc_user):
         if ('!' not in self.target) or ('@' not in self.target):
