@@ -77,8 +77,6 @@ class Server:
                     else:
                         params.append(param)
                 if len(params) > 0:
-                    if semi_trailing:
-                        params[-1] = ':' + params[-1]
                     line = '{} {}'.format(line, ' '.join(params))
         if '\n' in line:
             raise ValueError('writeline: Message should not be multi-lined')

@@ -3,7 +3,6 @@ import glob
 import inspect
 import re
 import sys
-from os.path import basename, dirname
 from django.db import transaction
 
 from ika.conf import settings
@@ -98,8 +97,8 @@ class Service:
 
     def register_modules(self, module_names):
         service_name = self.__module__
-
         service_module_names = set()
+
         def _make_module_names(prefix, value):
             if isinstance(value, dict):
                 for k, v in value.items():
