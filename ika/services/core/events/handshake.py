@@ -1,7 +1,8 @@
 from ika import __version__
 from ika.conf import settings
 from ika.service import Listener
-from ika.utils import chanmodes, usermodes, unixtime
+from ika.utils import unixtime
+from ika.ircobjects import IRCChannel, IRCUser
 
 
 class HandshakeCommands(Listener):
@@ -21,8 +22,10 @@ class HandshakeCommands(Listener):
     def capab(self, field, data=None):
         if field == 'CAPABILITIES':
             capabilities = dict(x.split('=') for x in data.split())
-            chanmodes['A'], chanmodes['B'], chanmodes['C'], chanmodes['D'] = capabilities['CHANMODES'].split(',')
-            usermodes['A'], usermodes['B'], usermodes['C'], usermodes['D'] = capabilities['USERMODES'].split(',')
+            a, b, c, d = capabilities['CHANMODES'].split(',')
+            IRCChannel.modesdef = dict(A=a, B=b, C=c, D=d)
+            a, b, c, d = capabilities['USERMODES'].split(',')
+            IRCUser.modesdef = dict(A=a, B=b, C=c, D=d)
 
     def error(self, error):
         raise RuntimeError('Remote server has returned an error: {}'.format(error))

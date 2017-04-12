@@ -1,13 +1,8 @@
 import inspect
-from collections import defaultdict
 from importlib import import_module, reload as reload_module
 from time import time
 
 from ika.enums import Message
-
-
-chanmodes = defaultdict(lambda: set())
-usermodes = defaultdict(lambda: set())
 
 
 def import_class_from_module(name):
@@ -22,7 +17,7 @@ def import_class_from_module(name):
         return cls
 
 
-def tokenize_modestring(modestring, *params) -> (dict, dict):
+def tokenize_modestring(modesdef, modestring, *params) -> (dict, dict):
     params = list(params)
     adds = dict()
     removes = dict()
@@ -33,9 +28,9 @@ def tokenize_modestring(modestring, *params) -> (dict, dict):
         elif c == '-':
             target = removes
         else:
-            if (c in chanmodes['A']) or (c in chanmodes['B']) or ((c in chanmodes['C']) and (target is adds)):
+            if (c in modesdef.get('A', '')) or (c in modesdef.get('B', '')) or ((c in modesdef.get('C', '')) and (target is adds)):
                 target[c] = params.pop(0)
-            elif c in chanmodes['D']:
+            elif c in modesdef.get('D', ''):
                 target[c] = None
     return adds, removes
 
@@ -70,37 +65,6 @@ def base36encode(number):
         number, i = divmod(number, 36)
         base36 = alphabet[i] + base36
     return base36 or alphabet[0]
-
-
-def apply_modes(cmodes, mdict, mlist):
-    modes = mlist[0]
-    params = mlist[1:]
-    remove = False
-    for m in modes:
-        if m == '+':
-            remove = False
-        elif m == '-':
-            remove = True
-        if remove:
-            if m in cmodes[0]:
-                mdict[m].remove(params.pop(0))
-                if len(mdict[m]):
-                    del mdict[m]
-            elif m in cmodes[1]:
-                del mdict[m]
-                del params[0]
-            elif m in (cmodes[2] + cmodes[3]):
-                del mdict[m]
-        else:
-            if m in cmodes[0]:
-                if m not in mdict:
-                    mdict[m] = list()
-                mdict[m].append(params.pop(0))
-            elif m in (cmodes[1] + cmodes[2]):
-                mdict[m] = params.pop(0)
-            elif m in cmodes[3]:
-                mdict[m] = None
-    return mdict
 
 
 def unixtime():

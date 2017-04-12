@@ -68,7 +68,7 @@ class ChannelFlags(Command):
             else:
                 types = flag.type
 
-            adds, removes = tokenize_modestring(flags)
+            adds, removes = tokenize_modestring(dict(), flags)
             for f in adds:
                 types |= int(self.reverse_flagmap[f])
             for f in removes:
