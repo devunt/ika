@@ -30,6 +30,7 @@ def main():
     except KeyboardInterrupt:
         ika.disconnect('Manually interrupted by console access')
     except:
+        ika.disconnect('Exception has occured in the main loop')
         logger.exception('Exception has occured in the main loop')
     finally:
         loop.close()
