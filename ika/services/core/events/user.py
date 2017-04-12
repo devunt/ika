@@ -20,32 +20,25 @@ class UserCommands(Listener):
     def fhost(self, uid, dhost):
         self.server.users[uid].dhost = dhost
 
-    def fmode(self, uid, target_uid_or_cname, *modes):
+    # fmode can be both user and server command.
+    def fmode(self, uid_or_sid, target_uid_or_cname, timestamp, *modes):
         if target_uid_or_cname.startswith('#'):
             self.server.channels[target_uid_or_cname].update_modes(*modes)
         else:
-            pass
-        # TODO: Implement
-        """
-        if len(params) == 3:  # channel/user mode
-            pass  # TODO: To be implemented
-        elif len(params) == 4:  # channel user mode
-            modes = params[2]
-            method = 'update' if modes[0] == '+' else 'difference_update'
-            if params[3] in self.channels[params[0].lower()].usermodes.keys():
-                getattr(self.channels[params[0].lower()].usermodes[params[3]], method)(modes[1:])
-        """
+            self.server.users[target_uid_or_cname].update_modes(*modes)
 
     def kick(self, uid, cname, target_uid, reason):
-        del self.server.channels[cname].umodes[target_uid]
-        if len(self.server.channels[cname].umodes) == 0:
-            del self.server.channels[cname]
+        self.part(target_uid, cname, reason)
 
     def part(self, uid, cname, reason):
-        del self.server.channels[cname].umodes[uid]
-        if len(self.server.channels[cname].umodes) == 0:
+        irc_channel = self.server.channels[cname]
+        self.server.users[uid].channels.remove(irc_channel)
+        del irc_channel.umodes[uid]
+        if len(irc_channel.umodes) == 0:
             del self.server.channels[cname]
 
     def quit(self, uid, reason):
-        # TODO: Remove from channel umodes too
+        while len(self.server.users[uid].channels) > 0:
+            irc_channel = next(iter(self.server.users[uid].channels))
+            self.part(uid, irc_channel.name, reason)
         del self.server.users[uid]

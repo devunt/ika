@@ -13,9 +13,23 @@ class IRCModeMixin:
         string = '+'
         params = list()
         for k, v in self.modes.items():
-            string += k
-            if v:
-                params.append(v)
+            if not isinstance(v, set):
+                string += k
+                if v:
+                    params.append(v)
+        if len(params) > 0:
+            string += ' ' + ' '.join(params)
+        return string
+
+    @property
+    def listmodestring(self):
+        string = '+'
+        params = list()
+        for k, v in self.modes.items():
+            if isinstance(v, set):
+                for e in v:
+                    string += k
+                    params.append(e)
         if len(params) > 0:
             string += ' ' + ' '.join(params)
         return string
@@ -23,11 +37,18 @@ class IRCModeMixin:
     def update_modes(self, *modes):
         adds, removes = tokenize_modestring(self.modesdef, *modes)
         for k, v in adds.items():
-            self.modes[k] = v
+            if isinstance(v, set):
+                s = self.modes.get(k, set())
+                self.modes[k] = s | v
+            else:
+                self.modes[k] = v
         for k, v in removes.items():
-            if v and self.modes[k] != v:
-                continue
-            del self.modes[k]
+            if isinstance(v, set):
+                self.modes[k] -= v
+                if len(self.modes[k]) == 0:
+                    del self.modes[k]
+            else:
+                del self.modes[k]
 
 
 class IRCUser(IRCModeMixin):
@@ -47,6 +68,9 @@ class IRCUser(IRCModeMixin):
         self.opertype = None
         self.metadata = dict()
 
+        # For backref
+        self.channels = set()
+
     @property
     def mask(self):
         return '{}!{}@{}'.format(self.nick, self.ident, self.dhost)
@@ -62,6 +86,8 @@ class IRCUser(IRCModeMixin):
 
 
 class IRCChannel(IRCModeMixin):
+    umodesdef = dict()
+
     def __init__(self, name, timestamp):
         super().__init__()
 
@@ -73,4 +99,17 @@ class IRCChannel(IRCModeMixin):
 
     @property
     def umodestring(self):
-        return ' '.join([f'{mode},{uid}' for uid, mode in self.umodes.items()])
+        return ' '.join([f'{"".join(mode)},{uid}' for uid, mode in self.umodes.items()])
+
+    def update_modes(self, *modes):
+        super().update_modes(*modes)
+        adds, removes = tokenize_modestring(self.umodesdef, *modes)
+        for mode, v in adds.items():
+            for uid in v:
+                self.umodes.setdefault(uid, set())
+                self.umodes[uid].add(mode)
+        for mode, v in removes.items():
+            for uid in v:
+                self.umodes[uid].remove(mode)
+                if len(self.umodes[uid]) == 0:
+                    del self.umodes[uid]

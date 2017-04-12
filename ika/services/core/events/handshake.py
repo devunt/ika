@@ -1,3 +1,5 @@
+import re
+
 from ika import __version__
 from ika.conf import settings
 from ika.service import Listener
@@ -22,6 +24,7 @@ class HandshakeCommands(Listener):
     def capab(self, field, data=None):
         if field == 'CAPABILITIES':
             capabilities = dict(x.split('=') for x in data.split())
+            IRCChannel.umodesdef = dict(A=re.match(r'\(([a-zA-Z]+?)\)', capabilities['PREFIX']).group(1))
             a, b, c, d = capabilities['CHANMODES'].split(',')
             IRCChannel.modesdef = dict(A=a, B=b, C=c, D=d)
             a, b, c, d = capabilities['USERMODES'].split(',')

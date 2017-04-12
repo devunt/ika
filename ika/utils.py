@@ -17,6 +17,7 @@ def import_class_from_module(name):
         return cls
 
 
+# modesdef: http://www.irc.org/tech_docs/005.html
 def tokenize_modestring(modesdef, modestring, *params) -> (dict, dict):
     params = list(params)
     adds = dict()
@@ -28,7 +29,9 @@ def tokenize_modestring(modesdef, modestring, *params) -> (dict, dict):
         elif c == '-':
             target = removes
         else:
-            if (c in modesdef.get('A', '')) or (c in modesdef.get('B', '')) or ((c in modesdef.get('C', '')) and (target is adds)):
+            if c in modesdef.get('A', ''):
+                target.setdefault(c, set()).add(params.pop(0))
+            elif (c in modesdef.get('B', '')) or ((c in modesdef.get('C', '')) and (target is adds)):
                 target[c] = params.pop(0)
             elif c in modesdef.get('D', ''):
                 target[c] = None
