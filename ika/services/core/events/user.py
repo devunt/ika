@@ -27,6 +27,9 @@ class UserCommands(Listener):
         else:
             self.server.users[target_uid_or_cname].update_modes(*modes)
 
+    def mode(self, uid, target_uid, *modes):
+        self.server.users[target_uid].update_modes(*modes)
+
     def kick(self, uid, cname, target_uid, reason):
         self.part(target_uid, cname, reason)
 
