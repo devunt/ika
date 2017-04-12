@@ -49,6 +49,7 @@ class IRCModeMixin:
                     del self.modes[k]
             else:
                 del self.modes[k]
+        return adds, removes
 
 
 class IRCUser(IRCModeMixin):
@@ -86,6 +87,11 @@ class IRCUser(IRCModeMixin):
     @property
     def is_operator(self):
         return self.opertype == 'NetAdmin'
+
+    def update_modes(self, *modes):
+        adds, removes = super().update_modes(*modes)
+        if 'o' in removes.keys():
+            self.opertype = None
 
 
 class IRCChannel(IRCModeMixin):

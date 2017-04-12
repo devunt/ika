@@ -8,6 +8,7 @@ class UserCommands(Listener):
 
     def opertype(self, uid, opertype):
         self.server.users[uid].opertype = opertype
+        self.server.users[uid].update_modes('+o')
 
     def idle(self, uid, target_uid, signon=None, idletime=None):
         service = self.server.service_bots.get(target_uid)
