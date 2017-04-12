@@ -2,10 +2,10 @@ from ika.service import Command, Permission
 
 
 class Announce(Command):
-    name = 'ANNOUNCE'
+    name = '공지'
     aliases = (
         'ANN',
-        '공지',
+        'ANNOUNCE',
     )
     syntax = '<내용>'
     regex = r'(?P<text>.+)'
