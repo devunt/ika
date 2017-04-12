@@ -13,7 +13,7 @@ class ChannelJoin(Listener):
         Flags.VOICE: 'v',
     }
 
-    async def fjoin(self, cname, timestamp, *modes_n_umodes):
+    async def fjoin(self, sid, cname, timestamp, *modes_n_umodes):
         channel = Channel.get(cname)
         if not channel:
             return

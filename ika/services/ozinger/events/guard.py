@@ -3,7 +3,7 @@ from ika.models import Channel
 
 
 class Guard(Listener):
-    async def endburst(self):
+    async def endburst(self, sid):
         # TODO: Implement
         """
         if linked_once:
@@ -16,7 +16,7 @@ class Guard(Listener):
         """
         pass
 
-    async def fjoin(self, cname, timestamp, *modes_n_umodes):
+    async def fjoin(self, sid, cname, timestamp, *modes_n_umodes):
         channel = Channel.get(cname)
         if not channel:
             return

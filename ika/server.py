@@ -97,7 +97,7 @@ class Server:
     def fire_events(self, line, mine=False):
         message_type, prefix, command, params = parseline(line)
 
-        if message_type is Message.USER:
+        if (message_type is Message.USER) or (message_type is Message.SERVER):
             params.insert(0, prefix)
 
         getattr(self.core_event_listener, command)(*params)

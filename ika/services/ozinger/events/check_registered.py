@@ -13,5 +13,5 @@ class CheckRegistered(Listener):
         if self.server.users[uid].account is None:
             self._check(uid, nick)
 
-    async def uid(self, uid, timestamp, nick, host, dhost, ident, ipaddress, signon, *modes_n_gecos):
+    async def uid(self, sid, uid, timestamp, nick, host, dhost, ident, ipaddress, signon, *modes_n_gecos):
         self._check(uid, nick)
