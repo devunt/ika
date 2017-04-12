@@ -10,6 +10,3 @@ class CommitHook(Listener):
             self.writesvsuserline(f'PRIVMSG {settings.logging.irc.channel} : \x02[ika]\x02 Fetching new changes...')
             proc = subprocess.run(['git', 'pull'])
             self.writesvsuserline(f'PRIVMSG {settings.logging.irc.channel} : \x02[ika]\x02 Fetching completed with return code {proc.returncode}')
-            if proc.returncode == 0:
-                self.server.reload_services()
-                self.writesvsuserline(f'PRIVMSG {settings.logging.irc.channel} : \x02[ika]\x02 Reloaded.')
