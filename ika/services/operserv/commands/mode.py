@@ -18,10 +18,10 @@ class Mode(Command):
                 target_uid_or_cname = target
                 timestamp = self.server.channels[target].timestamp
             else:
-                for user in self.server.users.values():
-                    if user.nick.lower() == target.lower():
-                        target_uid_or_cname = user.uid
-                        timestamp = user.timestamp
+                for _user in self.server.users.values():
+                    if _user.nick.lower() == target.lower():
+                        target_uid_or_cname = _user.uid
+                        timestamp = _user.timestamp
                         break
                 else:
                     raise KeyError

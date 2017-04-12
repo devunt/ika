@@ -22,9 +22,9 @@ class ServerCommands(Listener):
         target = self.server.channels if uid_or_cname.startswith('#') else self.server.users
 
         if data == '':
-            del target[field]
+            del target[uid_or_cname].metadata[field]
         else:
-            target[field] = data
+            target[uid_or_cname].metadata[field] = data
 
         if target is self.server.users:
             if field == 'accountname':
