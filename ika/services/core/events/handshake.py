@@ -30,5 +30,6 @@ class HandshakeCommands(Listener):
             a, b, c, d = capabilities['USERMODES'].split(',')
             IRCUser.modesdef = dict(A=a, B=b, C=c, D=d)
 
-    def error(self, error):
-        raise RuntimeError('Remote server has returned an error: {}'.format(error))
+    # ERROR can be both handshake and server command.
+    def error(self, *sid_and_error):
+        raise RuntimeError(f'Remote server has returned an error: {sid_and_error[-1]}')

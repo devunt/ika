@@ -21,7 +21,7 @@ class UserCommands(Listener):
     def fhost(self, uid, dhost):
         self.server.users[uid].dhost = dhost
 
-    # fmode can be both user and server command.
+    # FMODE can be both user and server command.
     def fmode(self, uid_or_sid, target_uid_or_cname, timestamp, *modes):
         if target_uid_or_cname.startswith('#'):
             self.server.channels[target_uid_or_cname].update_modes(*modes)
