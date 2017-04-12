@@ -15,4 +15,4 @@ class ChannelMention(Listener):
         m = self.pattern.match(message)
         if m:
             line = m.group('line')
-            self.service.process_command(self.server.users[uid], line or '도움말')
+            self.service.process_command(self.server.users[uid], line or '?')

@@ -16,5 +16,4 @@ class Stop(Command):
 
     async def execute(self, user, reason):
         self.msg(user, '장비를 정지합니다.')
-        self.server.disconnect('Manually interrupted by operator command ({})'
-                                       .format(reason or 'No reason was specified'))
+        self.server.disconnect('Manually interrupted by operator command ({})'.format(reason or 'No reason was specified'))
