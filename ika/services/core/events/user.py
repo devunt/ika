@@ -45,4 +45,5 @@ class UserCommands(Listener):
         while len(self.server.users[uid].channels) > 0:
             irc_channel = next(iter(self.server.users[uid].channels))
             self.part(uid, irc_channel.name, reason)
+        del self.server.nicks[self.server.users[uid].nick]
         del self.server.users[uid]

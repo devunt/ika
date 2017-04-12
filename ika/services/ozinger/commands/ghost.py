@@ -22,8 +22,6 @@ class Ghost(Command):
         account = Account.get(nick)
         if account != user.account:
             self.err(user, f'해당 닉네임이 \x02{user.account.name}\x02 계정에 속해 있지 않습니다.')
-        for target in self.server.users.values():
-            if target.nick == nick:
-                self.writesvsuserline('KILL', target.uid, f'{user.mask} 에 의한 고스트')
-                self.msg(user, f'\x02{target.nick}\x02 닉네임을 사용중인 사용자의 연결을 종료시켰습니다.')
-                break
+        target = self.server.nicks[nick]
+        self.writesvsuserline('KILL', target.uid, f'{user.mask} 에 의한 고스트')
+        self.msg(user, f'\x02{target.nick}\x02 닉네임을 사용중인 사용자의 연결을 강제로 종료시켰습니다.')

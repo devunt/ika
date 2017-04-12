@@ -17,6 +17,7 @@ class ServerCommands(Listener):
     def uid(self, sid, uid, timestamp, nick, host, dhost, ident, ipaddress, signon, *modes_n_gecos):
         self.server.users[uid] = IRCUser(uid, timestamp, nick, host, dhost, ident, ipaddress, signon, modes_n_gecos[-1])
         self.server.users[uid].update_modes(*modes_n_gecos[:-1])
+        self.server.nicks[nick] = self.server.users[uid]
 
     def metadata(self, sid, uid_or_cname, field, data):
         target = self.server.channels if uid_or_cname.startswith('#') else self.server.users

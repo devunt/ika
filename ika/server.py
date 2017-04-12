@@ -23,6 +23,7 @@ class Server:
         self._next_service_id = int('AAAAAA', 36)
 
         self.users = dict()
+        self.nicks = CaseInsensitiveDict()
         self.channels = CaseInsensitiveDict()
 
         self.reader = None

@@ -1,4 +1,6 @@
 from ika.service import Command, Permission
+from ika.ircobjects import IRCChannel, IRCUser
+from ika.utils import tokenize_modestring
 
 
 class Mode(Command):
@@ -14,19 +16,25 @@ class Mode(Command):
 
     async def execute(self, user, target, mode):
         try:
+            modestring = mode
             if target.startswith('#'):
                 target_uid_or_cname = target
                 timestamp = self.server.channels[target].timestamp
+                t = tokenize_modestring(IRCChannel.umodesdef, *mode.split())
+                for d in t:
+                    for s in d.values():
+                        for v in s:
+                            try:
+                                modestring = modestring.replace(v, self.server.nicks[v].uid)
+                            except KeyError:
+                                target = v
+                                raise
             else:
-                for _user in self.server.users.values():
-                    if _user.nick.lower() == target.lower():
-                        target_uid_or_cname = _user.uid
-                        timestamp = _user.timestamp
-                        break
-                else:
-                    raise KeyError
+                target_user = self.server.nicks[target]
+                target_uid_or_cname = target_user.uid
+                timestamp = target_user.timestamp
         except KeyError:
             self.msg(user, f'\x02{target}\x02 채널이나 유저가 존재하지 않습니다.')
         else:
-            self.writesvsuserline('FMODE', target_uid_or_cname, timestamp, mode)
+            self.writesvsuserline('FMODE', target_uid_or_cname, timestamp, modestring)
             self.msg(user, f'\x02{target}\x02에 \x02{mode}\x02모드를 설정했습니다.')
