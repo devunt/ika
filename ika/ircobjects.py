@@ -123,5 +123,3 @@ class IRCChannel(IRCModeMixin):
         for mode, v in removes.items():
             for uid in v:
                 self.umodes[uid].remove(mode)
-                if len(self.umodes[uid]) == 0:
-                    del self.umodes[uid]
