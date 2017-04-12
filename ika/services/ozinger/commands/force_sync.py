@@ -1,6 +1,6 @@
 from ika.service import Command, Permission
-from ika.enums import Flags
 from ika.models import Channel
+from ika.enums import Flags
 
 
 class ForceSynchronise(Command):
@@ -18,14 +18,6 @@ class ForceSynchronise(Command):
         '채널명을 지정할 시 해당 채널만, 지정하지 않을 시 네트워크에 등록되어 있는 모든 채널들을 동기화합니다.',
         '단, 기존에 추가되어 있는 권한은 회수되지 않으며 기존에 부여되지 않았던 권한만 추가적으로 부여됩니다.',
     )
-    modemap = {
-        Flags.OWNER: 'q',
-        Flags.FOUNDER: 'q',
-        Flags.PROTECT: 'a',
-        Flags.OP: 'o',
-        Flags.HALFOP: 'h',
-        Flags.VOICE: 'v',
-    }
 
     async def execute(self, user, name):
         if name is None:
@@ -42,12 +34,9 @@ class ForceSynchronise(Command):
                 continue
             for uid in irc_channel.umodes.keys():
                 joined_user = self.server.users[uid]
-                flags = channel.get_flags_by_user(joined_user)
-                modes = str()
-                for flag, mode in self.modemap.items():
-                    if (flags & flag) != 0:
-                        modes += mode
-                if len(modes) > 0:
-                    self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, f'+{modes}', ' '.join((uid,) * len(modes)))
+                flags = Flags(channel.get_flags_by_user(joined_user))
+                if flags:
+                    modestring = flags.modestring
+                    self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, f'+{modestring}', *((uid,) * len(modestring)))
             count += 1
         self.msg(user, f'{count}개 채널에 권한이 동기화되었습니다.')

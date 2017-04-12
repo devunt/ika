@@ -1,7 +1,7 @@
 from ika.service import Command, Permission
 from ika.models import Channel, Flag
-from ika.enums import Flags
 from ika.utils import tokenize_modestring
+from ika.enums import Flags
 
 
 class ChannelFlags(Command):
@@ -24,23 +24,6 @@ class ChannelFlags(Command):
         '권한 설정시 Q 권한은 이 명령을 이용해 지정이 불가능합니다.',
     )
 
-    flagmap = {
-        Flags.OWNER: '\x0306Q\x03',
-        Flags.FOUNDER: '\x0306F\x03',
-        Flags.PROTECT: '\x0304A\x03',
-        Flags.OP: '\x0309O\x03',
-        Flags.HALFOP: '\x0311H\x03',
-        Flags.VOICE: '\x0307V\x03',
-    }
-    reverse_flagmap = {
-        'Q': Flags.OWNER,
-        'F': Flags.FOUNDER,
-        'A': Flags.PROTECT,
-        'O': Flags.OP,
-        'H': Flags.HALFOP,
-        'V': Flags.VOICE,
-    }
-
     async def execute(self, user, cname, target, flags):
         channel = Channel.get(cname)
 
@@ -59,8 +42,8 @@ class ChannelFlags(Command):
             self.msg(user, ' ')
 
             for flag in channel.flags.all():
-                flags_str = ''.join(map(lambda x: x[1] if (flag.type & x[0]) != 0 else '', self.flagmap.items()))
-                self.msg(user, f'  \x02{flag.target:<32}\x02 {flags_str:<16} ({flag.updated_on} 에 마지막으로 변경됨)')
+                _flag = Flags(flag.type)
+                self.msg(user, f'  \x02{flag.target:<32}\x02 {_flag.coloredstring:<16} ({flag.updated_on} 에 마지막으로 변경됨)')
         else:
             flag = Flag.get(channel, target)
             if flag is None:
@@ -68,11 +51,11 @@ class ChannelFlags(Command):
             else:
                 types = flag.type
 
-            adds, removes = tokenize_modestring(dict(), flags)
+            adds, removes = tokenize_modestring(dict(D=Flags.get_all_characters()), flags)
             for f in adds:
-                types |= int(self.reverse_flagmap[f])
+                types |= int(Flags.get(f))
             for f in removes:
-                types &= ~int(self.reverse_flagmap[f])
+                types &= ~int(Flags.get(f))
 
             if types == 0:
                 if flag is not None:
