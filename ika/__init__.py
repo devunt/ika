@@ -1,1 +1,1 @@
-__version__ = 'ika-v0.1-wip'
+__version__ = 'ika-v0.2-wip'
