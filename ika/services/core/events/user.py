@@ -20,7 +20,11 @@ class UserCommands(Listener):
     def fhost(self, uid, dhost):
         self.server.users[uid].dhost = dhost
 
-    def fmode(self, uid, target_uid_or_cname, *args):
+    def fmode(self, uid, target_uid_or_cname, *modes):
+        if target_uid_or_cname.startswith('#'):
+            self.server.channels[target_uid_or_cname].update_modes(*modes)
+        else:
+            pass
         # TODO: Implement
         """
         if len(params) == 3:  # channel/user mode
@@ -31,7 +35,6 @@ class UserCommands(Listener):
             if params[3] in self.channels[params[0].lower()].usermodes.keys():
                 getattr(self.channels[params[0].lower()].usermodes[params[3]], method)(modes[1:])
         """
-        pass
 
     def kick(self, uid, cname, target_uid, reason):
         del self.server.channels[cname].umodes[target_uid]

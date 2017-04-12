@@ -16,7 +16,7 @@ class Guard(Listener):
         """
         pass
 
-    async def fjoin(self, cname, timestamp, modes, umodes):
+    async def fjoin(self, cname, timestamp, *modes_n_umodes):
         channel = Channel.get(cname)
         if not channel:
             return

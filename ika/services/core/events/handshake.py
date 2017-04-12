@@ -1,7 +1,7 @@
 from ika import __version__
 from ika.conf import settings
 from ika.service import Listener
-from ika.utils import unixtime
+from ika.utils import chanmodes, usermodes, unixtime
 
 
 class HandshakeCommands(Listener):
@@ -19,7 +19,10 @@ class HandshakeCommands(Listener):
             self.writeserverline('ENDBURST', exempt_event=True)
 
     def capab(self, field, data=None):
-        pass
+        if field == 'CAPABILITIES':
+            capabilities = dict(x.split('=') for x in data.split())
+            chanmodes['A'], chanmodes['B'], chanmodes['C'], chanmodes['D'] = capabilities['CHANMODES'].split(',')
+            usermodes['A'], usermodes['B'], usermodes['C'], usermodes['D'] = capabilities['USERMODES'].split(',')
 
     def error(self, error):
         raise RuntimeError('Remote server has returned an error: {}'.format(error))

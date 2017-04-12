@@ -1,8 +1,13 @@
 import inspect
+from collections import defaultdict
 from importlib import import_module, reload as reload_module
 from time import time
 
 from ika.enums import Message
+
+
+chanmodes = defaultdict(lambda: set())
+usermodes = defaultdict(lambda: set())
 
 
 def import_class_from_module(name):
@@ -17,17 +22,21 @@ def import_class_from_module(name):
         return cls
 
 
-def tokenize_modestring(line: str) -> (list, list):
-    adds = list()
-    removes = list()
+def tokenize_modestring(modestring, *params) -> (dict, dict):
+    params = list(params)
+    adds = dict()
+    removes = dict()
     target = adds
-    for c in line:
+    for c in modestring:
         if c == '+':
             target = adds
         elif c == '-':
             target = removes
         else:
-            target.append(c)
+            if (c in chanmodes['A']) or (c in chanmodes['B']) or ((c in chanmodes['C']) and (target is adds)):
+                target[c] = params.pop(0)
+            elif c in chanmodes['D']:
+                target[c] = None
     return adds, removes
 
 
@@ -44,17 +53,7 @@ def parseline(line: str) -> (Message, str, str, list):
     else:
         message_type = Message.HANDSHAKE
     middle_n_trailing = line.split(' :', 1)
-    for token in (' +', ' -'):
-        if token in middle_n_trailing[0]:
-            middle, semi_trailing = middle_n_trailing[0].split(token, 1)
-            semi_trailing = token[1:] + semi_trailing
-            break
-    else:
-        middle = middle_n_trailing[0]
-        semi_trailing = None
-    command, *params = middle.split(' ')
-    if semi_trailing:
-        params.append(semi_trailing)
+    command, *params = middle_n_trailing[0].split(' ')
     if len(middle_n_trailing) == 2:
         params.append(middle_n_trailing[1])
     return message_type, prefix, command, params

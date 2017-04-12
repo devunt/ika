@@ -1,4 +1,5 @@
 from ika.models import Account
+from ika.utils import tokenize_modestring
 
 
 class IRCUser:
@@ -32,10 +33,35 @@ class IRCUser:
 
 
 class IRCChannel:
-    def __init__(self, name, timestamp, modes):
+    def __init__(self, name, timestamp):
         self.name = name
         self.timestamp = int(timestamp)
-        self.modes = modes
 
+        self.modes = dict()
         self.umodes = dict()
         self.metadata = dict()
+
+    @property
+    def modestring(self):
+        string = '+'
+        params = list()
+        for k, v in self.modes.items():
+            string += k
+            if v:
+                params.append(v)
+        if len(params) > 0:
+            string += ' ' + ' '.join(params)
+        return string
+
+    @property
+    def umodestring(self):
+        return ' '.join([f'{mode},{uid}' for uid, mode in self.umodes.items()])
+
+    def update_modes(self, *modes):
+        adds, removes = tokenize_modestring(*modes)
+        for k, v in adds.items():
+            self.modes[k] = v
+        for k, v in removes.items():
+            if v and self.modes[k] != v:
+                continue
+            del self.modes[k]

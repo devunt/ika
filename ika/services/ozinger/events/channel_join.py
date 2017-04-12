@@ -13,7 +13,7 @@ class ChannelJoin(Listener):
         Flags.VOICE: 'v',
     }
 
-    async def fjoin(self, cname, timestamp, modes, umodes):
+    async def fjoin(self, cname, timestamp, *modes_n_umodes):
         channel = Channel.get(cname)
         if not channel:
             return
@@ -22,9 +22,9 @@ class ChannelJoin(Listener):
         if not irc_channel:
             return
 
-        usermodes = umodes[-1].split()
-        for usermode in usermodes:
-            uid = usermode.split(',')[1]
+        umodes = modes_n_umodes[-1].split()
+        for umode in umodes:
+            uid = umode.split(',')[1]
             user = self.server.users[uid]
             flags = channel.get_flags_by_user(user)
             modes = str()

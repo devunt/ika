@@ -17,14 +17,6 @@ class Mode(Command):
             if target.startswith('#'):
                 target_uid_or_cname = target
                 timestamp = self.server.channels[target].timestamp
-
-                params = mode.split()
-                if len(params) == 2:
-                    users = {v.nick.lower(): k for k, v in self.server.users.items()}
-                    user = users.get(params[2].lower())
-                    if user is not None:
-                        method = 'update' if params[0][0] == '+' else 'difference_update'
-                        getattr(self.server.channels[target.lower()].usermodes[user.uid], method)(params[0][1:])
             else:
                 for user in self.server.users.values():
                     if user.nick.lower() == target.lower():
