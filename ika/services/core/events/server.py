@@ -27,11 +27,11 @@ class ServerCommands(Listener):
         else:
             target[uid_or_cname].metadata[field] = data
 
-        if target is self.server.users:
-            if field == 'accountname':
-                account = Account.get(data)
-                if (account is None) or (account.name != data):
-                    self.writeserverline('METADATA', uid_or_cname, field, '')
+            if target is self.server.users:
+                if field == 'accountname':
+                    account = Account.get(data)
+                    if (account is None) or (account.name != data):
+                        self.writeserverline('METADATA', uid_or_cname, field, '')
 
     def fjoin(self, sid, cname, timestamp, *modes_n_umodes):
         if cname not in self.server.channels:

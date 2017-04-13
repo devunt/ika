@@ -6,9 +6,9 @@ from django.contrib.auth.hashers import check_password, make_password
 class Account(models.Model):
     email = models.EmailField(max_length=255)
     password = models.CharField(max_length=128)
-    vhost = models.CharField(max_length=255)
+    vhost = models.CharField(max_length=255, null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
-    authenticated_on = models.DateTimeField()
+    authenticated_on = models.DateTimeField(auto_now_add=True)
 
     def __repr__(self):
         return f'<Account {self.name} ({self.email})>'
@@ -79,7 +79,10 @@ class Flag(models.Model):
 
     def match(self, irc_user):
         if ('!' not in self.target) or ('@' not in self.target):
-            return irc_user.nick == self.target
+            if irc_user.account:
+                return irc_user.account.name == self.target
+            else:
+                return False
         pattern = re.escape(self.target)
         pattern = pattern.replace('\*', '.+?')
         pattern = '^{}$'.format(pattern)

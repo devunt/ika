@@ -1,5 +1,5 @@
 from ika.service import Command, Permission
-from ika.ircobjects import IRCChannel, IRCUser
+from ika.ircobjects import IRCChannel
 from ika.utils import tokenize_modestring
 
 

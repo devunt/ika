@@ -26,7 +26,7 @@ class RegisterChannel(Command):
         if not irc_channel:
             self.err(user, f'해당 채널 \x02{cname}\x02 가 존재하지 않습니다.')
 
-        if 'o' not in irc_channel.usermodes.get(user.uid, set()):
+        if 'o' not in irc_channel.umodes.get(user.uid, set()):
             self.err(user, f'해당 채널 \x02{cname}\x02 에 \x02{user.nick}\x02 유저에 대한 옵이 없습니다.')
 
         if Channel.get(cname):
@@ -44,5 +44,5 @@ class RegisterChannel(Command):
 
         self.msg(user, f'해당 채널 \x02{cname}\x02 의 등록이 완료되었습니다.')
 
-        self.service.join_channel(irc_channel)
+        self.writeserverline('FJOIN', cname, irc_channel.timestamp, irc_channel.modestring, f'o,{self.service.uid}')
         self.writesvsuserline('FMODE', cname, irc_channel.timestamp, '+q', user.uid)
