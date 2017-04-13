@@ -1,4 +1,4 @@
-from ika.models import Account
+from ika.models import Account, Channel
 from ika.utils import tokenize_modestring
 
 
@@ -88,6 +88,10 @@ class IRCUser(IRCModeMixin):
     def is_operator(self):
         return self.opertype == 'NetAdmin'
 
+    @property
+    def is_service(self):
+        return self.opertype == 'Services'
+
     def update_modes(self, *modes):
         adds, removes = super().update_modes(*modes)
         if 'o' in removes.keys():
@@ -103,7 +107,8 @@ class IRCChannel(IRCModeMixin):
         self.name = name
         self.timestamp = int(timestamp)
 
-        self.umodes = dict()
+        self.users = dict()
+        self.usermodes = dict()
         self.metadata = dict()
 
     def __repr__(self):
@@ -111,15 +116,63 @@ class IRCChannel(IRCModeMixin):
 
     @property
     def umodestring(self):
-        return ' '.join([f'{"".join(mode)},{uid}' for uid, mode in self.umodes.items()])
+        return ' '.join([f'{"".join(mode)},{uid}' for uid, mode in self.usermodes.items()])
+
+    @property
+    def channel(self):
+        return Channel.get(self.name)
 
     def update_modes(self, *modes):
         super().update_modes(*modes)
         adds, removes = tokenize_modestring(self.umodesdef, *modes)
         for mode, v in adds.items():
             for uid in v:
-                self.umodes.setdefault(uid, set())
-                self.umodes[uid].add(mode)
+                self.usermodes.setdefault(uid, set())
+                self.usermodes[uid].add(mode)
         for mode, v in removes.items():
             for uid in v:
-                self.umodes[uid].remove(mode)
+                self.usermodes[uid].remove(mode)
+
+    def generate_synchronizing_modestring(self):
+        if not self.channel:
+            return ''
+
+        to_be_added = list()
+        to_be_removed = list()
+
+        for uid, umode in self.usermodes.items():
+            user = self.users[uid]
+            if user.is_service:
+                continue
+
+            flags = self.channel.get_flags_by_user(user)
+            modes = flags.modes
+
+            adds = modes - umode
+            removes = umode - modes
+
+            for add in adds:
+                to_be_added.append((add, uid))
+            for remove in removes:
+                to_be_removed.append((remove, uid))
+
+        modestring = str()
+        params = list()
+
+        if len(to_be_added) > 0:
+            modestring += '+'
+            for mode, uid in to_be_added:
+                modestring += mode
+                params.append(uid)
+
+        if len(to_be_removed) > 0:
+           modestring += '-'
+           for mode, uid in to_be_removed:
+               modestring += mode
+               params.append(uid)
+
+        if len(params) > 0:
+            modestring += ' '
+            modestring += ' '.join(params)
+
+        return modestring

@@ -39,5 +39,6 @@ class ServerCommands(Listener):
         self.server.channels[cname].update_modes(*modes_n_umodes[:-1])
         for umode in modes_n_umodes[-1].split():
             mode, uid = umode.split(',')
-            self.server.channels[cname].umodes[uid] = set(mode)
+            self.server.channels[cname].users[uid] = self.server.users[uid]
+            self.server.channels[cname].usermodes[uid] = set(mode)
             self.server.users[uid].channels.add(self.server.channels[cname])

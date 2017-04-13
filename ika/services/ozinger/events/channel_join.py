@@ -12,7 +12,7 @@ class ChannelJoin(Listener):
         for umode in modes_n_umodes[-1].split():
             uid = umode.split(',')[1]
             user = self.server.users[uid]
-            flags = Flags(channel.get_flags_by_user(user))
+            flags = channel.get_flags_by_user(user)
             if flags:
                 modestring = flags.modestring
                 self.writesvsuserline('FMODE', cname, irc_channel.timestamp, f'+{modestring}', *((uid,) * len(modestring)))

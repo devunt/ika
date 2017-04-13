@@ -1,6 +1,5 @@
 from ika.service import Command, Permission
 from ika.models import Channel
-from ika.enums import Flags
 
 
 class ForceSynchronise(Command):
@@ -27,16 +26,16 @@ class ForceSynchronise(Command):
             if channel is None:
                 self.err(user, '등록되지 않은 채널입니다.')
             channels = [channel]
+
         count = 0
         for channel in channels:
             irc_channel = self.server.channels.get(channel.name)
             if irc_channel is None:
                 continue
-            for uid in irc_channel.umodes.keys():
-                joined_user = self.server.users[uid]
-                flags = Flags(channel.get_flags_by_user(joined_user))
-                if flags:
-                    modestring = flags.modestring
-                    self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, f'+{modestring}', *((uid,) * len(modestring)))
-            count += 1
-        self.msg(user, f'{count}개 채널에 권한이 동기화되었습니다.')
+
+            modestring = irc_channel.generate_synchronizing_modestring()
+            if modestring:
+                self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)
+                count += 1
+
+        self.msg(user, f'총 {count}개 채널에 권한이 동기화되었습니다.')

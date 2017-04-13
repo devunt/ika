@@ -2,6 +2,8 @@ import re
 from django.db import models
 from django.contrib.auth.hashers import check_password, make_password
 
+from ika.enums import Flags
+
 
 class Account(models.Model):
     email = models.EmailField(max_length=255)
@@ -61,7 +63,7 @@ class Channel(models.Model):
         for flag in self.flags.all():
             if flag.match(irc_user):
                 types |= flag.type
-        return types
+        return Flags(types)
 
     @classmethod
     def get(cls, name) -> 'Channel':
@@ -75,7 +77,7 @@ class Flag(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
 
     def __repr__(self):
-        return f'<Flag {self.channel} - {self.target} - {self.type}>'
+        return f'<Flag {self.channel} - {self.target} - {Flags(self.type)}>'
 
     def match(self, irc_user):
         if ('!' not in self.target) or ('@' not in self.target):

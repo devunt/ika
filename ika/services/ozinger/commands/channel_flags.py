@@ -53,9 +53,9 @@ class ChannelFlags(Command):
 
             adds, removes = tokenize_modestring(dict(D=Flags.get_all_characters()), flags)
             for f in adds:
-                types |= int(Flags.get(f))
+                types |= int(Flags.get_by_character(f))
             for f in removes:
-                types &= ~int(Flags.get(f))
+                types &= ~int(Flags.get_by_character(f))
 
             if types == 0:
                 if flag is not None:

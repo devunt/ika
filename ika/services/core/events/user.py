@@ -15,7 +15,7 @@ class UserCommands(Listener):
         if service is not None:
             self.server.writeuserline(service.uid, 'IDLE', uid, self.server.users[service.uid].signon, 0)
 
-    def nick(self, uid, nick):
+    def nick(self, uid, nick, timestamp):
         self.server.users[uid].nick = nick
 
     def fhost(self, uid, dhost):
@@ -31,17 +31,18 @@ class UserCommands(Listener):
     def mode(self, uid, target_uid, *modes):
         self.server.users[target_uid].update_modes(*modes)
 
-    def kick(self, uid, cname, target_uid, reason):
+    def kick(self, uid, cname, target_uid, reason=None):
         self.part(target_uid, cname, reason)
 
-    def part(self, uid, cname, reason):
+    def part(self, uid, cname, reason=None):
         irc_channel = self.server.channels[cname]
         self.server.users[uid].channels.remove(irc_channel)
-        del irc_channel.umodes[uid]
-        if len(irc_channel.umodes) == 0:
+        del irc_channel.users[uid]
+        del irc_channel.usermodes[uid]
+        if len(irc_channel.users) == 0:
             del self.server.channels[cname]
 
-    def quit(self, uid, reason):
+    def quit(self, uid, reason=None):
         while len(self.server.users[uid].channels) > 0:
             irc_channel = next(iter(self.server.users[uid].channels))
             self.part(uid, irc_channel.name, reason)

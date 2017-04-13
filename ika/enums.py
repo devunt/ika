@@ -25,15 +25,19 @@ class Flags(IntFlag):
     VOICE = 2
 
     @property
+    def modes(self):
+        return set([v[1] for k, v in self.get_map() if k in self])
+
+    @property
     def modestring(self):
-        return ''.join(set([v[1] for k, v in self.get_map() if k in self]))
+        return ''.join(self.modes)
 
     @property
     def coloredstring(self):
         return ''.join([colorize(v[0], v[2]) for k, v in self.get_map() if k in self])
 
     @classmethod
-    def get(cls, character):
+    def get_by_character(cls, character):
         for k, v in cls.get_map():
             if v[0] == character:
                 return k
@@ -52,5 +56,3 @@ class Flags(IntFlag):
             cls.HALFOP:  ('H', 'h', Color.CYAN),
             cls.VOICE:   ('V', 'v', Color.ORANGE),
         }.items()
-
-
