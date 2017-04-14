@@ -4,6 +4,7 @@ import inspect
 import re
 import sys
 from django.db import transaction
+from pydoc import locate as import_class
 
 from ika.conf import settings
 from ika.enums import Permission
@@ -45,7 +46,17 @@ class Service:
 
     @property
     def gecos(self):
-        return f'사용법: /msg {self.name} 도움말'
+        return f'사용법: {self.refer_command("ika.services.help.Help")}'
+
+    def refer_command(self, cls_or_instance, *params):
+        if isinstance(cls_or_instance, str):
+            cls_or_instance = import_class(cls_or_instance)
+        reference = f'\x02/msg {self.name} {cls_or_instance.name}'
+        if len(params) > 0:
+            reference += ' '
+            reference += ' '.join(params)
+        reference += '\x02'
+        return reference
 
     def msg(self, user_or_uid, line, *args, **kwargs):
         if isinstance(user_or_uid, IRCUser):
@@ -66,7 +77,7 @@ class Service:
 
         split = line.split(maxsplit=1)
         if len(split) == 0:
-            self.msg(user, f'명령을 입력해주세요. \x02/msg {self.name} 도움말\x02 을 입력하시면 사용할 수 있는 명령의 목록을 볼 수 있습니다.')
+            self.msg(user, f'명령을 입력해주세요. {self.refer_command("ika.services.help.Help")} 을 입력하시면 사용할 수 있는 명령의 목록을 볼 수 있습니다.')
         else:
             if len(split) == 1:
                 split.append('')
@@ -77,7 +88,7 @@ class Service:
             if command in self.commands:
                 asyncio.ensure_future(self.commands[command].run(user, param))
             else:
-                self.msg(user, f'존재하지 않는 명령어입니다. \x02/msg {self.name} 도움말\x02 을 입력해보세요.')
+                self.msg(user, f'존재하지 않는 명령어입니다. {self.refer_command("ika.services.help.Help")} 을 입력해보세요.')
 
     def register_irc_bots(self):
         if self.internal:
@@ -170,6 +181,9 @@ class Module:
     def server(self):
         return self.service.server
 
+    def refer_command(self, cls, *params):
+        return self.service.refer_command(cls, *params)
+
     def msg(self, user_or_uid, line, *args, **kwargs):
         self.service.msg(user_or_uid, line, *args, **kwargs)
 
@@ -206,7 +220,7 @@ class Command(Module):
 
     async def run(self, user, param):
         if (self.permission is Permission.LOGIN_REQUIRED) and (user.account is None):
-            self.msg(user, f'로그인되어 있지 않습니다. \x02/msg {self.service.name} 로그인\x02 명령을 이용해 로그인해주세요.')
+            self.msg(user, f'로그인되어 있지 않습니다. {self.refer_command("ika.services.ozinger.login.Login")} 명령을 이용해 로그인해주세요.')
         elif (self.permission is Permission.OPERATOR) and (not user.is_operator):
             self.msg(user, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
         else:
@@ -225,7 +239,7 @@ class Command(Module):
                     self.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.logging.irc.channel, ty, str(exc).splitlines()[0])
                     raise
             else:
-                self.msg(user, f'사용법이 올바르지 않습니다. \x02/msg {self.service.name} {self.name} ?\x02 를 입력해보세요.')
+                self.msg(user, f'사용법이 올바르지 않습니다. {self.refer_command(self, "?")} 를 입력해보세요.')
 
 
 class Listener(Module):

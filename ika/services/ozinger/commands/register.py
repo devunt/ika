@@ -1,7 +1,6 @@
-# from datetime import datetime
-
 from ika.service import Command
 from ika.models import Account, Nickname
+from ika.services.ozinger.commands.login import Login
 
 
 class Register(Command):
@@ -42,4 +41,4 @@ class Register(Command):
         nick.save()
 
         self.msg(user, f'해당 닉네임 \x02{nick.name}\x02 의 계정 등록이 완료되었습니다. '
-                       f'앞으로 \x02/msg {self.service.name} 로그인 {password}\x02 명령을 통해 로그인할 수 있습니다. 지금 로그인 해보세요.')
+                       f'앞으로 {self.refer_command(Login, password)} 명령을 통해 로그인할 수 있습니다. 지금 로그인 해보세요.')

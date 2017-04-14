@@ -1,5 +1,6 @@
 from ika.service import Command, Permission
 from ika.models import Nickname
+from ika.services.ozinger.commands.group import Group
 
 
 class ChangeName(Command):
@@ -29,7 +30,7 @@ class ChangeName(Command):
         nickname = Nickname.get(new_name)
         if (nickname is None) or (nickname.account != user.account):
             self.err(user, f'\x02{cur_name}\x02 계정에 \x02{new_name}\x02 닉네임이 존재하지 않습니다. '
-                           f'\x02/msg {self.service.name} 그룹\x02 명령을 이용해 해당 닉네임을 계정에 추가해보세요.')
+                           f'{self.refer_command(Group)} 명령을 이용해 해당 닉네임을 계정에 추가해보세요.')
 
         user.account.nicknames.update(is_account_name=False)
 

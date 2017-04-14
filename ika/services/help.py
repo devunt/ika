@@ -20,7 +20,7 @@ class Help(Command):
             if command in self.service.commands:
                 target = self.service.commands[command]
             else:
-                self.err(user, f'해당 명령이 존재하지 않아 도움말을 찾을 수 없습니다. \x02/msg {self.service.name} 도움말\x02 을 입력해보세요.')
+                self.err(user, f'해당 명령이 존재하지 않아 도움말을 찾을 수 없습니다. {self.refer_command(self)} 을 입력해보세요.')
         else:
             target = self.service
         self.msg(user, f'==== \x02{target.name}\x02 도움말 ====')
