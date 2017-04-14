@@ -52,7 +52,7 @@ class Service:
             uid = user_or_uid.uid
         else:
             uid = user_or_uid
-        self.writesvsuserline(f'NOTICE {uid} :{line}', *args, **kwargs)
+        self.writesvsuserline(f'NOTICE {uid} : {line}', *args, **kwargs)
 
     def writesvsuserline(self, line, *args, **kwargs):
         self.server.writeuserline(self.uid, line, *args, **kwargs)
