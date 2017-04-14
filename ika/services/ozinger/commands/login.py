@@ -32,6 +32,10 @@ class Login(Command):
 
         account.authenticated_on = datetime.now()
         self.msg(user, f'환영합니다! \x02{account.name}\x02 계정으로 로그인되었습니다.')
+
         self.writeserverline('METADATA', user.uid, 'accountname', account.name)
         if account.vhost is not None:
             self.writesvsuserline('CHGHOST', user.uid, account.vhost)
+        for irc_channel in user.channels:
+            modestring = irc_channel.generate_synchronizing_modestring(user.uid)
+            self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)
