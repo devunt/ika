@@ -4,7 +4,8 @@ import asyncio
 import os
 import sys
 from django.core.wsgi import get_wsgi_application
-from django.core.management import execute_from_command_line
+from django.core.management import call_command, execute_from_command_line
+from django.db import DEFAULT_DB_ALIAS, connections
 
 from ika.logger import logger
 from ika.server import Server
@@ -16,9 +17,22 @@ application = get_wsgi_application()
 
 def main():
     if len(sys.argv) > 1:
-        if sys.argv[1] == 'makemigrations' or sys.argv[1] == 'migrate':
+        if sys.argv[1] in ('makemigrations',):
             execute_from_command_line(sys.argv)
             return
+
+    from django.db.migrations.executor import MigrationExecutor
+
+    connection = connections[DEFAULT_DB_ALIAS]
+    connection.prepare_database()
+    executor = MigrationExecutor(connection)
+    plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
+
+    if len(plan) > 0:
+        print('Synchronizing database schemas...')
+        call_command('migrate')
+        print()
+        print('Starting application...')
 
     loop = asyncio.get_event_loop()
 
