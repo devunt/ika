@@ -34,9 +34,9 @@ class RegisterChannel(Command):
         flag.target = user.account
         flag.save()
 
-        self.msg(user, f'해당 채널 \x02{cname}\x02 의 등록이 완료되었습니다.')
-
         self.service.join_channel(cname)
         modestring = irc_channel.generate_synchronizing_modestring()
         if modestring:
             self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)
+
+        self.msg(user, f'해당 채널 \x02{cname}\x02 의 등록이 완료되었습니다.')

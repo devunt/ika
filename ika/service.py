@@ -228,7 +228,7 @@ class Command(Module):
     async def run(self, user, param):
         try:
             if (self.permission is Permission.LOGIN_REQUIRED) and (user.account is None):
-                self.err(user, f'로그인되어 있지 않습니다. {self.refer_command("ika.services.ozinger.login.Login")} 명령을 이용해 로그인해주세요.')
+                self.err(user, f'로그인되어 있지 않습니다. {self.refer_command("ika.services.ozinger.commands.login.Login")} 명령을 이용해 로그인해주세요.')
             elif (self.permission is Permission.OPERATOR) and (not user.is_operator):
                 self.err(user, '권한이 없습니다. 오퍼레이터 인증을 해 주세요.')
             else:
