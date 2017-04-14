@@ -16,10 +16,10 @@ class Guard(Listener):
             return
 
         if irc_channel not in self.server.users[self.service.uid].channels:
-           self.service.join_channel(irc_channel.name)
-           modestring = irc_channel.generate_synchronizing_modestring()
-           if modestring:
-               self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)
+            self.service.join_channel(irc_channel.name)
+            modestring = irc_channel.generate_synchronizing_modestring()
+            if modestring:
+                self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)
 
     async def kick(self, uid, cname, target_uid, reason=None):
         await self.part(target_uid, cname, reason)

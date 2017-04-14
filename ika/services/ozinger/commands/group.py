@@ -24,8 +24,6 @@ class Group(Command):
             self.err(user, f'\x02{user.account.name}\x02 계정에 등록할 수 있는 닉네임 제한을 초과했습니다 (5개).')
         if Nickname.get(user.nick):
             self.err(user, '이미 등록되어 있는 닉네임입니다.')
-        nickname = Nickname()
-        nickname.name = user.nick
-        nickname.account = user.account
+        nickname = Nickname(name=user.nick, account=user.account)
         nickname.save()
         self.msg(user, f'\x02{user.account.name}\x02 계정에 \x02{nickname.name}\x02 닉네임을 추가했습니다.')

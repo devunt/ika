@@ -1,5 +1,6 @@
 from ika.service import Command, Permission
 from ika.models import Nickname
+from ika.services.ozinger.commands.change_name import ChangeName
 
 
 class Ungroup(Command):
@@ -25,7 +26,8 @@ class Ungroup(Command):
             self.err(user, f'\x02{user.account.name}\x02 계정에 \x02{name}\x02 닉네임이 등록되어 있지 않습니다.')
 
         if nickname.is_account_name:
-            self.err(user, f'\x02{name}\x02 닉네임이 해당 계정의 기본 닉네임으로 지정되어 있어 제거할 수 없습니다. 기본 닉네임을 수정해주세요.')
+            self.err(user, f'\x02{nickname.name}\x02 닉네임이 해당 계정의 기본 닉네임으로 지정되어 있어 제거할 수 없습니다. '
+                           f'\x02/msg {self.service.name} {ChangeName.name}\x02 명령을 이용해 기본 닉네임을 수정해주세요.')
 
         nickname.delete()
-        self.msg(user, f'\x02{user.account.name}\x02 계정에서 \x02{name}\x02 닉네임을 제거했습니다.')
+        self.msg(user, f'\x02{user.account.name}\x02 계정에서 \x02{nickname.name}\x02 닉네임을 제거했습니다.')

@@ -1,6 +1,5 @@
 from ika.service import Listener
 from ika.models import Channel
-from ika.enums import Flags
 
 
 class ChannelJoin(Listener):
