@@ -23,6 +23,6 @@ class ChangePassword(Command):
         if user.account.check_password(password):
             user.account.set_password(new_password)
             user.account.save()
-            self.msg(user, f'\x02{user.account.name}\x02 계정의 비밀번호가 \x02{new_password}\x02 로 변경되었습니다.')
+            self.msg(user, f'\x02{user.account}\x02 계정의 비밀번호가 \x02{new_password}\x02 로 변경되었습니다.')
         else:
-            self.err(user, f'\x02{user.account.name}\x02 계정의 비밀번호와 일치하지 않습니다.')
+            self.err(user, f'\x02{user.account}\x02 계정의 비밀번호와 일치하지 않습니다.')

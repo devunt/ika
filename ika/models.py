@@ -12,6 +12,9 @@ class Account(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     authenticated_on = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+
     def __repr__(self):
         return f'<Account {self.name} ({self.email})>'
 
@@ -43,6 +46,9 @@ class Nickname(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='nicknames')
     is_account_name = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.name
+
     def __repr__(self):
         return f'<Nickname {self.name} ({self.account})>'
 
@@ -54,6 +60,9 @@ class Nickname(models.Model):
 class Channel(models.Model):
     name = models.CharField(max_length=255, unique=True)
     created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
 
     def __repr__(self):
         return f'<Channel {self.name}>'
@@ -79,6 +88,8 @@ class Flag(models.Model):
 
     def __repr__(self):
         return f'<Flag {self.channel} - {self.target} - {self.flags!r}>'
+
+    __str__ = __repr__
 
     @property
     def flags(self):

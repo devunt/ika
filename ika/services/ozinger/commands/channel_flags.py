@@ -40,7 +40,7 @@ class ChannelFlags(Command):
                 self.err(user, '해당 명령을 실행할 권한이 없습니다.')
 
         if (target is None) or (flagstring is None):
-            self.msg(user, f'\x02=== {channel.name} 채널 권한 정보 ===\x02')
+            self.msg(user, f'\x02=== {channel} 채널 권한 정보 ===\x02')
             self.msg(user, ' ')
 
             for flag in channel.flags.all():
@@ -53,7 +53,7 @@ class ChannelFlags(Command):
                         if irc_user.account == account:
                             target = irc_user.account
                 if not isinstance(target, Account):
-                    self.err(user, f'\x02{channel.name}\x02 채널에 \x02{target}\x02 계정으로 로그인중인 유저가 존재하지 않습니다.')
+                    self.err(user, f'\x02{channel}\x02 채널에 \x02{target}\x02 계정으로 로그인중인 유저가 존재하지 않습니다.')
 
             flag = Flag.get(channel, target)
             if flag is None:
@@ -73,7 +73,7 @@ class ChannelFlags(Command):
             if flags:
                 flag.flags = flags
                 flag.save()
-                self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{flag.target}\x02 대상에게 해당 권한을 설정했습니다.')
+                self.msg(user, f'\x02{channel}\x02 채널의 \x02{flag.target}\x02 대상에게 해당 권한을 설정했습니다.')
             else:
                 flag.delete()
-                self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{flag.target}\x02 대상의 권한을 제거했습니다.')
+                self.msg(user, f'\x02{channel}\x02 채널의 \x02{flag.target}\x02 대상의 권한을 제거했습니다.')

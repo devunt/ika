@@ -32,7 +32,7 @@ class Information(Command):
                 else:
                     # 채널이 존재하지 않으나 권한이 없는 이용자에게는 채널의 존재 여부를 알려줄 수 없음
                     self.err(user, '해당 명령을 실행할 권한이 없습니다.')
-            self.msg(user, '\x02=== {} 채널 정보 ===\x02', channel.name)
+            self.msg(user, '\x02=== {} 채널 정보 ===\x02', channel)
             self.msg(user, '채널 설립자: {}', ', '.join(map(lambda x: x.target, filter(lambda x: Flags.FOUNDER in x.flags, channel.flags))))
             self.msg(user, '채널 주인: {}', ', '.join(map(lambda x: x.target, filter(lambda x: Flags.OWNER in x.flags, channel.flags))))
             self.msg(user, '채널 등록일: {}', channel.created_on)
@@ -45,7 +45,7 @@ class Information(Command):
                 self.err(user, '해당 명령을 실행할 권한이 없습니다.')
             if account is None:
                 self.err(user, f'해당 계정 \x02{name}\x02 은 오징어 IRC 네트워크에 등록되어 있지 않습니다.')
-            self.msg(user, '\x02=== {} 계정 정보 ===\x02', account.name)
+            self.msg(user, '\x02=== {} 계정 정보 ===\x02', account)
             self.msg(user, '이메일: {}', account.email)
             self.msg(user, '대표 계정명: {}', account.name)
             self.msg(user, '보조 계정명: {}', (', '.join(account.aliases)) or '없음')

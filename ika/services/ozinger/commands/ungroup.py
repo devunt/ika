@@ -23,11 +23,11 @@ class Ungroup(Command):
     async def execute(self, user, name):
         nickname = Nickname.get(name or user.nick)
         if (nickname is None) or (nickname.account != user.account):
-            self.err(user, f'\x02{user.account.name}\x02 계정에 \x02{name or user.nick}\x02 닉네임이 등록되어 있지 않습니다.')
+            self.err(user, f'\x02{user.account}\x02 계정에 \x02{name or user.nick}\x02 닉네임이 등록되어 있지 않습니다.')
 
         if nickname.is_account_name:
-            self.err(user, f'\x02{nickname.name}\x02 닉네임이 해당 계정의 기본 닉네임으로 지정되어 있어 제거할 수 없습니다. '
+            self.err(user, f'\x02{nickname}\x02 닉네임이 해당 계정의 기본 닉네임으로 지정되어 있어 제거할 수 없습니다. '
                            f'{self.refer_command(ChangeName)} 명령을 이용해 기본 닉네임을 수정해주세요.')
 
         nickname.delete()
-        self.msg(user, f'\x02{user.account.name}\x02 계정에서 \x02{nickname.name}\x02 닉네임을 제거했습니다.')
+        self.msg(user, f'\x02{user.account}\x02 계정에서 \x02{nickname}\x02 닉네임을 제거했습니다.')

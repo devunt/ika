@@ -24,14 +24,14 @@ class Login(Command):
 
     async def execute(self, user, name, password):
         if user.account is not None:
-            self.err(user, f'이미 \x02{user.account.name}\x02 계정으로 로그인되어 있습니다.')
+            self.err(user, f'이미 \x02{user.account}\x02 계정으로 로그인되어 있습니다.')
 
         account = Account.get(name or user.nick)
         if (account is None) or (not account.check_password(password)):
             self.err(user, '등록되지 않은 계정이거나 잘못된 비밀번호입니다. 계정명이나 비밀번호를 모두 제대로 입력했는지 다시 한번 확인해주세요.')
 
         account.authenticated_on = datetime.now()
-        self.msg(user, f'환영합니다! \x02{account.name}\x02 계정으로 로그인되었습니다.')
+        self.msg(user, f'환영합니다! \x02{account}\x02 계정으로 로그인되었습니다.')
 
         self.writeserverline('METADATA', user.uid, 'accountname', account.name)
         if account.vhost is not None:

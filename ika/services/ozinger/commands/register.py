@@ -34,11 +34,11 @@ class Register(Command):
         account.set_password(password)
         account.save()
 
-        nick = Nickname()
-        nick.name = user.nick
-        nick.account = account
-        nick.is_account_name = True
-        nick.save()
+        nickname = Nickname()
+        nickname.name = user.nick
+        nickname.account = account
+        nickname.is_account_name = True
+        nickname.save()
 
-        self.msg(user, f'해당 닉네임 \x02{nick.name}\x02 의 계정 등록이 완료되었습니다. '
+        self.msg(user, f'해당 닉네임 \x02{nickname}\x02 의 계정 등록이 완료되었습니다. '
                        f'앞으로 {self.refer_command(Login, password)} 명령을 통해 로그인할 수 있습니다. 지금 로그인 해보세요.')

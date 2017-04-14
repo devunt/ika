@@ -28,7 +28,7 @@ class Unregister(Command):
 
         for flag in user.account.channel_flags.all():
             if Flags.FOUNDER in flag.flags:
-                self.err(user, f'\x02{flag.channel.name}\x02 채널에 \x02F\x02 (파운더) 권한이 있어 해당 계정 \x02{name}\x02 의 등록을 해제할 수 없습니다.')
+                self.err(user, f'\x02{flag.channel}\x02 채널에 \x02F\x02 (파운더) 권한이 있어 해당 계정 \x02{name}\x02 의 등록을 해제할 수 없습니다.')
 
         user.account.delete()
         self.writeserverline('METADATA', user.uid, 'accountname', '')

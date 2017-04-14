@@ -19,9 +19,9 @@ class Group(Command):
 
     async def execute(self, user):
         if len(user.account.aliases) >= 5:
-            self.err(user, f'\x02{user.account.name}\x02 계정에 등록할 수 있는 닉네임 제한을 초과했습니다 (5개).')
+            self.err(user, f'\x02{user.account}\x02 계정에 등록할 수 있는 닉네임 제한을 초과했습니다 (5개).')
         if Nickname.get(user.nick):
-            self.err(user, f'\x02{user.account.name}\x02 닉네임은 이미 본 계정 혹은 타 계정에 등록되어 있습니다. 닉네임을 바꿔서 다시 시도해보세요.')
+            self.err(user, f'\x02{user.account}\x02 닉네임은 이미 본 계정 혹은 타 계정에 등록되어 있습니다. 닉네임을 바꿔서 다시 시도해보세요.')
         nickname = Nickname(name=user.nick, account=user.account)
         nickname.save()
-        self.msg(user, f'\x02{user.account.name}\x02 계정에 \x02{nickname.name}\x02 닉네임을 추가했습니다.')
+        self.msg(user, f'\x02{user.account}\x02 계정에 \x02{nickname}\x02 닉네임을 추가했습니다.')

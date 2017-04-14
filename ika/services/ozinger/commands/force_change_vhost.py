@@ -23,4 +23,4 @@ class ForceChangeVirtualHost(Command):
         account.vhost = new_vhost
         account.save()
         self.writesvsuserline('CHGHOST', user.uid, account.vhost or user.host)
-        self.msg(user, '\x02{}\x02 계정의 가상 호스트가 \x02{}\x02 로 변경되었습니다.', user.account.name.name, new_vhost or '(없음)')
+        self.msg(user, '\x02{}\x02 계정의 가상 호스트가 \x02{}\x02 로 변경되었습니다.', user.account, new_vhost or '(없음)')
