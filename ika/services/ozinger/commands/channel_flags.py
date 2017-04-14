@@ -14,7 +14,7 @@ class ChannelFlags(Command):
         'FLAGS',
     )
     syntax = '<#채널명> [대상] [권한]'
-    regex = r'(?P<cname>#\S+)( (?P<target>\S+) (?P<flags>[+-][QFAOHV]+[+-FAOHV]*))?'
+    regex = r'(?P<cname>#\S+)( (?P<target>\S+) (?P<flagstring>[A-Za-z\+\-]+))?'
     permission = Permission.LOGIN_REQUIRED
     description = (
         '오징어 IRC 네트워크에 등록되어 있는 채널의 권한을 보거나 설정합니다,'
@@ -26,7 +26,7 @@ class ChannelFlags(Command):
         '권한 설정시 Q 권한은 이 명령을 이용해 지정이 불가능합니다.',
     )
 
-    async def execute(self, user, cname, target, flags):
+    async def execute(self, user, cname, target, flagstring):
         channel = Channel.get(cname)
 
         if channel is None:
@@ -39,13 +39,12 @@ class ChannelFlags(Command):
             if not user.is_operator:
                 self.err(user, '해당 명령을 실행할 권한이 없습니다.')
 
-        if (target is None) or (flags is None):
+        if (target is None) or (flagstring is None):
             self.msg(user, f'\x02=== {channel.name} 채널 권한 정보 ===\x02')
             self.msg(user, ' ')
 
             for flag in channel.flags.all():
-                _flag = Flags(flag.type)
-                self.msg(user, f'  \x02{flag.target:<32}\x02 {_flag.coloredstring:<16} ({flag.updated_on.strftime("%Y-%m-%d %H:%M:%S")}에 마지막으로 변경됨)')
+                self.msg(user, f'  \x02{flag.target:<32}\x02 {flag.flags.coloredstring:<16} ({flag.updated_on.strftime("%Y-%m-%d %H:%M:%S")}에 마지막으로 변경됨)')
         else:
             if not re.match(r'\S+!\S+@\S+', target):
                 account = Account.get(target)
@@ -61,18 +60,18 @@ class ChannelFlags(Command):
                 flag = Flag(channel=channel, type=0)
                 flag.target = target
 
-            _type = flag.type
-            adds, removes = tokenize_modestring(dict(D=Flags.get_all_characters()), flags)
+            flags = flag.flags
+            adds, removes = tokenize_modestring(dict(D=Flags.get_all_characters()), flagstring)
             for c in adds.keys():
-                _type |= Flags.get_by_character(c)
+                flags |= Flags.get_by_character(c)
             for c in removes.keys():
-                _type &= ~Flags.get_by_character(c)
+                flags &= ~Flags.get_by_character(c)
 
-            if _type == flag.type:
+            if flags == flag.flags:
                 self.err(user, '설정될 수 있는 권한이 없습니다.')
 
-            if _type:
-                flag.type = _type
+            if flags:
+                flag.flags = flags
                 flag.save()
                 self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{flag.target}\x02 대상에게 해당 권한을 설정했습니다.')
             else:

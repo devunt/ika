@@ -59,11 +59,11 @@ class Channel(models.Model):
         return f'<Channel {self.name}>'
 
     def get_flags_by_user(self, irc_user):
-        types = 0
+        flags = Flags(0)
         for flag in self.flags.all():
             if flag.match(irc_user):
-                types |= flag.type
-        return Flags(types)
+                flags |= flag.flags
+        return flags
 
     @classmethod
     def get(cls, name) -> 'Channel':
@@ -78,7 +78,15 @@ class Flag(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
 
     def __repr__(self):
-        return f'<Flag {self.channel} - {self.target} - {Flags(self.type)}>'
+        return f'<Flag {self.channel} - {self.target} - {self.flags!r}>'
+
+    @property
+    def flags(self):
+        return Flags(self.type)
+
+    @flags.setter
+    def flags(self, value):
+        self.type = value
 
     @property
     def target(self):
