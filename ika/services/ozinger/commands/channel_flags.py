@@ -1,5 +1,7 @@
+import re
+
 from ika.service import Command, Permission
-from ika.models import Channel, Flag
+from ika.models import Account, Channel, Flag
 from ika.utils import tokenize_modestring
 from ika.enums import Flags
 

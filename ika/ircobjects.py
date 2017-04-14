@@ -133,14 +133,19 @@ class IRCChannel(IRCModeMixin):
             for uid in v:
                 self.usermodes[uid].remove(mode)
 
-    def generate_synchronizing_modestring(self):
+    def generate_synchronizing_modestring(self, uid=None):
         if not self.channel:
             return ''
 
         to_be_added = list()
         to_be_removed = list()
 
-        for uid, umode in self.usermodes.items():
+        if uid:
+            usermodes = {uid: self.usermodes[uid]}
+        else:
+            usermodes = self.usermodes
+
+        for uid, umode in usermodes.items():
             user = self.users[uid]
             if user.is_service:
                 continue

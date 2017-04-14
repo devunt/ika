@@ -23,26 +23,20 @@ class RegisterChannel(Command):
 
     async def execute(self, user, cname):
         irc_channel = self.server.channels.get(cname)
-        if not irc_channel:
-            self.err(user, f'해당 채널 \x02{cname}\x02 가 존재하지 않습니다.')
-
-        if 'o' not in irc_channel.usermodes.get(user.uid, set()):
-            self.err(user, f'해당 채널 \x02{cname}\x02 에 \x02{user.nick}\x02 유저에 대한 옵이 없습니다.')
-
-        if Channel.get(cname):
-            self.err(user, f'해당 채널 \x02{cname}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.')
+        if (not irc_channel) or ('o' not in irc_channel.usermodes.get(user.uid, set())) or Channel.get(cname):
+            self.err(user, f'명령을 실행할 권한이 없습니다. 해당 채널 \x02{cname}\x02 이 아직 등록되지 않았고 \x02{user.nick}\x02 유저에 대한 옵이 존재하는지 확인해주세요.')
 
         channel = Channel()
         channel.name = cname
         channel.save()
 
-        flag = Flag()
-        flag.channel = channel
-        flag.target = user.account.name
-        flag.type = int(Flags.OWNER)
+        flag = Flag(channel=channel, type=Flags.FOUNDER | Flags.OWNER | Flags.OP)
+        flag.target = user.account
         flag.save()
 
         self.msg(user, f'해당 채널 \x02{cname}\x02 의 등록이 완료되었습니다.')
 
         self.writeserverline('FJOIN', cname, irc_channel.timestamp, irc_channel.modestring, f'o,{self.service.uid}')
-        self.writesvsuserline('FMODE', cname, irc_channel.timestamp, '+q', user.uid)
+        modestring = irc_channel.generate_synchronizing_modestring()
+        if modestring:
+            self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)

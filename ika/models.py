@@ -72,27 +72,57 @@ class Channel(models.Model):
 
 class Flag(models.Model):
     channel = models.ForeignKey(Channel, related_name='flags')
-    target = models.CharField(max_length=255)
+    target_account = models.ForeignKey(Account, related_name='channel_flags', null=True, blank=True)
+    target_mask = models.CharField(max_length=255, null=True, blank=True)
     type = models.PositiveSmallIntegerField()
     updated_on = models.DateTimeField(auto_now=True)
 
     def __repr__(self):
         return f'<Flag {self.channel} - {self.target} - {Flags(self.type)}>'
 
+    @property
+    def target(self):
+        if self.target_account:
+            return self.target_account.name
+        else:
+            return self.target_mask
+
+    @target.setter
+    def target(self, value):
+        if isinstance(value, Account):
+            self.target_account = value
+        else:
+            self.target_mask = value
+
     def match(self, irc_user):
-        if ('!' not in self.target) or ('@' not in self.target):
-            if irc_user.account:
-                return irc_user.account.name == self.target
-            else:
-                return False
-        pattern = re.escape(self.target)
-        pattern = pattern.replace('\*', '.+?')
-        pattern = '^{}$'.format(pattern)
-        return re.match(pattern, irc_user.mask, re.IGNORECASE) is not None
+        if self.target_account:
+            return self.target_account == irc_user.account
+        else:
+            pattern = re.escape(self.target_mask)
+            pattern = pattern.replace('\*', '.+?')
+            pattern = '^{}$'.format(pattern)
+            return re.match(pattern, irc_user.mask, re.IGNORECASE) is not None
+
+    def save(self, *args, **kwargs):
+        if (self.target_account and self.target_mask) or (not self.target_account and not self.target_mask):
+            raise ValueError('Exactly one of [Flag.target_acount, Flag.target_mask] must be set')
+        super().save(*args, **kwargs)
 
     @classmethod
     def get(cls, channel, target) -> 'Flag':
-        return cls.objects.filter(channel=channel, target__iexact=target).first()
+        if isinstance(target, Account):
+            return cls.objects.filter(channel=channel, target_account=target).first()
+        else:
+            return cls.objects.filter(channel=channel, target_mask__iexact=target).first()
+
+    @classmethod
+    def create(cls, channel, target) -> 'Flag':
+        flag = cls(channel=channel)
+        if isinstance(target, Account):
+            flag.target_account = target
+        else:
+            flag.target_mask = target
+        return flag
 
     class Meta:
-        unique_together = ('channel', 'target')
+        unique_together = ('channel', 'target_account', 'target_mask')
