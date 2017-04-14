@@ -8,7 +8,7 @@ from ika.enums import Flags
 class Account(models.Model):
     email = models.EmailField(max_length=255)
     password = models.CharField(max_length=128)
-    vhost = models.CharField(max_length=255, null=True, blank=True)
+    vhost = models.CharField(max_length=255, null=True)
     created_on = models.DateTimeField(auto_now_add=True)
     authenticated_on = models.DateTimeField(auto_now_add=True)
 
@@ -40,7 +40,7 @@ class Account(models.Model):
 
 class Nickname(models.Model):
     name = models.CharField(max_length=32, unique=True)
-    account = models.ForeignKey(Account, related_name='nicknames')
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='nicknames')
     is_account_name = models.BooleanField(default=False)
 
     def __repr__(self):
@@ -71,9 +71,9 @@ class Channel(models.Model):
 
 
 class Flag(models.Model):
-    channel = models.ForeignKey(Channel, related_name='flags')
-    target_account = models.ForeignKey(Account, related_name='channel_flags', null=True, blank=True)
-    target_mask = models.CharField(max_length=255, null=True, blank=True)
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name='flags')
+    target_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='channel_flags', null=True)
+    target_mask = models.CharField(max_length=255)
     type = models.PositiveSmallIntegerField()
     updated_on = models.DateTimeField(auto_now=True)
 
