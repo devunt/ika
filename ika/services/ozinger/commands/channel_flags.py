@@ -50,12 +50,11 @@ class ChannelFlags(Command):
             if not re.match(r'\S+!\S+@\S+', target):
                 account = Account.get(target)
                 if account:
-                    irc_channel = self.server.channels[cname]
-                    for irc_user in irc_channel.users.values():
+                    for irc_user in self.server.channels[cname].users.values():
                         if irc_user.account == account:
                             target = irc_user.account
                 if not isinstance(target, Account):
-                    self.err(user, f'\x02{channel.name}\x02 채널에 해당 계정 \x02{target}\x02 로 로그인중인 유저가 존재하지 않습니다.')
+                    self.err(user, f'\x02{channel.name}\x02 채널에 \x02{target}\x02 계정으로 로그인중인 유저가 존재하지 않습니다.')
 
             flag = Flag.get(channel, target)
             if flag is None:
