@@ -35,7 +35,7 @@ class ChannelFlags(Command):
             else:
                 self.err(user, '해당 명령을 실행할 권한이 없습니다.')
 
-        if (channel.get_flags_by_user(user) & Flags.OWNER) == 0:
+        if Flags.OWNER not in channel.get_flags_by_user(user):
             if not user.is_operator:
                 self.err(user, '해당 명령을 실행할 권한이 없습니다.')
 
@@ -45,32 +45,37 @@ class ChannelFlags(Command):
 
             for flag in channel.flags.all():
                 _flag = Flags(flag.type)
-                self.msg(user, f'  \x02{flag.target:<32}\x02 {_flag.coloredstring:<16} ({flag.updated_on} 에 마지막으로 변경됨)')
+                self.msg(user, f'  \x02{flag.target:<32}\x02 {_flag.coloredstring:<16} ({flag.updated_on.strftime("%Y-%m-%d %H:%M:%S")}에 마지막으로 변경됨)')
         else:
+            if not re.match(r'\S+!\S+@\S+', target):
+                account = Account.get(target)
+                if account:
+                    irc_channel = self.server.channels[cname]
+                    for irc_user in irc_channel.users.values():
+                        if irc_user.account == account:
+                            target = irc_user.account
+                if not isinstance(target, Account):
+                    self.err(user, f'\x02{channel.name}\x02 채널에 해당 계정 \x02{target}\x02 로 로그인중인 유저가 존재하지 않습니다.')
+
             flag = Flag.get(channel, target)
             if flag is None:
-                types = 0
-            else:
-                types = flag.type
+                flag = Flag(channel=channel, type=0)
+                flag.target = target
 
+            _type = flag.type
             adds, removes = tokenize_modestring(dict(D=Flags.get_all_characters()), flags)
-            for f in adds:
-                types |= int(Flags.get_by_character(f))
-            for f in removes:
-                types &= ~int(Flags.get_by_character(f))
+            for c in adds.keys():
+                _type |= Flags.get_by_character(c)
+            for c in removes.keys():
+                _type &= ~Flags.get_by_character(c)
 
-            if types == 0:
-                if flag is not None:
-                    flag.delete()
-                    self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{target}\x02 대상의 권한을 제거했습니다.')
-                else:
-                    self.err(user, '설정될 수 있는 권한이 없습니다.')
-            else:
-                if flag is None:
-                    flag = Flag()
-                    flag.channel = channel
-                    flag.target = target
-                flag.type = types
+            if _type == flag.type:
+                self.err(user, '설정될 수 있는 권한이 없습니다.')
+
+            if _type:
+                flag.type = _type
                 flag.save()
-
-                self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{target}\x02 대상에게 해당 권한을 설정했습니다.')
+                self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{flag.target}\x02 대상에게 해당 권한을 설정했습니다.')
+            else:
+                flag.delete()
+                self.msg(user, f'\x02{channel.name}\x02 채널의 \x02{flag.target}\x02 대상의 권한을 제거했습니다.')

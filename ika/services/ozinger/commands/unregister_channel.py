@@ -32,4 +32,4 @@ class UnregisterChannel(Command):
 
         self.msg(user, f'해당 채널 \x02{cname}\x02 의 등록이 해제되었습니다.')
 
-        self.writesvsuserline('PART', cname, 'Never left without saying goodbye')
+        self.service.part_channel(cname)
