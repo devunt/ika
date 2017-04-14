@@ -71,6 +71,9 @@ class Service:
             if len(split) == 1:
                 split.append('')
             command, param = split
+            if param == '?':
+                param = command
+                command = '?'
             if command in self.commands:
                 asyncio.ensure_future(self.commands[command].run(user, param))
             else:
@@ -222,7 +225,7 @@ class Command(Module):
                     self.writesvsuserline('PRIVMSG {} :ERROR! {} {}', settings.logging.irc.channel, ty, str(exc).splitlines()[0])
                     raise
             else:
-                self.msg(user, f'사용법이 올바르지 않습니다. \x02/msg {self.service.name} 도움말 {self.name}\x02 를 입력해보세요.')
+                self.msg(user, f'사용법이 올바르지 않습니다. \x02/msg {self.service.name} {self.name} ?\x02 를 입력해보세요.')
 
 
 class Listener(Module):
