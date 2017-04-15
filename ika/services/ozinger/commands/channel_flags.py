@@ -3,7 +3,8 @@ import re
 from ika.service import Command, Permission
 from ika.models import Account, Channel, Flag
 from ika.utils import tokenize_modestring
-from ika.enums import Flags
+from ika.enums import Flags, FlagsDefinition
+from ika.format import Color, colorize
 
 
 class ChannelFlags(Command):
@@ -24,7 +25,20 @@ class ChannelFlags(Command):
         '권한 설정시 대상은 \x02이카\x02 (로그인 계정명) 혹은 \x02이카*!*@*\x02 (마스크) 형식으로 설정이 가능하며,',
         '권한은 \x02+OV-A\x02 (옵과 보이스 권한을 추가, 동시에 프로텍트 권한을 제거) 등으로 설정이 가능합니다.',
         '권한 설정시 \x02Q\x02 권한은 이 명령을 이용해 지정이 불가능합니다.',
+        ' ',
+        '\x02현재 지원되는 권한의 목록은 다음과 같습니다:\x02',
+        ' ',
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        descriptions = list()
+        for k, v in FlagsDefinition.MAP.items():
+            description = f'  {colorize(v.character, v.color):<16} {colorize(v.name, v.color):<32}'
+            if not v.mutable:
+                description += colorize('(변경 불가)', Color.RED)
+            descriptions.append(description)
+        self.description += tuple(descriptions)
 
     async def execute(self, user, cname, target, flagstring):
         channel = Channel.get(cname)
