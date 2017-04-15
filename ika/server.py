@@ -48,7 +48,7 @@ class Server:
         line = await self.reader.readline()
         if line == b'':
             raise RuntimeError('Disconnected')
-        line = line.decode(errors='ignore').rstrip('\r\n')
+        line = line.decode(errors='surrogateescape').rstrip('\r\n')
         logger.debug(f'>>> {line}')
         return line
 
@@ -81,7 +81,7 @@ class Server:
                     line = '{} {}'.format(line, ' '.join(params))
         if '\n' in line:
             raise ValueError('writeline: Message should not be multi-lined')
-        self.writer.write(line.encode() + b'\r\n')
+        self.writer.write(line.encode(errors='surrogateescape') + b'\r\n')
         logger.debug(f'<<< {line}')
         if not exempt_event:
             self.fire_events(line, mine=True)
