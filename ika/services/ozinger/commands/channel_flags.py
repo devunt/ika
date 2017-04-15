@@ -20,11 +20,10 @@ class ChannelFlags(Command):
     description = (
         '오징어 IRC 네트워크에 등록되어 있는 채널의 권한을 보거나 설정합니다,'
         ' ',
-        '이 명령을 사용할 시 오징어 IRC 네트워크에 등록되어 있는 채널의 이용 권한을 보거나 설정하며,',
-        '개설자(파운더), 주인(오너), 보호된 사용자(프로텍트), 관리자(옵), 부관리자(하프옵), 발언권(보이스) 등의 권한이 설정 가능합니다.',
+        '이 명령을 사용할 시 오징어 IRC 네트워크에 등록되어 있는 채널의 이용 권한을 보거나 설정할 수 있습니다.',
         '권한 설정시 대상은 \x02이카\x02 (로그인 계정명) 혹은 \x02이카*!*@*\x02 (마스크) 형식으로 설정이 가능하며,',
+        '로그인 계정명을 대상으로 설정시 해당 계정으로 로그인 되어있는 유저가 \x02현재 해당 채널에 접속\x02해 있어야 합니다.'
         '권한은 \x02+OV-A\x02 (옵과 보이스 권한을 추가, 동시에 프로텍트 권한을 제거) 등으로 설정이 가능합니다.',
-        '권한 설정시 \x02Q\x02 권한은 이 명령을 이용해 지정이 불가능합니다.',
         ' ',
         '\x02현재 지원되는 권한의 목록은 다음과 같습니다:\x02',
         ' ',
@@ -36,7 +35,7 @@ class ChannelFlags(Command):
         for k, v in FlagsDefinition.MAP.items():
             description = f'  {colorize(v.character, v.color):<16} {colorize(v.name, v.color):<32}'
             if not v.mutable:
-                description += colorize('(변경 불가)', Color.RED)
+                description += colorize('(설정 불가)', Color.RED)
             descriptions.append(description)
         self.description += tuple(descriptions)
 
