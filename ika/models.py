@@ -117,10 +117,7 @@ class Flag(models.Model):
         if self.target_account:
             return self.target_account == irc_user.account
         else:
-            pattern = re.escape(self.target_mask)
-            pattern = pattern.replace('\*', '.+?')
-            pattern = '^{}$'.format(pattern)
-            return re.match(pattern, irc_user.mask, re.IGNORECASE) is not None
+            return irc_user.match_mask(self.target_mask)
 
     def save(self, *args, **kwargs):
         if (self.target_account and self.target_mask) or (not self.target_account and not self.target_mask):

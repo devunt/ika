@@ -1,3 +1,5 @@
+import re
+
 from ika.models import Account, Channel
 from ika.utils import tokenize_modestring
 
@@ -75,6 +77,12 @@ class IRCUser(IRCModeMixin):
     def __repr__(self):
         return f'<IRCUser {self.mask}>'
 
+    def match_mask(self, mask):
+        pattern = re.escape(mask)
+        pattern = pattern.replace('\*', '.+?')
+        pattern = '^{}$'.format(pattern)
+        return re.match(pattern, self.mask, re.IGNORECASE) is not None
+
     @property
     def mask(self):
         return '{}!{}@{}'.format(self.nick, self.ident, self.dhost)
@@ -133,7 +141,10 @@ class IRCChannel(IRCModeMixin):
             for uid in v:
                 self.usermodes[uid].remove(mode)
 
-    def generate_synchronizing_modestring(self, uid=None):
+    def generate_synchronizing_modestring(self, uid=None, account=None, mask=None):
+        if account and mask:
+            raise ValueError('Exactly one of [account, mask] must be set')
+
         if not self.channel:
             return ''
 
@@ -148,6 +159,12 @@ class IRCChannel(IRCModeMixin):
         for uid, umode in usermodes.items():
             user = self.users[uid]
             if user.is_service:
+                continue
+
+            if mask and (not user.match_mask(mask)):
+                continue
+
+            if account and (user.account != account):
                 continue
 
             flags = self.channel.get_flags_by_user(user)
