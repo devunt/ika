@@ -18,8 +18,8 @@ class Message(Enum):
 
 
 class Flags(IntFlag):
-    OWNER = 64
     FOUNDER = 32
+    OWNER = 64
     PROTECT = 4
     OP = 16
     HALFOP = 8
@@ -38,10 +38,11 @@ class Flags(IntFlag):
         return ''.join([colorize(v.character, v.color) for k, v in FlagsDefinition.MAP.items() if k in self])
 
     @classmethod
-    def get_by_character(cls, character):
-        for k, v in FlagsDefinition.MAP:
-            if v.character == character:
+    def get_by_character_for_mutation(cls, character):
+        for k, v in FlagsDefinition.MAP.items():
+            if v.mutable and (v.character == character):
                 return k
+        return 0
 
     @classmethod
     def get_all_characters(cls):
@@ -49,13 +50,15 @@ class Flags(IntFlag):
 
 
 class FlagsDefinition:
-    _ = namedtuple('Definition', ['character', 'mode', 'color'])
+    _ = namedtuple('Definition', ['character', 'mode', 'mutable', 'color'])
+    N = False
+    Y = True
 
     MAP = {
-        Flags.OWNER:   _('Q', 'q', Color.PURPLE),
-        Flags.FOUNDER: _('F', 'q', Color.PURPLE),
-        Flags.PROTECT: _('A', 'a', Color.RED),
-        Flags.OP:      _('O', 'o', Color.LIME),
-        Flags.HALFOP:  _('H', 'h', Color.CYAN),
-        Flags.VOICE:   _('V', 'v', Color.ORANGE),
+        Flags.FOUNDER: _('F', 'q', N, Color.PURPLE),
+        Flags.OWNER:   _('Q', 'q', Y, Color.PURPLE),
+        Flags.PROTECT: _('A', 'a', Y, Color.RED),
+        Flags.OP:      _('O', 'o', Y, Color.LIME),
+        Flags.HALFOP:  _('H', 'h', Y, Color.CYAN),
+        Flags.VOICE:   _('V', 'v', Y, Color.ORANGE),
     }

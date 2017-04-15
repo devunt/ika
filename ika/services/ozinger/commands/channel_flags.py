@@ -23,7 +23,7 @@ class ChannelFlags(Command):
         '개설자(파운더), 주인(오너), 보호된 사용자(프로텍트), 관리자(옵), 부관리자(하프옵), 발언권(보이스) 등의 권한이 설정 가능합니다.',
         '권한 설정시 대상은 \x02이카\x02 (로그인 계정명) 혹은 \x02이카*!*@*\x02 (마스크) 형식으로 설정이 가능하며,',
         '권한은 \x02+OV-A\x02 (옵과 보이스 권한을 추가, 동시에 프로텍트 권한을 제거) 등으로 설정이 가능합니다.',
-        '권한 설정시 Q 권한은 이 명령을 이용해 지정이 불가능합니다.',
+        '권한 설정시 \x02Q\x02 권한은 이 명령을 이용해 지정이 불가능합니다.',
     )
 
     async def execute(self, user, cname, target, flagstring):
@@ -63,9 +63,9 @@ class ChannelFlags(Command):
             flags = flag.flags
             adds, removes = tokenize_modestring(dict(D=Flags.get_all_characters()), flagstring)
             for c in adds.keys():
-                flags |= Flags.get_by_character(c)
+                flags |= Flags.get_by_character_for_mutation(c)
             for c in removes.keys():
-                flags &= ~Flags.get_by_character(c)
+                flags &= ~Flags.get_by_character_for_mutation(c)
 
             if flags == flag.flags:
                 self.err(user, '설정될 수 있는 권한이 없습니다.')
