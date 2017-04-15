@@ -17,6 +17,7 @@ link:
   host: 127.0.0.1
   port: 7002
   password: NYBAFAT
+  encoding: utf-8
 
 logging:
   irc:
