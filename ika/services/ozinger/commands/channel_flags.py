@@ -90,3 +90,11 @@ class ChannelFlags(Command):
                 self.msg(user, f'\x02{channel}\x02 채널의 \x02{flag.target}\x02 대상에게 해당 권한을 설정했습니다.')
             else:
                 self.msg(user, f'\x02{channel}\x02 채널의 \x02{flag.target}\x02 대상의 권한을 제거했습니다.')
+
+            if irc_channel:
+                if isinstance(target, Account):
+                    modestring = irc_channel.generate_synchronizing_modestring(account=target)
+                else:
+                    modestring = irc_channel.generate_synchronizing_modestring(mask=target)
+                if modestring:
+                    self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)
