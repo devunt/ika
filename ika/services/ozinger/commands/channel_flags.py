@@ -84,10 +84,10 @@ class ChannelFlags(Command):
             if flags == flag.flags:
                 self.err(user, '설정될 수 있는 권한이 없습니다.')
 
+            flag.flags = flags
+            flag.save()
+
             if flags:
-                flag.flags = flags
-                flag.save()
                 self.msg(user, f'\x02{channel}\x02 채널의 \x02{flag.target}\x02 대상에게 해당 권한을 설정했습니다.')
             else:
-                flag.delete()
                 self.msg(user, f'\x02{channel}\x02 채널의 \x02{flag.target}\x02 대상의 권한을 제거했습니다.')

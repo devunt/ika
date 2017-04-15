@@ -122,7 +122,10 @@ class Flag(models.Model):
     def save(self, *args, **kwargs):
         if (self.target_account and self.target_mask) or (not self.target_account and not self.target_mask):
             raise ValueError('Exactly one of [Flag.target_acount, Flag.target_mask] must be set')
-        super().save(*args, **kwargs)
+        if self.flags:
+            super().save(*args, **kwargs)
+        else:
+            self.delete()
 
     @classmethod
     def get(cls, channel, target) -> 'Flag':
