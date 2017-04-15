@@ -20,7 +20,12 @@ class ServerCommands(Listener):
         self.server.nicks[nick] = self.server.users[uid]
 
     def metadata(self, sid, uid_or_cname, field, data):
-        target = self.server.channels if uid_or_cname.startswith('#') else self.server.users
+        if uid_or_cname == '*':
+            return
+        elif uid_or_cname.startswith('#'):
+            target = self.server.channels
+        else:
+            target = self.server.users
 
         if data == '':
             del target[uid_or_cname].metadata[field]
