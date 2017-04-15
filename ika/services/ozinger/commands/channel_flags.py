@@ -59,12 +59,15 @@ class ChannelFlags(Command):
             for flag in channel.flags.all():
                 self.msg(user, f'  \x02{flag.target:<32}\x02 {flag.flags.coloredstring:<16} ({flag.updated_on.strftime("%Y-%m-%d %H:%M:%S")}에 마지막으로 변경됨)')
         else:
+            irc_channel = self.server.channels.get(cname)
+
             if not re.match(r'\S+!\S+@\S+', target):
                 account = Account.get(target)
-                if account:
-                    for irc_user in self.server.channels[cname].users.values():
+                if account and irc_channel:
+                    for irc_user in irc_channel.users.values():
                         if irc_user.account == account:
                             target = irc_user.account
+                            break
                 if not isinstance(target, Account):
                     self.err(user, f'\x02{channel}\x02 채널에 \x02{target}\x02 계정으로 로그인중인 유저가 존재하지 않습니다.')
 

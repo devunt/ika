@@ -24,10 +24,10 @@ class Register(Command):
 
     async def execute(self, user, email, password):
         if Nickname.get(user.nick) is not None:
-            self.err(user, '해당 닉네임 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', user.nick)
+            self.err(user, f'해당 닉네임 \x02{user.nick}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.')
 
         if Account.objects.filter(email__iexact=email).exists():
-            self.err(user, '해당 이메일 \x02{}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.', email)
+            self.err(user, f'해당 이메일 \x02{email}\x02 은 이미 오징어 IRC 네트워크에 등록되어 있습니다.')
 
         account = Account()
         account.email = email

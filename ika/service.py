@@ -68,7 +68,7 @@ class Service:
 
     @staticmethod
     def err(user_or_uid, line, *args, **kwargs):
-        raise CommandError(user_or_uid, line.format(args, **kwargs))
+        raise CommandError(user_or_uid, line.format(*args, **kwargs))
 
     def writesvsuserline(self, line, *args, **kwargs):
         self.server.writeuserline(self.uid, line, *args, **kwargs)
