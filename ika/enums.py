@@ -1,3 +1,4 @@
+from collections import namedtuple
 from enum import Enum, IntFlag
 
 from ika.format import Color, colorize
@@ -26,7 +27,7 @@ class Flags(IntFlag):
 
     @property
     def modes(self):
-        return set([v[1] for k, v in self.get_map() if k in self])
+        return set([v.mode for k, v in FlagsDefinition.MAP.items() if k in self])
 
     @property
     def modestring(self):
@@ -34,25 +35,27 @@ class Flags(IntFlag):
 
     @property
     def coloredstring(self):
-        return ''.join([colorize(v[0], v[2]) for k, v in self.get_map() if k in self])
+        return ''.join([colorize(v.character, v.color) for k, v in FlagsDefinition.MAP.items() if k in self])
 
     @classmethod
     def get_by_character(cls, character):
-        for k, v in cls.get_map():
-            if v[0] == character:
+        for k, v in FlagsDefinition.MAP:
+            if v.character == character:
                 return k
 
     @classmethod
     def get_all_characters(cls):
-        return [v[0] for k, v in cls.get_map()]
+        return [v.character for k, v in FlagsDefinition.MAP.items()]
 
-    @classmethod
-    def get_map(cls):
-        return {
-            cls.OWNER:   ('Q', 'q', Color.PURPLE),
-            cls.FOUNDER: ('F', 'q', Color.PURPLE),
-            cls.PROTECT: ('A', 'a', Color.RED),
-            cls.OP:      ('O', 'o', Color.LIME),
-            cls.HALFOP:  ('H', 'h', Color.CYAN),
-            cls.VOICE:   ('V', 'v', Color.ORANGE),
-        }.items()
+
+class FlagsDefinition:
+    _ = namedtuple('Definition', ['character', 'mode', 'color'])
+
+    MAP = {
+        Flags.OWNER:   _('Q', 'q', Color.PURPLE),
+        Flags.FOUNDER: _('F', 'q', Color.PURPLE),
+        Flags.PROTECT: _('A', 'a', Color.RED),
+        Flags.OP:      _('O', 'o', Color.LIME),
+        Flags.HALFOP:  _('H', 'h', Color.CYAN),
+        Flags.VOICE:   _('V', 'v', Color.ORANGE),
+    }
