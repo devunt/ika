@@ -12,6 +12,23 @@ class ServerCommands(Listener):
         if sid == self.server.linked_sid:
             self.server.register_service_irc_bots()
 
+    def squit(self, sid, quit_sid, reason):
+        uids_to_be_removed = list()
+        for uid, user in self.server.users.items():
+            if uid[:3] != quit_sid:
+                continue
+            while len(user.channels) > 0:
+                irc_channel = next(iter(self.server.users[uid].channels))
+                del irc_channel.users[uid]
+                del irc_channel.usermodes[uid]
+                if len(irc_channel.users) == 0:
+                    del self.server.channels[irc_channel.name]
+                user.channels.remove(irc_channel)
+            del self.server.nicks[user.nick]
+            uids_to_be_removed.append(uid)
+        for uid in uids_to_be_removed:
+            del self.server.users[uid]
+
     def ping(self, sid, origin, me):
         self.writeserverline('PONG', me, origin)
 
