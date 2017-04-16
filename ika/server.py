@@ -21,7 +21,7 @@ class Server:
         self.services = dict()
         self.service_bots = dict()
 
-        self._next_service_id = int('AAAAAA', 36)
+        self._next_service_id = int('AAAAAA', 36) - 1
 
         self.users = dict()
         self.nicks = CaseInsensitiveDict()

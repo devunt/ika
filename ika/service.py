@@ -102,20 +102,17 @@ class Service:
         if self.internal:
             return
 
-        _id = self.server.gen_next_service_id()
-        self.id = base36encode(_id)
         nicks = list(self.aliases)
-        nicks.insert(0, self.name)
+        nicks.append(self.name)
         for nick in nicks:
-            uid = f'{self.server.sid}{base36encode(_id)}'
-            self.uids.append(uid)
-            self.server.service_bots[uid] = self
-            self.writeserverline('UID', uid, unixtime(), nick, '0.0.0.0', self.server.name, self.ident, '0.0.0.0', unixtime(), '+Iiko', self.gecos)
-            self.server.writeuserline(uid, 'OPERTYPE Services')
+            self.id = base36encode(self.server.gen_next_service_id())
+            self.uids.append(self.uid)
+            self.server.service_bots[self.uid] = self
+            self.writeserverline('UID', self.uid, unixtime(), nick, '0.0.0.0', self.server.name, self.ident, '0.0.0.0', unixtime(), '+Iiko', self.gecos)
+            self.server.writeuserline(self.uid, 'OPERTYPE Services')
             irc_channel = self.server.channels.get(settings.logging.irc.channel)
             timestamp, modes = (irc_channel.timestamp, irc_channel.modestring) if irc_channel else (unixtime(), '+')
-            self.writeserverline('FJOIN', settings.logging.irc.channel, timestamp, modes, f'a,{uid}')
-            _id = self.server.gen_next_service_id()
+            self.writeserverline('FJOIN', settings.logging.irc.channel, timestamp, modes, f'a,{self.uid}')
 
     def register_modules(self, module_names):
         service_name = self.__module__
