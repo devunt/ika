@@ -47,3 +47,6 @@ class ServerCommands(Listener):
             self.server.channels[cname].users[uid] = self.server.users[uid]
             self.server.channels[cname].usermodes[uid] = set(mode)
             self.server.users[uid].channels.add(self.server.channels[cname])
+
+    def sysnick(self, sid, uid, nick, timestamp):
+        self.server.users[uid].nick = nick
