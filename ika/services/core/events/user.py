@@ -16,7 +16,10 @@ class UserCommands(Listener):
             self.server.writeuserline(service.uid, 'IDLE', uid, self.server.users[service.uid].signon, 0)
 
     def nick(self, uid, nick, timestamp):
-        self.server.users[uid].nick = nick
+        irc_user = self.server.users[uid]
+        del self.server.nicks[irc_user.nick]
+        irc_user.nick = nick
+        self.server.nicks[irc_user.nick] = irc_user
 
     def fhost(self, uid, dhost):
         self.server.users[uid].dhost = dhost

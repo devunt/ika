@@ -49,5 +49,8 @@ class ServerCommands(Listener):
             self.server.channels[cname].usermodes[uid] = set(mode)
             self.server.users[uid].channels.add(self.server.channels[cname])
 
-    def sysnick(self, sid, uid, nick, timestamp):
-        self.server.users[uid].nick = nick
+    def svsnick(self, sid, uid, nick, timestamp):
+        irc_user = self.server.users[uid]
+        del self.server.nicks[irc_user.nick]
+        irc_user.nick = nick
+        self.server.nicks[irc_user.nick] = irc_user
