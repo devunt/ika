@@ -13,6 +13,7 @@ class Server:
         self.description = settings.server.description
         self.sid = settings.server.sid
         self.link = settings.link
+        self.linked_sid = None
 
         self.core_event_listener = EventListener()
         self.event_listener = EventListener()
@@ -98,12 +99,9 @@ class Server:
     def fire_events(self, line, mine=False):
         message_type, prefix, command, params = parseline(line)
 
-        if (message_type is Message.USER) or (message_type is Message.SERVER):
-            params.insert(0, prefix)
-
-        getattr(self.core_event_listener, command)(*params)
+        getattr(self.core_event_listener, command)(prefix, *params)
         if (not mine) and (not self.bursting):
-            getattr(self.event_listener, command)(*params)
+            getattr(self.event_listener, command)(prefix, *params)
 
     def register_services(self):
         self.register_service('core')
