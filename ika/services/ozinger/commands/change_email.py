@@ -17,7 +17,7 @@ class ChangeEmail(Command):
     )
 
     async def execute(self, user, password, new_email):
-        if user.account.password == password:
+        if user.account.check_password(password):
             account = user.account
             account.email = new_email
             account.save()

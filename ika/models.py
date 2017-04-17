@@ -1,4 +1,3 @@
-import re
 from django.db import models
 from django.contrib.auth.hashers import check_password, make_password
 
