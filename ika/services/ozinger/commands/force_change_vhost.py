@@ -20,7 +20,7 @@ class ForceChangeVirtualHost(Command):
         account = Account.get(name)
         if account is None:
             self.err(user, '등록되지 않은 계정입니다.')
-        account.vhost = new_vhost
+        account.vhost = new_vhost or ''
         account.save()
         self.writesvsuserline('CHGHOST', user.uid, account.vhost or user.host)
         self.msg(user, '\x02{}\x02 계정의 가상 호스트가 \x02{}\x02 로 변경되었습니다.', user.account, new_vhost or '(없음)')

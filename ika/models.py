@@ -8,7 +8,7 @@ from ika.enums import Flags
 class Account(models.Model):
     email = models.EmailField(max_length=255)
     password = models.CharField(max_length=128)
-    vhost = models.CharField(max_length=255, null=True)
+    vhost = models.CharField(max_length=255)
     created_on = models.DateTimeField(auto_now_add=True)
     authenticated_on = models.DateTimeField(auto_now_add=True)
 
