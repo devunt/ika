@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.hashers import check_password, make_password
+from jsonfield import JSONField
 
 from ika.enums import Flags
 
@@ -59,6 +60,7 @@ class Nickname(models.Model):
 class Channel(models.Model):
     name = models.CharField(max_length=255, unique=True)
     created_on = models.DateTimeField(auto_now_add=True)
+    data = JSONField()
 
     def __str__(self):
         return self.name
