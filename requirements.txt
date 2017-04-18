@@ -1,6 +1,7 @@
 appdirs==1.4.3
 contextlib2==0.5.4
 Django==1.11
+dnspython==1.15.0
 packaging==16.8
 pyparsing==2.2.0
 pytz==2017.2
