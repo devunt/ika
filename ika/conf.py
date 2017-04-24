@@ -36,6 +36,11 @@ DATABASES = {
     }
 }
 
+PASSWORD_HASHERS = (
+    'ika.hashers.PasslibBCryptSHA256PasswordHasher',
+    'ika.hashers.PasslibMD5CryptPasswordHasher',
+)
+
 INSTALLED_APPS = (
     'ika',
 )
