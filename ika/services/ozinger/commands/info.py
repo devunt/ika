@@ -33,9 +33,12 @@ class Information(Command):
                     # 채널이 존재하지 않으나 권한이 없는 이용자에게는 채널의 존재 여부를 알려줄 수 없음
                     self.err(user, '해당 명령을 실행할 권한이 없습니다.')
             self.msg(user, '\x02=== {} 채널 정보 ===\x02', channel)
-            self.msg(user, '채널 설립자: {}', ', '.join(map(lambda x: x.target, filter(lambda x: Flags.FOUNDER in x.flags, channel.flags))))
-            self.msg(user, '채널 주인: {}', ', '.join(map(lambda x: x.target, filter(lambda x: Flags.OWNER in x.flags, channel.flags))))
+            self.msg(user, '채널 설립자: {}', ', '.join(map(lambda x: x.target, filter(lambda x: Flags.FOUNDER in x.flags, channel.flags.all()))) or '(없음)')
+            self.msg(user, '채널 주인: {}', ', '.join(map(lambda x: x.target, filter(lambda x: Flags.OWNER in x.flags, channel.flags.all()))) or '(없음)')
             self.msg(user, '채널 등록일: {}', channel.created_on)
+            self.msg(user, '채널 진입글: {}', channel.data.get('entrymsg', '(없음)'))
+            self.msg(user, '채널 웹사이트: {}', channel.data.get('url', '(없음)'))
+            self.msg(user, '채널 이메일: {}', channel.data.get('email', '(없음)'))
         else:
             if name is None:
                 account = user.account
@@ -52,3 +55,7 @@ class Information(Command):
             self.msg(user, '가상 호스트: {}', account.vhost or '없음')
             self.msg(user, '계정 등록일: {}', account.created_on)
             self.msg(user, '마지막 로그인: {}', account.authenticated_on)
+            self.msg(user, ' ')
+            self.msg(user, '보유중인 채널 권한 목록:')
+            for flag in account.channel_flags.all():
+                self.msg(user, f'\x02{flag.channel.name:<32}\x02 {flag.flags.coloredstring}')
