@@ -16,38 +16,40 @@ application = get_wsgi_application()
 
 
 def main():
-    if len(sys.argv) > 1:
-        if sys.argv[1] in ('makemigrations',):
-            execute_from_command_line(sys.argv)
-            return
+    if len(sys.argv) == 1:
+        print("Usage: ./run.py run")
+        return
 
-    from django.db.migrations.executor import MigrationExecutor
+    if sys.argv[1] in ('makemigrations',):
+        execute_from_command_line(sys.argv)
+    elif sys.argv[1] == 'run':
+        from django.db.migrations.executor import MigrationExecutor
 
-    connection = connections[DEFAULT_DB_ALIAS]
-    connection.prepare_database()
-    executor = MigrationExecutor(connection)
-    plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
+        connection = connections[DEFAULT_DB_ALIAS]
+        connection.prepare_database()
+        executor = MigrationExecutor(connection)
+        plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
 
-    if len(plan) > 0:
-        print('Synchronizing database schemas...')
-        call_command('migrate')
-        print()
-        print('Starting application...')
+        if len(plan) > 0:
+            print('Synchronizing database schemas...')
+            call_command('migrate')
+            print()
+            print('Starting application...')
 
-    loop = asyncio.get_event_loop()
+        loop = asyncio.get_event_loop()
 
-    ika = Server()
-    ika.register_services()
+        ika = Server()
+        ika.register_services()
 
-    try:
-        loop.run_until_complete(ika.connect())
-    except KeyboardInterrupt:
-        ika.disconnect('Manually interrupted by console access')
-    except:
-        ika.disconnect('Exception has occured in the main loop')
-        logger.exception('Exception has occured in the main loop')
-    finally:
-        loop.close()
+        try:
+            loop.run_until_complete(ika.connect())
+        except KeyboardInterrupt:
+            ika.disconnect('Manually interrupted by console access')
+        except:
+            ika.disconnect('Exception has occured in the main loop')
+            logger.exception('Exception has occured in the main loop')
+        finally:
+            loop.close()
 
 
 if __name__ == '__main__':
