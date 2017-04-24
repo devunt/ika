@@ -17,12 +17,12 @@ class ChannelJoin(Listener):
 
             entrymsg = channel.data.get('entrymsg')
             if entrymsg:
-                self.msg(uid, f'\x02[{channel.name}] {entrymsg}\x02')
+                self.msg(uid, f'\x02[{channel.name}]\x02 {entrymsg}')
 
             url = channel.data.get('url')
             if url:
-                self.msg(uid, f'\x02[{channel.name}] 채널 웹사이트: {url}\x02')
+                self.msg(uid, f'\x02[{channel.name}]\x02 채널 웹사이트: {url}')
 
             email = channel.data.get('email')
             if email:
-                self.msg(uid, f'\x02[{channel.name}] 채널 이메일: {email}\x02')
+                self.msg(uid, f'\x02[{channel.name}]\x02 채널 이메일: {email}')
