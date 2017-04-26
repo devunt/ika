@@ -27,6 +27,9 @@ logging:
     level: WARNING
   console:
     level: DEBUG
+  file:
+    level: DEBUG
+    name: ika.log
 
 services:
   ozinger:

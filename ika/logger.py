@@ -17,3 +17,8 @@ if settings.logging.sentry.dsn is not None:
 
 logger = logging.getLogger('ika')
 logger.setLevel(getattr(logging, settings.logging.console.level))
+
+file_handler = logging.FileHandler(settings.logging.file.name)
+file_handler.setLevel(settings.logging.file.level)
+
+logger.addHandler(logging.FileHandler(settings.logging.file.name))
