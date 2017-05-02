@@ -1,7 +1,6 @@
 import asyncio
 
 from ika.conf import settings
-from ika.enums import Message
 from ika.event import EventListener
 from ika.logger import logger
 from ika.utils import CaseInsensitiveDict, import_class_from_module, parseline

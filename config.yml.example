@@ -1,5 +1,5 @@
 database:
-  # 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+  # `postgresql_psycopg2`, `mysql`, `sqlite3` or `oracle`.
   engine: sqlite3
   name: ika.sqlite3
   host:
@@ -16,9 +16,9 @@ link:
   name: kanade.irc.ozinger.org
   host: 127.0.0.1
   port: 7002
-  password: NYBAFAT
   ssl: strict  # `strict`, `noverify`, `no`.
   encoding: utf-8
+  password: NYBAFAT
 
 logging:
   irc:
@@ -29,8 +29,8 @@ logging:
   console:
     level: DEBUG
   file:
-    level: DEBUG
     name: ika.log
+    level: DEBUG
 
 services:
   ozinger:
