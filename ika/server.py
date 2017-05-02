@@ -33,7 +33,15 @@ class Server:
         self.bursting = False
 
     async def connect(self):
-        self.reader, self.writer = await asyncio.open_connection(self.link.host, self.link.port)
+        sc = False
+        if self.link.ssl != 'no':
+            import ssl
+            sc = ssl.create_default_context()
+            if self.link.ssl == 'noverify':
+                sc.check_hostname = False
+                sc.verify_mode = ssl.CERT_NONE
+
+        self.reader, self.writer = await asyncio.open_connection(self.link.host, self.link.port, ssl=sc)
         logger.debug('Connected')
 
         self.writeline('SERVER', self.name, self.link.password, 0, self.sid, self.description, exempt_event=True)
