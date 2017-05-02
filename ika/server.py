@@ -157,5 +157,6 @@ class Server:
     def disconnect(self, reason=''):
         for instance in self.services.values():
             instance.unload_irc_bots(reason=reason)
-        self.writeserverline('SQUIT', self.link.name, reason, exempt_event=True)
-        self.writeserverline(f'ERROR :Service disconnected ({reason})', exempt_event=True)
+        if self.linked_sid:
+            self.writeserverline('SQUIT', self.link.name, reason, exempt_event=True)
+            self.writeserverline(f'ERROR :Service disconnected ({reason})', exempt_event=True)
