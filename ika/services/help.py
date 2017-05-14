@@ -32,7 +32,7 @@ class Help(Command):
         if isinstance(target, Service):
             self.msg(user, ' ')
             commands = set()
-            for _, command in self.service.commands.items():
+            for _, command in sorted(self.service.commands.items(), key=lambda x: x[1].name):
                 if ((command.permission is Permission.LOGIN_REQUIRED) and (user.account is None)) or \
                         ((command.permission is Permission.OPERATOR) and (not user.is_operator)):
                     continue
