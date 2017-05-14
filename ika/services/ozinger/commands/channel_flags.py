@@ -14,7 +14,7 @@ class ChannelFlags(Command):
         'CHANNELFLAGS',
         'FLAGS',
     )
-    syntax = '<#채널명> [대상] [권한]'
+    syntax = '<#채널명> [<대상> <권한>]'
     regex = r'(?P<cname>#\S+)( (?P<target>\S+) (?P<flagstring>[A-Za-z\+\-]+))?'
     permission = Permission.LOGIN_REQUIRED
     description = (
