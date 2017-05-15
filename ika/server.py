@@ -33,7 +33,7 @@ class Server:
 
     async def connect(self):
         sc = False
-        if self.link.ssl != 'no':
+        if self.link.ssl:
             import ssl
             sc = ssl.create_default_context()
             if self.link.ssl == 'noverify':
