@@ -6,6 +6,9 @@ class UserCommands(Listener):
         if target_uid_or_cname.startswith(self.server.sid):
             self.server.service_bots[target_uid_or_cname].process_command(self.server.users[uid], message)
 
+    def notice(self, uid, target_uid_or_cname, message):
+        self.privmsg(uid, target_uid_or_cname, message)
+
     def opertype(self, uid, opertype):
         self.server.users[uid].opertype = opertype
         self.server.users[uid].update_modes('+o')
