@@ -41,6 +41,7 @@ def tokenize_modestring(modesdef, modestring, *params) -> (dict, dict):
 def parseline(line: str) -> (Message, str, str, list):
     prefix = None
     message_type = Message.INVALID
+    line = line.strip()
     if line[0] == ':':
         prefix, line = line.split(' ', 1)
         prefix = prefix[1:]
