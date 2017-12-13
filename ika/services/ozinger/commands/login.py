@@ -40,4 +40,5 @@ class Login(Command):
             self.writesvsuserline('CHGHOST', user.uid, account.vhost)
         for irc_channel in user.channels:
             modestring = irc_channel.generate_synchronizing_modestring(user.uid)
-            self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)
+            if modestring:
+                self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)
