@@ -60,7 +60,7 @@ class Nickname(models.Model):
 class Channel(models.Model):
     name = models.CharField(max_length=255, unique=True)
     created_on = models.DateTimeField(auto_now_add=True)
-    data = JSONField()
+    data = JSONField(default={})
 
     def __str__(self):
         return self.name
