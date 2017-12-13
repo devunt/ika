@@ -15,6 +15,7 @@ class ForceSynchronise(Command):
         ' ',
         '이 명령을 사용할 시 오징어 IRC 네트워크에 등록되어 있는 채널들의 권한 상태를 강제로 데이터베이스와 동기화합니다.',
         '채널명을 지정할 시 해당 채널만, 지정하지 않을 시 네트워크에 등록되어 있는 모든 채널들을 동기화합니다.',
+        '서비스봇이 채널에 진입해있지 않았을 경우, 채널에 진입합니다.',
     )
 
     async def execute(self, user, name):
@@ -32,6 +33,7 @@ class ForceSynchronise(Command):
             if irc_channel is None:
                 continue
 
+            self.service.join_channel(irc_channel.name)
             modestring = irc_channel.generate_synchronizing_modestring()
             if modestring:
                 self.writesvsuserline('FMODE', irc_channel.name, irc_channel.timestamp, modestring)

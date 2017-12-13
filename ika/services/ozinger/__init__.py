@@ -17,8 +17,11 @@ class Ozinger(Service):
 
     def join_channel(self, cname):
         irc_channel = self.server.channels.get(cname)
-        timestamp, modestring = (irc_channel.timestamp, irc_channel.modestring) if irc_channel else (unixtime(), '+')
-        self.writeserverline('FJOIN', cname, timestamp, modestring, f'o,{self.uid}')
+        if self.uid not in irc_channel.users:
+            timestamp, modestring = (irc_channel.timestamp, irc_channel.modestring) if irc_channel else (unixtime(), '+')
+            self.writeserverline('FJOIN', cname, timestamp, modestring, f'o,{self.uid}')
 
     def part_channel(self, cname, reason=None):
-        self.writesvsuserline('PART', cname, reason or 'Never left without saying goodbye')
+        irc_channel = self.server.channels.get(cname)
+        if self.uid in irc_channel.users:
+            self.writesvsuserline('PART', cname, reason or 'Never left without saying goodbye')
