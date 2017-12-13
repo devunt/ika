@@ -134,7 +134,11 @@ class IRCChannel(IRCModeMixin):
 
     @property
     def channel(self):
-        return Channel.get(self.name)
+        try:
+            return Channel.get(self.name)
+        except UnicodeEncodeError:
+            # surrogates are not allowed.
+            return None
 
     def update_modes(self, *modes):
         super().update_modes(*modes)
