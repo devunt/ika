@@ -3,7 +3,7 @@ import re
 from ika.service import Listener
 
 
-class ChannelMention(Listener):
+class Fantasy(Listener):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pattern = re.compile(r'^{}(,|:)( (?P<line>.+))?$'.format(re.escape(self.service.name)))
