@@ -17,7 +17,7 @@ class Censorship(Listener):
             return
 
         for name, pattern in self.patterns.items():
-            m = pattern.match(message)
+            m = pattern.search(message)
             if m:
                 usermask = self.server.users[uid].mask
                 rule_id = md5(name.encode()).hexdiget()[:10]
