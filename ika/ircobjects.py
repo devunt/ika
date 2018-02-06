@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from ika.models import Account, Channel
 from ika.utils import tokenize_modestring
@@ -94,6 +95,10 @@ class IRCUser(IRCModeMixin):
     def account(self) -> Account:
         name = self.metadata.get('accountname')
         return name and Account.get(name)
+
+    @property
+    def connected_at(self):
+        return datetime.fromtimestamp(self.signon)
 
     @property
     def is_operator(self):

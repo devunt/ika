@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, timedelta
 from hashlib import md5
 
 from ika.service import Listener
@@ -16,6 +17,12 @@ class Censorship(Listener):
         if not target_uid_or_cname.startswith('#'):
             return
 
+        user = self.server.users[uid]
+
+        # 접속 시간 5분 미만 유저에게만 censorship 적용
+        if (user.connected_at - datetime.now()) > timedelta(minutes=5):
+            return
+
         for name, pattern in self.patterns.items():
             m = pattern.search(message)
             if m:
@@ -23,5 +30,6 @@ class Censorship(Listener):
                 rule_id = md5(name.encode()).hexdigest()[:10]
                 self.writesvsuserline('KICK', target_uid_or_cname, uid, f'이용자 보호 규칙 ({rule_id}) 위반')
                 self.writesvsuserline(f'PRIVMSG {settings.logging.irc.channel} : \x02[ika]\x02 '
-                                      f'User {usermask} violated censorship rule `{name}` with next message: {message}')
+                                      f'User {usermask} violated censorship rule `{name}` on {target_uid_or_cname} '
+                                      f'with next message: {message}')
                 break
