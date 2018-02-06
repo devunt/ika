@@ -20,7 +20,7 @@ class Censorship(Listener):
         user = self.server.users[uid]
 
         # 접속 시간 5분 미만 유저에게만 censorship 적용
-        if (user.connected_at - datetime.now()) > timedelta(minutes=5):
+        if (datetime.now() - user.connected_at) > timedelta(minutes=5):
             return
 
         for name, pattern in self.patterns.items():
