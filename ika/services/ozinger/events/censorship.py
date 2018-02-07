@@ -10,7 +10,7 @@ class Censorship(Listener):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.patterns = {
-            'supernet': re.compile(r's\s*u\s*p\s*e\s*r\s*n\s*e\s*t\s*s'),
+            'supernet': re.compile(r's\s*u\s*p\s*e\s*r\s*n\s*e\s*t\s*s', re.IGNORECASE),
         }
 
     async def privmsg(self, uid, target_uid_or_cname, message):
