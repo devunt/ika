@@ -67,6 +67,9 @@ class ServerCommands(Listener):
             self.server.users[uid].channels.add(self.server.channels[cname])
 
     def svsnick(self, sid, uid, nick, timestamp):
+        if uid not in self.server.users:
+            return
+
         irc_user = self.server.users[uid]
         del self.server.nicks[irc_user.nick]
         irc_user.nick = nick
