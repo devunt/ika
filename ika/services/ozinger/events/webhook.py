@@ -1,6 +1,7 @@
 import asyncio
 import aiohttp
 import json
+import re
 from aiohttp import web
 from ika.service import Listener
 from ika.conf import settings
@@ -8,6 +9,8 @@ from ika.models import Application, Channel
 
 
 class Webhook(Listener):
+    RE_NICK = re.compile(r'^[A-Za-z0-9가-힣_]{1,16}$')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -97,10 +100,14 @@ class Webhook(Listener):
         if not nick or not target or not text or ' ' in nick or ' ' in target:
             return {'type': 'invalid_payload'}
 
+        if not self.RE_NICK.match(nick):
+            return {'type': 'invalid_payload'}
+
         if target.startswith('#'):
             channel = Channel.get(target)
             if not channel or not app.channels.filter(pk=channel.pk).exists():
                 return {'type': 'unauthorized_channel'}
+            await self.__on_channel_msg(channel, app.slug, nick, text)
         else:
             return {'type': 'invalid_target'}
 
@@ -111,6 +118,18 @@ class Webhook(Listener):
         mask = f'{nick}+{slug}!{slug}@{slug}.api.ozinger.org'
         self.writesvsuserline(f'FAKEMSG {mask} {target} {text}')
 
+    async def __on_channel_msg(self, channel, origin, nick, text):
+        for app in channel.apps.all():
+            for _id, ws in self.wss:
+                if _id == app.id:
+                    await ws.send_json({
+                        'type': 'message',
+                        'origin': origin,
+                        'nick': nick,
+                        'target': channel.name,
+                        'text': text,
+                    })
+
     async def privmsg(self, uid, target_uid_or_cname, message):
         if not target_uid_or_cname.startswith('#'):
             return
@@ -119,12 +138,4 @@ class Webhook(Listener):
         if not channel:
             return
 
-        for app in channel.apps.all():
-            for _id, ws in self.wss:
-                if _id == app.id:
-                    await ws.send_json({
-                        'type': 'message',
-                        'nick': uid,
-                        'target': target_uid_or_cname,
-                        'text': message,
-                    })
+        await self.__on_channel_msg(channel, None, self.server.users[uid].nick, message)

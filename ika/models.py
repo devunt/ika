@@ -151,7 +151,7 @@ class Flag(models.Model):
 
 
 class Application(models.Model):
-    RE_TOKEN = re.compile('(?P<id>\d+)@(?P<secret_key>[a-z0-9]{32})')
+    RE_TOKEN = re.compile(r'(?P<id>\d+)@(?P<secret_key>[a-z0-9]{32})')
 
     name = models.CharField(max_length=32, unique=True)
     slug = models.CharField(max_length=8, unique=True)
