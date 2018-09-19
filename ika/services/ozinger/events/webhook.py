@@ -31,6 +31,7 @@ class Webhook(Listener):
         asyncio.ensure_future(self.__shutdown_webapp())
 
     async def __run_webapp(self):
+        await self.service.webhook_lock.acquire()
         self.runner = web.AppRunner(self.app)
         await self.runner.setup()
         site = web.TCPSite(self.runner, settings.webhook.host, settings.webhook.port)
