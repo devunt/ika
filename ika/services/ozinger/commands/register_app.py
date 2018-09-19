@@ -9,7 +9,7 @@ class RegisterApp(Command):
         'NEWAPP',
         'REGISTERAPP',
     )
-    syntax = '<앱 이름> <앱 약어 (최대 4자)>'
+    syntax = '<앱 이름> <앱 약어 (최대 8자)>'
     regex = r'(?P<appname>\S+) (?P<appslug>[a-z]{1,8})'
     permission = Permission.LOGIN_REQUIRED
     description = (
@@ -18,7 +18,7 @@ class RegisterApp(Command):
         '이 명령을 사용할 시 오징어 IRC 네트워크에 해당 앱을 등록하며,',
         '그 뒤로 네트워크에서 제공하는 여러 앱 전용 기능등을 이용하실 수 있습니다.',
         ' ',
-        '앱 약어는 영문 소문자 최소 1글자에서 최대 4글자까지 입력하실 수 있습니다.',
+        '앱 약어는 영문 소문자 최소 1글자에서 최대 8글자까지 입력하실 수 있습니다.',
         '앱 이름과 앱 약어는 모두 고유하며, 공백은 허용되지 않습니다.',
     )
 
