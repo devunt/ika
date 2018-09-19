@@ -64,7 +64,7 @@ class Webhook(Listener):
                                 await ws.send_json({'type': 'authed', 'name': app.name, 'slug': app.slug})
                                 self.wss.append((app.id, ws))
                             else:
-                                return {'type': 'invalid_token'}
+                                await ws.send_json({'type': 'invalid_token'})
                         else:
                             await ws.send_json({'type': 'invalid_payload'})
                     elif action == 'message':
