@@ -1,3 +1,5 @@
+import re
+import uuid
 from django.db import models
 from django.contrib.auth.hashers import check_password, make_password
 from jsonfield import JSONField
@@ -146,3 +148,28 @@ class Flag(models.Model):
 
     class Meta:
         unique_together = ('channel', 'target_account', 'target_mask')
+
+
+class Application(models.Model):
+    RE_TOKEN = re.compile('(?P<id>\d+)@(?P<secret_key>[a-z0-9]{32})')
+
+    name = models.CharField(max_length=32, unique=True)
+    slug = models.CharField(max_length=4, unique=True)
+    developer = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='apps')
+    secret_key = models.UUIDField(default=uuid.uuid4)
+    channels = models.ManyToManyField(Channel, related_name='apps')
+
+    @property
+    def token(self):
+        return f'{self.id}@{self.secret_key.hex}'
+
+    @classmethod
+    def get_by_token(cls, token):
+        if not token:
+            return None
+
+        m = cls.RE_TOKEN.match(token)
+        if not m:
+            return None
+
+        return cls.objects.filter(id=m['id'], secret_key=m['secret_key']).first()

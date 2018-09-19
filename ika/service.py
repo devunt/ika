@@ -29,6 +29,7 @@ class Service:
     internal = False
 
     def __init__(self, server):
+        self.listeners = list()
         self.commands = CaseInsensitiveDict()
         self.event_handlers = list()
         self.uids = list()
@@ -146,6 +147,7 @@ class Service:
             for command_name in instance.names:
                 self.commands[command_name] = instance
         elif isinstance(instance, Listener):
+            self.listeners.append(instance)
             methods = inspect.getmembers(instance, inspect.ismethod)
             for method_name, handler in methods:
                 if not method_name.startswith('__'):
@@ -159,7 +161,10 @@ class Service:
     def unload_modules(self):
         for hook, handler in self.event_handlers:
             hook -= handler
+        for listener in self.listeners:
+            listener.__uninit__()
         self.commands = CaseInsensitiveDict()
+        self.listeners = list()
         self.event_handlers = list()
 
     def unload_irc_bots(self, reason=''):
@@ -250,5 +255,5 @@ class Command(Module):
 
 
 class Listener(Module):
-    pass
-
+    def __uninit__(self):
+        pass
