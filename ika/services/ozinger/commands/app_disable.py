@@ -42,3 +42,4 @@ class EnableApp(Command):
         channel.apps.remove(app)
 
         self.msg(user, f'해당 채널 \x02{channel.name}\x02에 \x02{app.name}\x02 앱이 비활성화되었습니다.')
+        self.writesvsuserline(f'NOTICE {channel.name} : {user.nick} 님이 채널에서 {app.name} 앱을 제거했습니다.')

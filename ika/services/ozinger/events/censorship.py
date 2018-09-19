@@ -29,7 +29,6 @@ class Censorship(Listener):
                 usermask = user.mask
                 rule_id = md5(name.encode()).hexdigest()[:7]
                 self.writesvsuserline('KICK', target_uid_or_cname, uid, f'이용자 보호 규칙 위반 ({rule_id})')
-                self.writesvsuserline(f'PRIVMSG {settings.logging.irc.channel} : \x02[ika]\x02 '
-                                      f'User {usermask} violated censorship rule `{name}` on {target_uid_or_cname} '
-                                      f'with next message: {message}')
+                self.notify_admins(f'User {usermask} violated censorship rule `{name}` on {target_uid_or_cname} '
+                                   f'with next message: {message}')
                 break

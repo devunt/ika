@@ -10,7 +10,7 @@ class RegisterApp(Command):
         'REGISTERAPP',
     )
     syntax = '<앱 이름> <앱 약어 (최대 4자)>'
-    regex = r'(?P<appname>\S+) (?P<appslug>[a-z]{1,4})'
+    regex = r'(?P<appname>\S+) (?P<appslug>[a-z]{1,8})'
     permission = Permission.LOGIN_REQUIRED
     description = (
         '오징어 IRC 네트워크에 앱을 등록합니다.',
@@ -37,3 +37,4 @@ class RegisterApp(Command):
 
         self.msg(user, f'해당 앱 \x02{appname}\x02 의 등록이 완료되었습니다. '
                        f'API 토큰은 다음과 같습니다: [ \x02{app.token}\x02 ]')
+        self.notify_admins(f'New app `{appname}` ({app.slug}) by {app.developer}')

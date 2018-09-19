@@ -154,7 +154,7 @@ class Application(models.Model):
     RE_TOKEN = re.compile('(?P<id>\d+)@(?P<secret_key>[a-z0-9]{32})')
 
     name = models.CharField(max_length=32, unique=True)
-    slug = models.CharField(max_length=4, unique=True)
+    slug = models.CharField(max_length=8, unique=True)
     developer = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='apps')
     secret_key = models.UUIDField(default=uuid.uuid4)
     channels = models.ManyToManyField(Channel, related_name='apps')

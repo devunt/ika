@@ -77,6 +77,9 @@ class Service:
     def writeserverline(self, line, *args, **kwargs):
         self.server.writeserverline(line, *args, **kwargs)
 
+    def notify_admins(self, line, *args, **kwargs):
+        self.writesvsuserline(f'PRIVMSG {settings.logging.irc.channel} : \x02[ika]\x02 {line}', *args, **kwargs)
+
     def process_command(self, user, line):
         if self.internal:
             return
@@ -205,6 +208,9 @@ class Module:
 
     def writeserverline(self, line, *args, **kwargs):
         self.service.writeserverline(line, *args, **kwargs)
+
+    def notify_admins(self, line, *args, **kwargs):
+        self.service.notify_admins(line, *args, **kwargs)
 
 
 class Command(Module):
