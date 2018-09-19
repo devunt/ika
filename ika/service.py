@@ -138,7 +138,7 @@ class Service:
 
         self.register_module('ika.services.help')
         for service_module_name in service_module_names:
-            self.register_module(f'{service_module_name}')
+            self.register_module(service_module_name)
 
     def register_module(self, module_name):
         instance = import_class_from_module(module_name)(self)

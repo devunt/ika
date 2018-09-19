@@ -57,7 +57,7 @@ class Server:
         if line == b'':
             raise RuntimeError('Disconnected')
         line = line.decode(self.link.encoding, errors='surrogateescape').rstrip('\r\n')
-        logger.debug(f'>>> {line}')
+        logger.debug(f'<<< {line}')
         return line
 
     def writeline(self, line, *args, **kwargs):
@@ -90,7 +90,7 @@ class Server:
         if '\n' in line:
             raise ValueError('writeline: Message should not be multi-lined')
         self.writer.write(line.encode(self.link.encoding, errors='surrogateescape') + b'\r\n')
-        logger.debug(f'<<< {line}')
+        logger.debug(f'>>> {line}')
         if not exempt_event:
             self.fire_events(line, mine=True)
 

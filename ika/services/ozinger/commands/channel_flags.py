@@ -18,7 +18,7 @@ class ChannelFlags(Command):
     regex = r'(?P<cname>#\S+)( (?P<target>\S+) (?P<flagstring>[A-Za-z\+\-]+))?'
     permission = Permission.LOGIN_REQUIRED
     description = (
-        '오징어 IRC 네트워크에 등록되어 있는 채널의 권한을 보거나 설정합니다,'
+        '오징어 IRC 네트워크에 등록되어 있는 채널의 권한을 보거나 설정합니다.'
         ' ',
         '이 명령을 사용할 시 오징어 IRC 네트워크에 등록되어 있는 채널의 이용 권한을 보거나 설정할 수 있습니다.',
         '권한 설정시 대상은 \x02이카\x02 (로그인 계정명) 혹은 \x02이카*!*@*\x02 (마스크) 형식으로 설정이 가능하며,',
