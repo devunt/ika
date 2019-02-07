@@ -59,6 +59,7 @@ class ServerCommands(Listener):
     def fjoin(self, sid, cname, timestamp, *modes_n_umodes):
         if cname not in self.server.channels:
             self.server.channels[cname] = IRCChannel(cname, timestamp)
+        self.server.channels[cname].timestamp = timestamp
         self.server.channels[cname].update_modes(*modes_n_umodes[:-1])
         for umode in modes_n_umodes[-1].split():
             mode, uid = umode.split(',')
