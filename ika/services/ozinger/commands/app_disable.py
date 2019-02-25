@@ -3,7 +3,7 @@ from ika.models import Application, Channel
 from ika.enums import Flags
 
 
-class EnableApp(Command):
+class DisableApp(Command):
     name = '앱비활성화'
     aliases = (
         '앱떼기',
