@@ -77,7 +77,7 @@ class MessageConsumer(AsyncJsonWebsocketConsumer):
         await self.respond(
             code='message',
             origin=event['origin'],
-            nick=event['sender'],
+            sender=event['sender'],
             target=event['target'],
             message=event['message'],
         )
