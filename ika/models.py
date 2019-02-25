@@ -168,7 +168,7 @@ class Application(models.Model):
         if not token:
             return None
 
-        m = cls.RE_TOKEN.match(token)
+        m = cls.RE_TOKEN.match(str(token))
         if not m:
             return None
 

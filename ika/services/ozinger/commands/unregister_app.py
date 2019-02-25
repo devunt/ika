@@ -2,7 +2,7 @@ from ika.service import Command, Permission
 from ika.models import Application
 
 
-class RegisterApp(Command):
+class UnregisterApp(Command):
     name = '앱등록해제'
     aliases = (
         '앱삭제',

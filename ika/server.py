@@ -1,4 +1,5 @@
 import asyncio
+import aioredis
 
 from ika.conf import settings
 from ika.event import EventListener
@@ -28,6 +29,10 @@ class Server:
 
         self.reader = None
         self.writer = None
+
+        self.redis_pub_conn = None
+        self.redis_sub_conn = None
+        self.redis_sub_channel = None
 
         self.bursting = False
 

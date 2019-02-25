@@ -20,7 +20,7 @@ def main():
         print("Usage: ./run.py run")
         return
 
-    if sys.argv[1] in ('makemigrations',):
+    if sys.argv[1] in ('makemigrations', 'runserver',):
         execute_from_command_line(sys.argv)
     elif sys.argv[1] == 'run':
         from django.db.migrations.executor import MigrationExecutor
@@ -50,7 +50,6 @@ def main():
             logger.exception('Exception has occured in the main loop')
         finally:
             loop.close()
-
 
 if __name__ == '__main__':
     main()
