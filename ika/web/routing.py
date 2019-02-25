@@ -4,12 +4,12 @@ from django.conf.urls import url
 from . import controllers
 
 urlpatterns = [
-    url(r'^message$', controllers.MessageView.as_view()),
+    url(r'^chat$', controllers.MessageView.as_view()),
 ]
 
 application = ProtocolTypeRouter({
     'websocket': URLRouter([
-        url(r'^ws$', controllers.MessageConsumer),
+        url(r'^chat$', controllers.MessageConsumer),
     ]),
 })
 
