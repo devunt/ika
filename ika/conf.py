@@ -49,6 +49,7 @@ INSTALLED_APPS = (
 SECRET_KEY = 'ika'
 
 DEBUG = settings.debug
+ALLOWED_HOSTS = settings.web.allowed_hosts
 ROOT_URLCONF = 'ika.web.routing'
 ASGI_APPLICATION = 'ika.web.routing.application'
 CHANNEL_LAYERS = {
