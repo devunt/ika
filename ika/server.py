@@ -1,4 +1,5 @@
 import asyncio
+import aioredis
 
 from ika.conf import settings
 from ika.event import EventListener
@@ -29,9 +30,15 @@ class Server:
         self.reader = None
         self.writer = None
 
+        self.redis_pub_conn = None
+        self.redis_sub_conn = None
+        self.redis_sub_channel = None
+
         self.bursting = False
 
     async def connect(self):
+        await self.connect_redis()
+
         sc = False
         if self.link.ssl:
             import ssl
@@ -51,6 +58,24 @@ class Server:
                 continue
 
             self.fire_events(line)
+
+    async def connect_redis(self):
+        self.redis_pub_conn = await aioredis.create_redis(settings.redis.url)
+        self.redis_sub_conn = await aioredis.create_redis(settings.redis.url)
+        self.redis_sub_channel, = await self.redis_sub_conn.subscribe(settings.redis.subscribe_channel)
+
+        asyncio.ensure_future(self.redis_reader())
+
+    async def redis_reader(self):
+        while await self.redis_sub_channel.wait_message():
+            try:
+                message = await self.redis_sub_channel.get_json()
+                self.writeline(message['line'])
+            except:
+                logger.exception('Exception has occured while processing game message')
+
+    async def redis_writeline(self, data):
+        await self.redis_pub_conn.publish_json(settings.redis.publish_channel, data)
 
     async def readline(self):
         line = await self.reader.readline()
@@ -109,6 +134,12 @@ class Server:
         getattr(self.core_event_listener, command)(prefix, *params)
         if (not mine) and (not self.bursting):
             getattr(self.event_listener, command)(prefix, *params)
+
+        asyncio.ensure_future(self.redis_writeline({
+            'prefix': prefix,
+            'command': command,
+            'params': params,
+        }))
 
     def register_services(self):
         self.register_service('core')

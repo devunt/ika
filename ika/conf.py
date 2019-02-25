@@ -42,7 +42,20 @@ PASSWORD_HASHERS = (
 )
 
 INSTALLED_APPS = (
+    'channels',
     'ika',
 )
 
 SECRET_KEY = 'ika'
+
+DEBUG = settings.debug
+ROOT_URLCONF = 'ika.web.urls'
+ASGI_APPLICATION = 'ika.web.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [settings.redis.url],
+        },
+    },
+}
