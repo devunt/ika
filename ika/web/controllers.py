@@ -115,7 +115,7 @@ def handle_message_action(app, payload):
     else:
         return 'invalid_target'
 
-    mask = f'{sender}+{app.slug}!{sender}+{app.slug}@{app.slug}-app.api.ozinger.org'
+    mask = f'{sender}+!{app.slug}@{app.slug}.apps.api.ozinger.org'
 
     async_to_sync(channel_layer.send)('ika_reverse', {
         'type': 'ika.reversed_message',
